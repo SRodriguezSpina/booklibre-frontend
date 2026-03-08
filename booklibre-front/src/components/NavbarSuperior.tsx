@@ -24,15 +24,18 @@ export const NavItem = ({ text, to }: NavItemProps) => {
 export const NavbarSuperior = () => {
     const items: NavItemProps[] = [
         { text: 'Inicio', to: '/home' },
-        { text: 'Mis préstamos', to: '/' },
+        { text: 'Mis Préstamos', to: '/' },
         { text: 'Perfil', to: '/perfil' }
     ]
 
     return (
-        <section className="flex justify-center bg-surface">
+        <section className="flex justify-center bg-surface border-b">
             {/* acá el logo del programita */}
-            <nav className="fixed top-0 h-18 bg-surface max-w-2x1 w-full">
-                <ul className="flex gap-x-10 items-center pb-2 pt-4">
+            <div className="bg-red-500 p-10">
+                test
+            </div>
+            <nav className="h-16 max-w-2xl w-full">
+                <ul className="flex gap-10 list-none">
                     {items.map(item => (
                         <NavItem
                             key={item.to}
