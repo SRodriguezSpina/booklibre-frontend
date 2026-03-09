@@ -24,13 +24,13 @@ export const NavItem = ({ text, to }: NavItemProps) => {
 export const NavbarSuperior = () => {
     const items: NavItemProps[] = [
         { text: 'Inicio', to: '/home' },
-        { text: 'Mis Préstamos', to: '/' },
+        { text: 'Mis Préstamos', to: '/prestamos' },
         { text: 'Perfil', to: '/perfil' }
     ]
 
     return (
-        <section className="bg-surface border-b">
-            <nav className="h-16 w-full flex items-center justify-between px-6">
+        <section className="bg-background">
+            <nav className="h-16 w-full flex items-center justify-between px-6 max-w-6xl mx-auto">
                 <div className="flex items-center gap-8">
                     <div className="w-8 h-8 bg-primary rounded">
                         <img
@@ -48,8 +48,9 @@ export const NavbarSuperior = () => {
                     </ul>
                 </div>
 
-                <div className="flex items-center gap-2 text-sm text-secondary">
+                <div className="flex items-center gap-3 text-sm text-secondary">
                         <span>120 pnts</span>
+                        <div className="w-8 h-8 rounded-full bg-secondary/10" />
                 </div>
             </nav>
         </section>

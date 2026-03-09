@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-type PropsCard = {
+export type PropsCard = {
   children: ReactNode
   className?: string
 }
@@ -8,14 +8,14 @@ type PropsCard = {
 export function Card({ children, className = '' }: PropsCard) {
   return (
     <div
-      className={`rounded-xl border border-secondary/20 bg-surface p-4 shadow-sm ${className}`}
+      className={`rounded-3xl border border-gray-200/80 bg-surface p-5 shadow-[0_18px_40px_rgba(15,23,42,0.06)] ${className}`}
     >
       {children}
     </div>
   )
 }
 
-type PropsCardHeader = {
+export type PropsCardHeader = {
   titulo: string
   icono?: ReactNode
   className?: string
@@ -29,3 +29,4 @@ export function CardHeader({ titulo, icono, className = '' }: PropsCardHeader) {
     </div>
   )
 }
+

@@ -1,11 +1,11 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
-type VarianteBoton = 'primario' | 'secundario' | 'gris' | 'outline' | 'ghost'
+export type VarianteBoton = 'primario' | 'secundario' | 'gris' | 'outline' | 'ghost'
 
-type PropsBoton = {
+export type PropsBoton = {
   tipo?: VarianteBoton
   children?: ReactNode
-  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
+  alClic?: (e: React.MouseEvent<HTMLButtonElement>) => void
   deshabilitado?: boolean
   className?: string
   type?: ButtonHTMLAttributes<HTMLButtonElement>['type']
@@ -23,18 +23,20 @@ const estilosPorVariante: Record<VarianteBoton, string> = {
 export function Boton({
   tipo = 'primario',
   children,
-  onClick,
+  alClic,
   deshabilitado = false,
   className = '',
   type = 'button',
   'data-testid': idPrueba = 'boton',
 }: PropsBoton) {
-  const clasesBase = 'inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
+  const clasesBase =
+    'inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
+
   return (
     <button
       type={type}
       className={`${clasesBase} ${estilosPorVariante[tipo]} ${className}`}
-      onClick={onClick}
+      onClick={alClic}
       disabled={deshabilitado}
       data-testid={idPrueba}
     >
@@ -42,3 +44,4 @@ export function Boton({
     </button>
   )
 }
+

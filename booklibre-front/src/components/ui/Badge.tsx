@@ -1,6 +1,6 @@
-type VarianteBadge = 'exito' | 'advertencia' | 'neutral'
+export type VarianteBadge = 'exito' | 'advertencia' | 'neutral'
 
-type PropsBadge = {
+export type PropsBadge = {
   children: string
   variante?: VarianteBadge
   className?: string
@@ -21,3 +21,4 @@ export function Badge({ children, variante = 'neutral', className = '' }: PropsB
     </span>
   )
 }
+

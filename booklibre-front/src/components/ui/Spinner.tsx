@@ -1,4 +1,4 @@
-type PropsSpinner = {
+export type PropsSpinner = {
   className?: string
 }
 
@@ -15,3 +15,4 @@ export function Spinner({ className = '' }: PropsSpinner) {
     </div>
   )
 }
+

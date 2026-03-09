@@ -3,7 +3,7 @@ export type Pestaña = {
   etiqueta: string
 }
 
-type PropsTabs = {
+export type PropsTabs = {
   pestañas: Pestaña[]
   idActivo: string
   alCambiar: (id: string) => void
@@ -30,3 +30,4 @@ export function Tabs({ pestañas, idActivo, alCambiar, className = '' }: PropsTa
     </div>
   )
 }
+
