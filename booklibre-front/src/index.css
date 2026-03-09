@@ -1,5 +1,17 @@
 @import 'tailwindcss';
-
+:root {
+  --color-primary-light: #7fa2b1;
+    --color-primary: #577c8e;
+    --color-primary-dark: #3f5c69;
+  
+    --color-secondary-light: #4a5f77;
+    --color-secondary: #2f4157;
+    --color-secondary-dark: #1e2a38;
+  
+    --color-background: #f4efeb;
+    --color-surface: #ffffff;
+    --color-accent: #c7d9e5;
+}
 body {
   font-family: var(--font-family);
 }

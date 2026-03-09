@@ -3,19 +3,24 @@ import { MainLayoutWrapper } from "./layouts/MainLayoutWrapper";
 import { Home } from "./pages/Home";
 
 export function AppRouter() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        {/* <Route path="/auth/:mode" element={<AuthForm />} /> */}
-        {/* chequeo de autentucación, sino al login */}
-        {/* <Route element={<ProtectedLayout />}> */}
-            {/* navbar superior */}
-            <Route element={<MainLayoutWrapper />}>
-                <Route path='/' element={<Home />} />
+    return (
+        <BrowserRouter>
+            <Routes>
+                {/* <Route path="/auth/:mode" element={<AuthForm />} /> */}
+                {/* chequeo de autentucación, sino al login */}
+                {/* <Route element={<ProtectedLayout />}> */}
+                {/* navbar superior */}
+                <Route element={<MainLayoutWrapper />}>
+
+                    <Route index element={<Navigate to='/home' />} />
+                
+                    <Route path='home' element={<Home />} />
+                    {/* <Route path='prestamos' element={<Prestamos />} /> */}
+                    {/* <Route path='perfil' element={<Perfil />} /> */}
             </Route>
-        {/* </Route> */}
-      
-      </Routes>
-    </BrowserRouter>
-  )
+                {/* </Route> */}
+
+            </Routes>
+        </BrowserRouter>
+    )
 }
