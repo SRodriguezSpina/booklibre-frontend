@@ -9,6 +9,7 @@ export type PropsGestionMisLibros = {
 }
 
 type Filtro = 'todos' | 'disponibles' | 'prestados'
+type CampoOrden = 'titulo' | 'estado' | 'fecha'
 
 const pestañas: Pestaña[] = [
   { id: 'todos', etiqueta: 'Todos' },
@@ -25,22 +26,57 @@ const filtrarLibros = (libros: Libro[], filtro: Filtro) => {
 export const GestionMisLibros = ({ libros }: PropsGestionMisLibros) => {
   const [filtro, setFiltro] = useState<Filtro>('todos')
   const [pagina, setPagina] = useState(1)
+  const [campoOrden, setCampoOrden] = useState<CampoOrden>('titulo')
+  const [sentidoOrden, setSentidoOrden] = useState<'ascendente' | 'descendente'>('ascendente')
   const porPagina = 3
 
   const librosFiltrados = useMemo(() => filtrarLibros(libros, filtro), [libros, filtro])
 
-  const totalPaginas = Math.max(1, Math.ceil(librosFiltrados.length / porPagina))
+  const librosOrdenados = useMemo(() => {
+    const copia = [...librosFiltrados]
+
+    copia.sort((a, b) => {
+      let resultado = 0
+      if (campoOrden === 'titulo') {
+        resultado = a.titulo.localeCompare(b.titulo)
+      } else if (campoOrden === 'estado') {
+        resultado = a.estado.localeCompare(b.estado)
+      } else if (campoOrden === 'fecha') {
+        resultado = new Date(a.fechaAgregado).getTime() - new Date(b.fechaAgregado).getTime()
+      }
+
+      return sentidoOrden === 'ascendente' ? resultado : -resultado
+    })
+
+    return copia
+  }, [librosFiltrados, campoOrden, sentidoOrden])
+
+  const totalPaginas = Math.max(1, Math.ceil(librosOrdenados.length / porPagina))
   const paginaAjustada = Math.min(pagina, totalPaginas)
   const inicio = (paginaAjustada - 1) * porPagina
   const fin = inicio + porPagina
-  const librosPagina = librosFiltrados.slice(inicio, fin)
+  const librosPagina = librosOrdenados.slice(inicio, fin)
+
+  const cambiarOrden = (campo: CampoOrden) => {
+    if (campoOrden === campo) {
+      setSentidoOrden(sentidoOrden === 'ascendente' ? 'descendente' : 'ascendente')
+    } else {
+      setCampoOrden(campo)
+      setSentidoOrden('ascendente')
+    }
+    setPagina(1)
+  }
 
   return (
     <Card className="p-0 overflow-hidden rounded-3xl">
       <div className="px-6 pt-6 pb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-secondary">Gestión de Mis Libros</h2>
-        <Boton tipo="gris" alClic={() => {}} className="px-4 py-2 text-sm">
-          + Agregar Nuevo Libro
+        <Boton
+          tipo="secundario"
+          alClic={() => {}}
+          className="px-5 py-2 text-sm rounded-full shadow-sm"
+        >
+          + Agregar nuevo libro
         </Boton>
       </div>
 
@@ -56,10 +92,15 @@ export const GestionMisLibros = ({ libros }: PropsGestionMisLibros) => {
       </div>
 
       <div className="px-6 pt-4">
-        <TablaLibros libros={librosPagina} />
+        <TablaLibros
+          libros={librosPagina}
+          campoOrden={campoOrden}
+          sentidoOrden={sentidoOrden}
+          alCambiarOrden={cambiarOrden}
+        />
         <div className="text-xs text-secondary/60 mt-2">
-          Mostrando {librosFiltrados.length === 0 ? 0 : inicio + 1}–{Math.min(fin, librosFiltrados.length)} de{' '}
-          {librosFiltrados.length} libros
+          Mostrando {librosOrdenados.length === 0 ? 0 : inicio + 1}–
+          {Math.min(fin, librosOrdenados.length)} de {librosOrdenados.length} libros
         </div>
         <Paginacion
           pagina={paginaAjustada}

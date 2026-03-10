@@ -3,6 +3,9 @@ import type { Libro } from '../../models/libroModel'
 
 export type PropsTablaLibros = {
   libros: Libro[]
+  campoOrden: 'titulo' | 'estado' | 'fecha'
+  sentidoOrden: 'ascendente' | 'descendente'
+  alCambiarOrden: (campo: 'titulo' | 'estado' | 'fecha') => void
 }
 
 const badgePorEstado = (estado: Libro['estado']) => {
@@ -10,15 +13,58 @@ const badgePorEstado = (estado: Libro['estado']) => {
   return { variante: 'advertencia' as const, texto: 'Prestado' }
 }
 
-export const TablaLibros = ({ libros }: PropsTablaLibros) => {
+const IconoOrden = ({
+  activo,
+  sentido,
+}: {
+  activo: boolean
+  sentido: 'ascendente' | 'descendente'
+}) => {
+  if (!activo) return <span className="ml-1 text-gray-300">↕</span>
+  return <span className="ml-1 text-gray-500">{sentido === 'ascendente' ? '↑' : '↓'}</span>
+}
+
+export const TablaLibros = ({
+  libros,
+  campoOrden,
+  sentidoOrden,
+  alCambiarOrden,
+}: PropsTablaLibros) => {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left text-sm">
         <thead className="text-xs text-secondary/60">
           <tr className="border-b border-gray-200">
-            <th className="py-3 font-medium">TÍTULO Y AUTOR</th>
-            <th className="py-3 font-medium">DISPONIBLE</th>
-            <th className="py-3 font-medium">AGREGADO</th>
+            <th className="py-3 font-medium">
+              <button
+                type="button"
+                className="inline-flex items-center gap-1 hover:text-secondary"
+                onClick={() => alCambiarOrden('titulo')}
+              >
+                TÍTULO Y AUTOR
+                <IconoOrden activo={campoOrden === 'titulo'} sentido={sentidoOrden} />
+              </button>
+            </th>
+            <th className="py-3 font-medium">
+              <button
+                type="button"
+                className="inline-flex items-center gap-1 hover:text-secondary"
+                onClick={() => alCambiarOrden('estado')}
+              >
+                DISPONIBLE
+                <IconoOrden activo={campoOrden === 'estado'} sentido={sentidoOrden} />
+              </button>
+            </th>
+            <th className="py-3 font-medium">
+              <button
+                type="button"
+                className="inline-flex items-center gap-1 hover:text-secondary"
+                onClick={() => alCambiarOrden('fecha')}
+              >
+                AGREGADO
+                <IconoOrden activo={campoOrden === 'fecha'} sentido={sentidoOrden} />
+              </button>
+            </th>
             <th className="py-3 text-right pr-4 font-medium">ACCIONES</th>
           </tr>
         </thead>

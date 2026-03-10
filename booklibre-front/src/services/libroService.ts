@@ -4,10 +4,10 @@ import type { Libro } from '../models/libroModel'
 import { librosMock } from '../mocks/librosMock'
 
 class LibroService {
-  async obtenerLibrosDeUsuario(_idUsuario: number): Promise<Libro[]> {
+  async obtenerLibrosDeUsuario(idUsuario: number): Promise<Libro[]> {
     if (!API_URL) return librosMock
     try {
-      const response = await axios.get<Libro[]>(`${API_URL}/usuario/${_idUsuario}/libros`)
+      const response = await axios.get<Libro[]>(`${API_URL}/usuario/${idUsuario}/libros`)
       return response.data
     } catch {
       return librosMock

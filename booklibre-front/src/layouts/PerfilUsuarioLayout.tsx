@@ -19,7 +19,7 @@ export const PerfilUsuarioLayout = () => {
 
   const cargarUsuario = async () => {
     try {
-      const response = await usuarioService.obtenerUsuario(1)
+      const response = await usuarioService.obtenerUsuario(1) // hardcodeado por ahora
       setUsuario(response)
     } catch (e: unknown) {
       setError(obtenerMensajeError(e))

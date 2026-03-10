@@ -3,9 +3,12 @@ import type { Usuario } from '../../models/usuarioModel'
 
 export type PropsPerfilResumen = {
   usuario: Usuario
+  editando: boolean
+  onEditar: () => void
+  onCancelar: () => void
 }
 
-export const PerfilResumen = ({ usuario }: PropsPerfilResumen) => {
+export const PerfilResumen = ({ usuario, editando, onEditar, onCancelar }: PropsPerfilResumen) => {
   return (
     <section className="bg-gradient-to-r from-surface to-accent/10 rounded-3xl border border-white/70 shadow-[0_18px_40px_rgba(15,23,42,0.08)] px-8 py-6 flex items-center justify-between gap-8">
       <div className="flex items-center gap-5">
@@ -24,9 +27,23 @@ export const PerfilResumen = ({ usuario }: PropsPerfilResumen) => {
       </div>
 
       <div className="min-w-[150px] flex justify-end">
-        <Boton tipo="secundario" className="w-full" alClic={() => {}}>
-          Editar Perfil
-        </Boton>
+        {editando ? (
+          <Boton
+            tipo="secundario"
+            className="w-full px-5 py-2.5 text-sm rounded-full"
+            alClic={onCancelar}
+          >
+            Cancelar edición
+          </Boton>
+        ) : (
+          <Boton
+            tipo="secundario"
+            className="w-full px-5 py-2.5 text-sm rounded-full shadow-sm"
+            alClic={onEditar}
+          >
+            Editar perfil
+          </Boton>
+        )}
       </div>
     </section>
   )

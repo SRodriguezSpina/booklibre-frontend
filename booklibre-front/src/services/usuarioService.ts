@@ -4,10 +4,10 @@ import type { Usuario } from '../models/usuarioModel'
 import { usuarioMock } from '../mocks/usuarioMock'
 
 class UsuarioService {
-  async obtenerUsuario(id: number): Promise<Usuario> {
+  async obtenerUsuario(idUsuario: number): Promise<Usuario> {
     if (!API_URL) return usuarioMock
     try {
-      const response = await axios.get<Usuario>(`${API_URL}/usuario/${id}`)
+      const response = await axios.get<Usuario>(`${API_URL}/usuario/${idUsuario}`)
       return response.data
     } catch {
       return usuarioMock

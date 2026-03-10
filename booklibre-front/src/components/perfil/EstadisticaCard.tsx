@@ -1,12 +1,12 @@
 import { Card } from '../ui'
 
-export type PropsStatCard = {
+export type PropsEstadisticaCard = {
   valor: number
   etiqueta: string
   claseFondo?: string
 }
 
-export const StatCard = ({ valor, etiqueta, claseFondo = 'bg-accent/10' }: PropsStatCard) => {
+export const EstadisticaCard = ({ valor, etiqueta, claseFondo = 'bg-accent/10' }: PropsEstadisticaCard) => {
   return (
     <Card className={`flex flex-col items-center justify-center py-6 border-none ${claseFondo}`}>
       <div className="text-2xl font-semibold text-secondary">{valor}</div>
