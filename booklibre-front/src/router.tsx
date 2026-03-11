@@ -2,6 +2,9 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { MainLayoutWrapper } from "./layouts/MainLayoutWrapper"
 import { Home } from "./pages/Home"
 import { DetallePrestamos } from "./pages/DetallePrestamos"
+import { Login } from "./pages/Login"
+import { Register } from "./pages/Register"
+
 
 export function AppRouter() {
   return (
@@ -16,6 +19,8 @@ export function AppRouter() {
 
           <Route path="home" element={<Home />} />
           <Route path="mis-prestamos" element={<DetallePrestamos />} />
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
           {/* <Route path='perfil' element={<Perfil />} /> */}
         </Route>
         {/* </Route> */}
