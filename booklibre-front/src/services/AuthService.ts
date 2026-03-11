@@ -1,14 +1,13 @@
 import axios from "axios"
 import type { RegisterData, LoginData, AuthResponseUsuario } from "../types/UsuarioTypes"
-
-const REST_SERVER_URL = "http://localhost:8080"
+import { API_BASE_URL } from "../env"
 
 class AuthService {
   // ── Auth ──────────────────────────────────────────────────────────────────
 
   async login(data: LoginData): Promise<AuthResponseUsuario> {
     const response = await axios.post<AuthResponseUsuario>(
-      `${REST_SERVER_URL}/api/login`,
+      `${API_BASE_URL}/api/login`,
       data,
     )
     if (response.data.success && response.data.usuario) {
@@ -20,7 +19,7 @@ class AuthService {
 
   async registro(data: RegisterData): Promise<AuthResponseUsuario> {
     const response = await axios.post<AuthResponseUsuario>(
-      `${REST_SERVER_URL}/api/registro`,
+      `${API_BASE_URL}/api/registro`,
       data,
     )
     return response.data

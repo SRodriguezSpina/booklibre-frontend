@@ -1,7 +1,7 @@
 import { useOutletContext } from 'react-router-dom'
-import { useAlIniciar } from '../utils/hooks'
+import { useOnInit } from '../utils/hooks'
 import { libroService } from '../services/libroService'
-import type { Libro } from '../models/libroModel'
+import { Libro } from '../classes/Libro'
 import type { Usuario } from '../models/usuarioModel'
 import { useEffect, useState } from 'react'
 import type { ContextoPerfilUsuario } from '../layouts/PerfilUsuarioLayout'
@@ -19,11 +19,16 @@ export const PerfilUsuario = () => {
   const [borradorUsuario, setBorradorUsuario] = useState<Usuario>(usuario)
 
   const cargarLibros = async () => {
-    const response = await libroService.obtenerLibrosDeUsuario(usuario.id)
-    setLibros(response)
+    try {
+      const response = await libroService.obtenerLibrosDeUsuario(usuario.id)
+      setLibros(response)
+    } catch {
+      setLibros([])
+      toast.error('No se pudieron cargar tus libros.')
+    }
   }
 
-  useAlIniciar(() => {
+  useOnInit(() => {
     void cargarLibros()
   })
 
@@ -55,57 +60,46 @@ export const PerfilUsuario = () => {
     }
   }
 
-  const manejarAgregarLibro = async () => {
-    try {
-      const nuevo = await libroService.agregarLibro(usuario.id, {
-        titulo: 'Nuevo Libro',
-        autor: 'Autor Desconocido',
-      })
-      setLibros([...libros, nuevo])
-      toast.success('¡Libro agregado!')
-    } catch (e) {
-      toast.error('Error al agregar libro')
-    }
+  const manejarAgregarLibro = () => {
+    toast.info('Funcionalidad para agregar libro próximamente.')
   }
 
-  const cantidadPrestados = libros.filter((l) => l.estado === 'Prestado').length
+  const cantidadPrestados = libros.filter((l) => !l.estoyDisponible()).length
 
   return (
-    <div className="bg-background min-h-[calc(100vh-4rem)] px-4 py-8 md:px-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-        <PerfilResumen
-          usuario={borradorUsuario}
-          editando={editando}
-          onEditar={comenzarEdicion}
-        />
+    <div className="max-w-6xl mx-auto space-y-8">
+      <PerfilResumen
+        usuario={borradorUsuario}
+        editando={editando}
+        onEditar={comenzarEdicion}
+      />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-4 space-y-6">
-            <MisDatosCard
-              usuario={borradorUsuario}
-              editando={editando}
-              onCambioUsuario={setBorradorUsuario}
-              onGuardar={guardarEdicion}
-              onCancelar={cancelarEdicion}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="lg:col-span-4 space-y-6">
+          <MisDatosCard
+            usuario={borradorUsuario}
+            editando={editando}
+            onCambioUsuario={setBorradorUsuario}
+            onGuardar={guardarEdicion}
+            onCancelar={cancelarEdicion}
+          />
+
+          <div className="grid grid-cols-2 gap-4">
+            <EstadisticaCard
+              valor={cantidadPrestados}
+              etiqueta="Libros Prestados"
+              claseFondo="bg-[#fdf2f2]"
             />
-
-            <div className="grid grid-cols-2 gap-4">
-              <EstadisticaCard
-                valor={cantidadPrestados}
-                etiqueta="Libros Prestados"
-                claseFondo="bg-[#fdf2f2]"
-              />
-              <EstadisticaCard
-                valor={libros.length}
-                etiqueta="Libros Leídos"
-                claseFondo="bg-[#f5f3ff]"
-              />
-            </div>
+            <EstadisticaCard
+              valor={libros.length}
+              etiqueta="Mis Libros"
+              claseFondo="bg-[#f5f3ff]"
+            />
           </div>
+        </div>
 
-          <div className="lg:col-span-8">
-            <GestionMisLibros libros={libros} onAgregar={manejarAgregarLibro} />
-          </div>
+        <div className="lg:col-span-8">
+          <GestionMisLibros libros={libros} onAgregar={manejarAgregarLibro} />
         </div>
       </div>
     </div>

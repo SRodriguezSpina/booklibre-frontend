@@ -1,6 +1,6 @@
 import { Badge } from '../ui'
 import { Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
-import type { Libro } from '../../models/libroModel'
+import { Libro } from '../../classes/Libro'
 
 export type PropsTablaLibros = {
   libros: Libro[]
@@ -9,10 +9,10 @@ export type PropsTablaLibros = {
   alCambiarOrden: (campo: 'titulo' | 'estado' | 'fecha') => void
 }
 
-const CONFIG_ESTADOS: Record<Libro['estado'], { variante: 'exito' | 'advertencia'; texto: string }> = {
-  Disponible: { variante: 'exito', texto: 'Disponible' },
-  Prestado: { variante: 'advertencia', texto: 'Prestado' },
-}
+const getBadge = (libro: Libro) =>
+  libro.estoyDisponible()
+    ? { variante: 'exito' as const, texto: 'Disponible' }
+    : { variante: 'advertencia' as const, texto: 'Prestado' }
 
 const IconoOrden = ({ activo, sentido }: { activo: boolean; sentido: 'ascendente' | 'descendente' }) => {
   if (!activo) return <ChevronsUpDown className="ml-1 w-3 h-3 text-gray-300" />
@@ -21,18 +21,14 @@ const IconoOrden = ({ activo, sentido }: { activo: boolean; sentido: 'ascendente
     : <ChevronDown className="ml-1 w-3 h-3 text-secondary" />
 }
 
+const formatearFecha = (fechaStr?: string) => {
+  if (!fechaStr) return 'Sin préstamo activo'
+  return new Date(fechaStr)
+    .toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' })
+    .replace('.', '')
+}
+
 export const TablaLibros = ({ libros, campoOrden, sentidoOrden, alCambiarOrden }: PropsTablaLibros) => {
-
-  // Formateador de fecha simple (ej: 05 Ago, 2023)
-  const formatearFecha = (fechaStr: string) => {
-    const fecha = new Date(fechaStr)
-    return fecha.toLocaleDateString('es-AR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    }).replace('.', '')
-  }
-
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left text-sm">
@@ -64,7 +60,7 @@ export const TablaLibros = ({ libros, campoOrden, sentidoOrden, alCambiarOrden }
                 className="inline-flex items-center hover:text-secondary transition-colors"
                 onClick={() => alCambiarOrden('fecha')}
               >
-                Agregado
+                Devolución
                 <IconoOrden activo={campoOrden === 'fecha'} sentido={sentidoOrden} />
               </button>
             </th>
@@ -73,18 +69,14 @@ export const TablaLibros = ({ libros, campoOrden, sentidoOrden, alCambiarOrden }
         </thead>
         <tbody className="divide-y divide-gray-50">
           {libros.map((libro) => {
-            const { variante, texto } = CONFIG_ESTADOS[libro.estado]
+            const { variante, texto } = getBadge(libro)
             return (
               <tr key={libro.id} className="group hover:bg-gray-50/50 transition-colors">
                 <td className="py-4">
                   <div className="flex items-center gap-4">
-                    {libro.portadaUrl ? (
-                      <img src={libro.portadaUrl} alt={libro.titulo} className="w-10 h-14 rounded-md object-cover shadow-sm" />
-                    ) : (
-                      <div className="w-10 h-14 rounded-md bg-secondary/5 flex items-center justify-center text-[10px] text-secondary/30 border border-secondary/10">
-                        No image
-                      </div>
-                    )}
+                    <div className="w-10 h-14 rounded-md bg-secondary/5 flex items-center justify-center text-[10px] text-secondary/30 border border-secondary/10 shrink-0">
+                      📖
+                    </div>
                     <div>
                       <div className="font-bold text-secondary text-base">{libro.titulo}</div>
                       <div className="text-xs text-secondary/50 font-medium">{libro.autor}</div>
@@ -95,7 +87,7 @@ export const TablaLibros = ({ libros, campoOrden, sentidoOrden, alCambiarOrden }
                   <Badge variante={variante}>{texto}</Badge>
                 </td>
                 <td className="py-4 text-secondary/60 font-medium">
-                  {formatearFecha(libro.fechaAgregado)}
+                  {formatearFecha(libro.fechaDevolucion)}
                 </td>
                 <td className="py-4">
                   <div className="flex justify-end gap-2 pr-4 text-secondary/40">
@@ -115,4 +107,3 @@ export const TablaLibros = ({ libros, campoOrden, sentidoOrden, alCambiarOrden }
     </div>
   )
 }
-

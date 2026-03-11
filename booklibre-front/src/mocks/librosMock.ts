@@ -1,32 +1,33 @@
-import type { Libro } from '../models/libroModel'
+import type { LibroDTO } from '../models/libroModel'
 
-export const librosMock: Libro[] = [
+export const librosMock: LibroDTO[] = [
   {
-    id: '1',
+    id: 1,
     titulo: 'El Gran Gatsby',
     autor: 'F. Scott Fitzgerald',
-    genero: 'Literatura Clásica',
-    portadaUrl: null,
-    estado: 'Disponible',
-    fechaAgregado: '2023-10-24',
+    tipo: 'Común',
+    paginas: 180,
+    estado: 'Muy bueno',
+    propietarioId: 1,
   },
   {
-    id: '2',
+    id: 2,
     titulo: 'Sistemas de Diseño',
-    autor: 'Adi Huriwits',
-    genero: 'Diseño',
-    portadaUrl: null,
-    estado: 'Prestado',
-    fechaAgregado: '2023-09-12',
+    autor: 'Adi Hurwitz',
+    tipo: 'Común',
+    paginas: 320,
+    estado: 'Excelente',
+    propietarioId: 1,
+    alquiladoPorId: 2,
+    fechaDevolucion: '2026-04-15',
   },
   {
-    id: '3',
+    id: 3,
     titulo: 'La Biblioteca de la Medianoche',
     autor: 'Matt Haig',
-    genero: 'Ciencia Ficción',
-    portadaUrl: null,
-    estado: 'Disponible',
-    fechaAgregado: '2023-08-05',
+    tipo: 'Con dedicatoria',
+    paginas: 288,
+    estado: 'Bueno',
+    propietarioId: 1,
   },
 ]
-

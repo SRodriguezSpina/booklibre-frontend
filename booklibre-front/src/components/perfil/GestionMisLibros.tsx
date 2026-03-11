@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Boton, Card, Tabs, type Pestaña } from '../ui'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import type { Libro } from '../../models/libroModel'
+import { Libro } from '../../classes/Libro'
 import { TablaLibros } from './TablaLibros'
+import { Paginacion } from './Paginacion'
 
 export type PropsGestionMisLibros = {
   libros: Libro[]
@@ -20,14 +20,18 @@ const pestañas: Pestaña[] = [
 
 const ESTRATEGIAS_FILTRO: Record<Filtro, (l: Libro) => boolean> = {
   todos: () => true,
-  disponibles: (l) => l.estado === 'Disponible',
-  prestados: (l) => l.estado === 'Prestado',
+  disponibles: (l) => l.estoyDisponible(),
+  prestados: (l) => !l.estoyDisponible(),
 }
 
 const COMPARADORES_ORDEN: Record<CampoOrden, (a: Libro, b: Libro) => number> = {
   titulo: (a, b) => a.titulo.localeCompare(b.titulo),
-  estado: (a, b) => a.estado.localeCompare(b.estado),
-  fecha: (a, b) => new Date(a.fechaAgregado).getTime() - new Date(b.fechaAgregado).getTime(),
+  estado: (a, b) => Number(a.estoyDisponible()) - Number(b.estoyDisponible()),
+  fecha: (a, b) => {
+    const fa = a.fechaDevolucion ? new Date(a.fechaDevolucion).getTime() : 0
+    const fb = b.fechaDevolucion ? new Date(b.fechaDevolucion).getTime() : 0
+    return fa - fb
+  },
 }
 
 export const GestionMisLibros = ({ libros, onAgregar }: PropsGestionMisLibros) => {
@@ -117,28 +121,15 @@ export const GestionMisLibros = ({ libros, onAgregar }: PropsGestionMisLibros) =
               alCambiarOrden={cambiarOrden}
             />
 
-            <div className="flex items-center justify-between mt-4">
-              <div className="text-xs text-secondary/40 font-medium">
-                Mostrando {inicio + 1}–{Math.min(fin, librosOrdenados.length)} de {librosOrdenados.length} libros
-              </div>
-
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setPagina(paginaAjustada - 1)}
-                  disabled={paginaAjustada <= 1}
-                  className="p-1.5 rounded-md hover:bg-gray-100 disabled:opacity-20 disabled:hover:bg-transparent transition-colors text-secondary"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setPagina(paginaAjustada + 1)}
-                  disabled={paginaAjustada >= totalPaginas}
-                  className="p-1.5 rounded-md hover:bg-gray-100 disabled:opacity-20 disabled:hover:bg-transparent transition-colors text-secondary"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
+            <div className="text-xs text-secondary/40 font-medium mt-4">
+              Mostrando {inicio + 1}–{Math.min(fin, librosOrdenados.length)} de {librosOrdenados.length} libros
             </div>
+
+            <Paginacion
+              pagina={paginaAjustada}
+              totalPaginas={totalPaginas}
+              alCambiar={(nueva) => setPagina(nueva)}
+            />
           </>
         )}
       </div>

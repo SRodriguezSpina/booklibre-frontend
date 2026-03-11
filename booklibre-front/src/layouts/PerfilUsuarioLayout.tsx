@@ -2,24 +2,30 @@ import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Spinner, ErrorCard, type ErrorPersonalizado } from '../components/ui'
 import type { Usuario } from '../models/usuarioModel'
-import { usuarioMock } from '../mocks/usuarioMock'
 import { useAlIniciar } from '../utils/hooks'
 import { obtenerMensajeError } from '../utils/errorHandler'
 import { usuarioService } from '../services/usuarioService'
+import { authService } from '../services/AuthService'
 
 export type ContextoPerfilUsuario = {
   usuario: Usuario
-  setUsuario: React.Dispatch<React.SetStateAction<Usuario>>
+  setUsuario: (usuario: Usuario) => void
 }
 
 export const PerfilUsuarioLayout = () => {
-  const [usuario, setUsuario] = useState<Usuario>(usuarioMock)
+  const [usuario, setUsuario] = useState<Usuario | null>(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState<ErrorPersonalizado | null>(null)
 
   const cargarUsuario = async () => {
+    const id = authService.obtenerIdUsuarioActual()
+    if (id == null) {
+      setError({ mensaje: 'Debés iniciar sesión para ver tu perfil.' })
+      setCargando(false)
+      return
+    }
     try {
-      const response = await usuarioService.obtenerUsuario(1) // hardcodeado por ahora
+      const response = await usuarioService.obtenerUsuario(id)
       setUsuario(response)
     } catch (e: unknown) {
       setError(obtenerMensajeError(e))
@@ -31,11 +37,14 @@ export const PerfilUsuarioLayout = () => {
   useAlIniciar(cargarUsuario)
 
   if (cargando) return <Spinner />
-  if (error) return <ErrorCard error={error} alReintentar={() => window.location.reload()} />
+  if (error) return <ErrorCard error={error} alReintentar={cargarUsuario} />
+  if (usuario == null) return null
+
+  const setUsuarioActualizado = (u: Usuario) => setUsuario(u)
 
   return (
     <div className="bg-background min-h-[calc(100vh-4rem)] px-4 py-8 md:px-8">
-      <Outlet context={{ usuario, setUsuario } satisfies ContextoPerfilUsuario} />
+      <Outlet context={{ usuario, setUsuario: setUsuarioActualizado } satisfies ContextoPerfilUsuario} />
     </div>
   )
 }

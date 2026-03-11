@@ -1,5 +1,5 @@
 import { Card, CardHeader, Boton } from '../ui'
-import type { Usuario, PerfilUsuarioTipo } from '../../models/usuarioModel'
+import type { Usuario } from '../../models/usuarioModel'
 
 export type PropsMisDatosCard = {
   usuario: Usuario
@@ -9,19 +9,17 @@ export type PropsMisDatosCard = {
   onCancelar: () => void
 }
 
-export const MisDatosCard = ({
-  usuario,
-  editando,
+export const MisDatosCard = ({usuario,
+editando,
   onCambioUsuario,
   onGuardar,
-  onCancelar,
-}: PropsMisDatosCard) => {
+  onCancelar,}: PropsMisDatosCard) => {
   const manejarCambio =
-    (campo: keyof Usuario) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    (campo: keyof Usuario) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
       onCambioUsuario({ ...usuario, [campo]: e.target.value })
     }
 
-  const opcionesTipoPerfil: PerfilUsuarioTipo[] = ['Lector', 'Publicador']
+  const opcionesTipo: Usuario['tipoUsuario'][] = ['Lector', 'Publicador', 'LectorPublicador']
 
   return (
     <Card className="bg-surface">
@@ -43,16 +41,16 @@ export const MisDatosCard = ({
         </div>
 
         <div>
-          <div className="text-xs font-semibold text-secondary/60">TELÉFONO</div>
+          <div className="text-xs font-semibold text-secondary/60">CELULAR</div>
           {editando ? (
             <input
               type="tel"
-              value={usuario.telefono}
-              onChange={manejarCambio('telefono')}
+              value={usuario.celular}
+              onChange={manejarCambio('celular')}
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-secondary focus:outline-none focus:ring-2 focus:ring-primary/60"
             />
           ) : (
-            <div className="text-sm text-secondary">{usuario.telefono}</div>
+            <div className="text-sm text-secondary">{usuario.celular}</div>
           )}
         </div>
 
@@ -61,31 +59,33 @@ export const MisDatosCard = ({
           {editando ? (
             <input
               type="text"
-              value={usuario.ubicacion}
-              onChange={manejarCambio('ubicacion')}
+              value={usuario.ciudad}
+              onChange={manejarCambio('ciudad')}
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-secondary focus:outline-none focus:ring-2 focus:ring-primary/60"
             />
           ) : (
-            <div className="text-sm text-secondary">{usuario.ubicacion}</div>
+            <div className="text-sm text-secondary">{usuario.ciudad}</div>
           )}
         </div>
 
         <div>
-          <div className="text-xs font-semibold text-secondary/60">TIPO DE PERFIL</div>
+          <div className="text-xs font-semibold text-secondary/60">TIPO DE USUARIO</div>
           {editando ? (
             <select
-              value={usuario.tipoPerfil}
-              onChange={manejarCambio('tipoPerfil')}
+              value={usuario.tipoUsuario}
+              onChange={manejarCambio('tipoUsuario')}
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-secondary bg-white focus:outline-none focus:ring-2 focus:ring-primary/60"
             >
-              {opcionesTipoPerfil.map((opcion) => (
+              {opcionesTipo.map((opcion) => (
                 <option key={opcion} value={opcion}>
-                  {opcion}
+                  {opcion === 'LectorPublicador' ? 'Lector & Publicador' : opcion}
                 </option>
               ))}
             </select>
           ) : (
-            <div className="text-sm text-secondary">{usuario.tipoPerfil}</div>
+            <div className="text-sm text-secondary">
+              {usuario.tipoUsuario === 'LectorPublicador' ? 'Lector & Publicador' : usuario.tipoUsuario}
+            </div>
           )}
         </div>
       </div>
@@ -95,7 +95,7 @@ export const MisDatosCard = ({
           <Boton tipo="gris" alClic={onCancelar} className="w-auto px-4 py-2 text-sm">
             Cancelar
           </Boton>
-          <Boton tipo="primario" alClic={onGuardar} className="w-auto px-4 py-2 text-sm">
+          <Boton tipo="gris" alClic={onGuardar} className="w-auto px-4 py-2 text-sm">
             Guardar cambios
           </Boton>
         </div>
@@ -103,4 +103,3 @@ export const MisDatosCard = ({
     </Card>
   )
 }
-
