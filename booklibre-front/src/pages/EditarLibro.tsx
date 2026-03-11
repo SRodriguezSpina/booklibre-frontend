@@ -7,31 +7,47 @@ import { useOnInit } from "../utils/hooks"
 
 type Values = Record<string, string>
 
-const emptyValues = (): Values =>
-  Object.fromEntries(
-    [...LibroForm.fields.map((f) => f.name), "tipo", "estado"].map((k) => [k, ""])
-  )
+const emptyValues = (): Values => ({
+  titulo: "", autor: "", descripcion: "", tipo: "", genero: "",
+  paginas: "", isbn: "", idioma: "", estado: "", fechaPublicacion: "",
+  propietarioId: "",
+})
 
 const fromValues = (values: Values): LibroForm => {
   const instance = new LibroForm()
   Object.assign(instance, {
     ...values,
     paginas: values.paginas === "" ? "" : Number(values.paginas),
+    isbn:    values.isbn    === "" ? "" : Number(values.isbn),
   })
   return instance
 }
+
+const toValues = (form: LibroForm): Values => ({
+  titulo:           form.titulo,
+  autor:            form.autor,
+  descripcion:      form.descripcion,
+  tipo:             form.tipo,
+  genero:           form.genero,
+  paginas:          String(form.paginas),
+  isbn:             String(form.isbn),
+  idioma:           form.idioma,
+  estado:           form.estado,
+  fechaPublicacion: form.fechaPublicacion,
+  propietarioId:    String(form.propietarioId),
+})
 
 export const EditarLibro = () => {
   const navigate = useNavigate()
   const { id } = useParams()
   const esNuevo = id === "nuevo"
 
-  const [values, setValues]           = useState<Values>(emptyValues())
-  const [errors, setErrors]           = useState<Record<string, string | undefined>>({})
+  const [values, setValues] = useState<Values>(emptyValues())
+  const [errors, setErrors] = useState<Record<string, string | undefined>>({})
   const [serverError, setServerError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [readOnly, setReadOnly]       = useState(false)
-  const [loading, setLoading]         = useState(!esNuevo)
+  const [readOnly, setReadOnly] = useState(false)
+  const [loading, setLoading] = useState(!esNuevo)
 
   const titulo = readOnly ? "Detalle del libro" : esNuevo ? "Nuevo libro" : "Editar libro"
 
@@ -43,15 +59,7 @@ export const EditarLibro = () => {
     }
     try {
       const libro = await libroService.getLibroById(Number(id))
-      const form = LibroForm.fromLibro(libro)
-      setValues({
-        titulo:        form.titulo,
-        autor:         form.autor,
-        paginas:       String(form.paginas),
-        tipo:          form.tipo,
-        estado:        form.estado,
-        propietarioId: String(form.propietarioId),
-      })
+      setValues(toValues(LibroForm.fromLibro(libro)))
       const params = new URLSearchParams(window.location.search)
       setReadOnly(params.get("readOnly") === "true")
     } catch {
@@ -112,6 +120,7 @@ export const EditarLibro = () => {
         className="bg-surface border border-accent rounded-2xl p-6 flex flex-col gap-5"
         noValidate
       >
+        {/* Text / number / date fields */}
         {LibroForm.fields.map((field) => (
           <Field
             key={field.name}
@@ -125,9 +134,10 @@ export const EditarLibro = () => {
           />
         ))}
 
+        {/* Select fields */}
         <SelectField
           label="Tipo"
-          value={values.tipo ?? ""}
+          value={values.tipo}
           error={errors.tipo}
           disabled={readOnly}
           options={[{ value: "", label: "Seleccioná una opción" }, ...LibroForm.tipoOptions]}
@@ -135,8 +145,26 @@ export const EditarLibro = () => {
         />
 
         <SelectField
+          label="Género"
+          value={values.genero}
+          error={errors.genero}
+          disabled={readOnly}
+          options={[{ value: "", label: "Seleccioná una opción" }, ...LibroForm.generoOptions]}
+          onChange={(v) => handleChange("genero", v)}
+        />
+
+        <SelectField
+          label="Idioma"
+          value={values.idioma}
+          error={errors.idioma}
+          disabled={readOnly}
+          options={[{ value: "", label: "Seleccioná una opción" }, ...LibroForm.idiomaOptions]}
+          onChange={(v) => handleChange("idioma", v)}
+        />
+
+        <SelectField
           label="Estado"
-          value={values.estado ?? ""}
+          value={values.estado}
           error={errors.estado}
           disabled={readOnly}
           options={[{ value: "", label: "Seleccioná una opción" }, ...LibroForm.estadoOptions]}
