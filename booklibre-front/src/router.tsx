@@ -2,11 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { MainLayoutWrapper } from "./layouts/MainLayoutWrapper"
 import { Home } from "./pages/Home"
 import { DetallePrestamos } from "./pages/DetallePrestamos"
-import { Login } from "./pages/Login"
-import { Register } from "./pages/Register"
-import { PerfilUsuario } from "./pages/PerfilUsuario"
-import { PerfilUsuarioLayout } from "./layouts/PerfilUsuarioLayout"
-import { NotFound } from "./pages/NotFound"
+import { AuthPage } from "./pages/AuthPage.tsx"
+
 
 export function AppRouter() {
   return (
@@ -17,14 +14,9 @@ export function AppRouter() {
 
           <Route path="home" element={<Home />} />
           <Route path="mis-prestamos" element={<DetallePrestamos />} />
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
-
-          <Route path="perfil" element={<PerfilUsuarioLayout />}>
-            <Route index element={<PerfilUsuario />} />
-          </Route>
-
-          <Route path="*" element={<NotFound />} />
+          <Route path="login"    element={<AuthPage key="login" mode="login" />} />
+          <Route path="register" element={<AuthPage key="register" mode="register" />} />
+          {/* <Route path='perfil' element={<Perfil />} /> */}
         </Route>
       </Routes>
     </BrowserRouter>
