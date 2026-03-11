@@ -1,0 +1,88 @@
+import { Libro } from "../../classes/Libro"
+import type { TipoPrestamo } from "../../models/libroModel"
+
+interface LibroCardProps {
+  libro: Libro
+  tipoVista: TipoPrestamo
+}
+
+export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
+  const esPrestamoRecibido = tipoVista === "prestados-a-mi"
+  const proximoAVencer = libro.estaProximoAVencer()
+
+  const getBadgeStyles = () => {
+    if (proximoAVencer) return "bg-accent text-primary-dark"
+    if (libro.alquiladoPorId) return "bg-primary-light text-primary-dark"
+    return "bg-secondary-light text-secondary-dark"
+  }
+
+  const getEtiqueta = () => {
+    if (proximoAVencer) return "PRÓXIMO A VENCER"
+    if (libro.alquiladoPorId) return "ACTIVO"
+    return "DEVUELTO"
+  }
+
+  return (
+    <div className="bg-surface rounded-xl shadow-sm border border-accent overflow-hidden flex flex-col h-full hover:shadow-md transition-shadow">
+      <div className="relative h-64 bg-background">
+        <div
+          className={`absolute top-3 right-3 px-2 py-1 rounded text-[10px] font-bold z-10 shadow-sm ${getBadgeStyles()}`}
+        >
+          {getEtiqueta()}
+        </div>
+        <img
+          src={`https://covers.openlibrary.org/b/isbn/${libro.id}-L.jpg`}
+          alt={libro.titulo}
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      <div className="p-4 flex flex-col flex-1 gap-2">
+        <div className="flex justify-between items-start">
+          <h3 className="font-bold text-secondary-dark line-clamp-1">
+            {libro.titulo}
+          </h3>
+          <span className="text-accent text-sm font-extrabold">★ 4.8</span>
+        </div>
+        <p className="text-xs text-secondary opacity-80">{libro.autor}</p>
+
+        <div className="mt-auto pt-3 border-t border-accent space-y-2">
+          <div className="flex items-center gap-2 text-[11px]">
+            <span className="text-secondary-light font-bold uppercase tracking-tighter">
+              👤 {esPrestamoRecibido ? "Prestado por:" : "Prestado a:"}
+            </span>
+            <span className="text-secondary-dark font-semibold">
+              Usuario{" "}
+              {esPrestamoRecibido ? libro.propietarioId : libro.alquiladoPorId}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 text-[11px]">
+            <span className="text-secondary-light font-bold uppercase tracking-tighter">
+              📅 Rango:
+            </span>
+            <span className="text-secondary-dark font-semibold">
+              {libro.fechaDevolucion || "Sin fecha"}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 text-[11px]">
+            <span className="text-secondary-light font-bold uppercase tracking-tighter">
+              💎 Bibliokarma:
+            </span>
+            <span className="text-primary font-black">+240 </span>
+          </div>
+        </div>
+
+        {esPrestamoRecibido && (
+          <button
+            onClick={() => console.log("Abrir modal calificación")}
+            className="mt-3 w-full py-2 bg-primary text-white rounded-lg text-xs font-bold hover:bg-primary-dark active:bg-accent transition-all shadow-sm"
+          >
+            ★ Calificar
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}

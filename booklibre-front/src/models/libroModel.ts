@@ -1,12 +1,21 @@
-export type EstadoLibro = 'Disponible' | 'Prestado'
+export type TipoLibro = "Común" | "Con dedicatoria" | "Coleccionable"
+export type EstadoLibro =
+  | "Excelente"
+  | "Muy bueno"
+  | "Bueno"
+  | "Regular"
+  | "Malo"
+export type TipoPrestamo = "prestados-a-mi" | "prestados-por-mi"
 
-export type Libro = {
-  id: string
+export interface LibroDTO {
+  id: number
   titulo: string
   autor: string
-  genero?: string
-  portadaUrl?: string | null
+  tipo: TipoLibro
+  paginas: number
   estado: EstadoLibro
-  fechaAgregado: string
+  imagenUrl?: string
+  propietarioId: number
+  alquiladoPorId?: number
+  fechaDevolucion?: string // ISO string
 }
-

@@ -1,9 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect } from "react"
 
-export const useAlIniciar = (callbackInicial: () => void) => {
+export const useOnInit = (initialCallBack: () => void) => {
   useEffect(() => {
-    callbackInicial()
+    initialCallBack()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 }
-
