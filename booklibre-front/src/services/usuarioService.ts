@@ -13,6 +13,17 @@ class UsuarioService {
       return usuarioMock
     }
   }
+
+  async actualizarUsuario(usuario: Usuario): Promise<Usuario> {
+    if (!API_URL) return usuario
+    try {
+      const response = await axios.put<Usuario>(`${API_URL}/usuario/${usuario.id}`, usuario)
+      return response.data
+    } catch {
+      // Si falla la API en desarrollo, devolvemos el usuario para que la UI no se rompa
+      return usuario
+    }
+  }
 }
 
 export const usuarioService = new UsuarioService()

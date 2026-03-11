@@ -9,6 +9,8 @@ import { PerfilResumen } from '../components/perfil/PerfilResumen'
 import { MisDatosCard } from '../components/perfil/MisDatosCard'
 import { EstadisticaCard } from '../components/perfil/EstadisticaCard'
 import { GestionMisLibros } from '../components/perfil/GestionMisLibros'
+import { usuarioService } from '../services/usuarioService'
+import { toast } from 'react-toastify'
 
 export const PerfilUsuario = () => {
   const { usuario, setUsuario } = useOutletContext<ContextoPerfilUsuario>()
@@ -41,9 +43,29 @@ export const PerfilUsuario = () => {
     setEditando(false)
   }
 
-  const guardarEdicion = () => {
-    setUsuario(borradorUsuario)
-    setEditando(false)
+  const guardarEdicion = async () => {
+    try {
+      const usuarioActualizado = await usuarioService.actualizarUsuario(borradorUsuario)
+      setUsuario(usuarioActualizado)
+      setEditando(false)
+      toast.success('¡Perfil actualizado con éxito!')
+    } catch (error) {
+      toast.error('No se pudieron guardar los cambios.')
+      console.error(error)
+    }
+  }
+
+  const manejarAgregarLibro = async () => {
+    try {
+      const nuevo = await libroService.agregarLibro(usuario.id, {
+        titulo: 'Nuevo Libro',
+        autor: 'Autor Desconocido',
+      })
+      setLibros([...libros, nuevo])
+      toast.success('¡Libro agregado!')
+    } catch (e) {
+      toast.error('Error al agregar libro')
+    }
   }
 
   const cantidadPrestados = libros.filter((l) => l.estado === 'Prestado').length
@@ -55,7 +77,6 @@ export const PerfilUsuario = () => {
           usuario={borradorUsuario}
           editando={editando}
           onEditar={comenzarEdicion}
-          onCancelar={cancelarEdicion}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -72,18 +93,21 @@ export const PerfilUsuario = () => {
               <EstadisticaCard
                 valor={cantidadPrestados}
                 etiqueta="Libros Prestados"
-                claseFondo="bg-[#fdecec]"
+                claseFondo="bg-[#fdf2f2]"
               />
-              <EstadisticaCard valor={45} etiqueta="Libros Leídos" claseFondo="bg-[#f3e8ff]" />
+              <EstadisticaCard
+                valor={libros.length}
+                etiqueta="Libros Leídos"
+                claseFondo="bg-[#f5f3ff]"
+              />
             </div>
           </div>
 
           <div className="lg:col-span-8">
-            <GestionMisLibros libros={libros} />
+            <GestionMisLibros libros={libros} onAgregar={manejarAgregarLibro} />
           </div>
         </div>
       </div>
     </div>
   )
 }
-

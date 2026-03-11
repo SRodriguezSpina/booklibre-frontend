@@ -8,7 +8,7 @@ export const librosMock: Libro[] = [
     genero: 'Literatura Clásica',
     portadaUrl: null,
     estado: 'Disponible',
-    fechaAgregado: '24 Oct, 2023',
+    fechaAgregado: '2023-10-24',
   },
   {
     id: '2',
@@ -17,7 +17,7 @@ export const librosMock: Libro[] = [
     genero: 'Diseño',
     portadaUrl: null,
     estado: 'Prestado',
-    fechaAgregado: '12 Sep, 2023',
+    fechaAgregado: '2023-09-12',
   },
   {
     id: '3',
@@ -26,7 +26,7 @@ export const librosMock: Libro[] = [
     genero: 'Ciencia Ficción',
     portadaUrl: null,
     estado: 'Disponible',
-    fechaAgregado: '05 Ago, 2023',
+    fechaAgregado: '2023-08-05',
   },
 ]
 

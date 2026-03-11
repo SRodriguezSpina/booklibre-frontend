@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react'
 import { Boton, Card, Tabs, type Pestaña } from '../ui'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Libro } from '../../models/libroModel'
 import { TablaLibros } from './TablaLibros'
-import { Paginacion } from './Paginacion'
 
 export type PropsGestionMisLibros = {
   libros: Libro[]
+  onAgregar: () => void
 }
 
 type Filtro = 'todos' | 'disponibles' | 'prestados'
@@ -17,38 +18,33 @@ const pestañas: Pestaña[] = [
   { id: 'prestados', etiqueta: 'Prestados' },
 ]
 
-const filtrarLibros = (libros: Libro[], filtro: Filtro) => {
-  if (filtro === 'disponibles') return libros.filter((l) => l.estado === 'Disponible')
-  if (filtro === 'prestados') return libros.filter((l) => l.estado === 'Prestado')
-  return libros
+const ESTRATEGIAS_FILTRO: Record<Filtro, (l: Libro) => boolean> = {
+  todos: () => true,
+  disponibles: (l) => l.estado === 'Disponible',
+  prestados: (l) => l.estado === 'Prestado',
 }
 
-export const GestionMisLibros = ({ libros }: PropsGestionMisLibros) => {
+const COMPARADORES_ORDEN: Record<CampoOrden, (a: Libro, b: Libro) => number> = {
+  titulo: (a, b) => a.titulo.localeCompare(b.titulo),
+  estado: (a, b) => a.estado.localeCompare(b.estado),
+  fecha: (a, b) => new Date(a.fechaAgregado).getTime() - new Date(b.fechaAgregado).getTime(),
+}
+
+export const GestionMisLibros = ({ libros, onAgregar }: PropsGestionMisLibros) => {
   const [filtro, setFiltro] = useState<Filtro>('todos')
   const [pagina, setPagina] = useState(1)
   const [campoOrden, setCampoOrden] = useState<CampoOrden>('titulo')
   const [sentidoOrden, setSentidoOrden] = useState<'ascendente' | 'descendente'>('ascendente')
   const porPagina = 3
 
-  const librosFiltrados = useMemo(() => filtrarLibros(libros, filtro), [libros, filtro])
+  const librosFiltrados = useMemo(() => libros.filter(ESTRATEGIAS_FILTRO[filtro]), [libros, filtro])
 
   const librosOrdenados = useMemo(() => {
-    const copia = [...librosFiltrados]
-
-    copia.sort((a, b) => {
-      let resultado = 0
-      if (campoOrden === 'titulo') {
-        resultado = a.titulo.localeCompare(b.titulo)
-      } else if (campoOrden === 'estado') {
-        resultado = a.estado.localeCompare(b.estado)
-      } else if (campoOrden === 'fecha') {
-        resultado = new Date(a.fechaAgregado).getTime() - new Date(b.fechaAgregado).getTime()
-      }
-
+    const comparador = COMPARADORES_ORDEN[campoOrden]
+    return [...librosFiltrados].sort((a, b) => {
+      const resultado = comparador(a, b)
       return sentidoOrden === 'ascendente' ? resultado : -resultado
     })
-
-    return copia
   }, [librosFiltrados, campoOrden, sentidoOrden])
 
   const totalPaginas = Math.max(1, Math.ceil(librosOrdenados.length / porPagina))
@@ -73,7 +69,7 @@ export const GestionMisLibros = ({ libros }: PropsGestionMisLibros) => {
         <h2 className="text-lg font-semibold text-secondary">Gestión de Mis Libros</h2>
         <Boton
           tipo="secundario"
-          alClic={() => {}}
+          alClic={onAgregar}
           className="px-5 py-2 text-sm rounded-full shadow-sm"
         >
           + Agregar nuevo libro
@@ -91,24 +87,61 @@ export const GestionMisLibros = ({ libros }: PropsGestionMisLibros) => {
         />
       </div>
 
-      <div className="px-6 pt-4">
-        <TablaLibros
-          libros={librosPagina}
-          campoOrden={campoOrden}
-          sentidoOrden={sentidoOrden}
-          alCambiarOrden={cambiarOrden}
-        />
-        <div className="text-xs text-secondary/60 mt-2">
-          Mostrando {librosOrdenados.length === 0 ? 0 : inicio + 1}–
-          {Math.min(fin, librosOrdenados.length)} de {librosOrdenados.length} libros
-        </div>
-        <Paginacion
-          pagina={paginaAjustada}
-          totalPaginas={totalPaginas}
-          alCambiar={(nueva) => setPagina(nueva)}
-        />
+      <div className="px-6 pb-6 pt-2">
+        {libros.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+              📚
+            </div>
+            <div className="text-secondary font-bold text-lg">Aún no tienes libros</div>
+            <p className="text-secondary/50 text-sm max-w-[250px] mt-1">
+              ¡Comienza agregando tu primer libro a la colección!
+            </p>
+          </div>
+        ) : librosFiltrados.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="text-secondary font-bold text-lg">No se encontraron resultados</div>
+            <p className="text-secondary/50 text-sm mt-1">
+              Prueba cambiando el filtro de búsqueda.
+            </p>
+            <Boton tipo="secundario" alClic={() => setFiltro('todos')} className="mt-4 px-4 py-2 text-xs">
+              Ver todos los libros
+            </Boton>
+          </div>
+        ) : (
+          <>
+            <TablaLibros
+              libros={librosPagina}
+              campoOrden={campoOrden}
+              sentidoOrden={sentidoOrden}
+              alCambiarOrden={cambiarOrden}
+            />
+
+            <div className="flex items-center justify-between mt-4">
+              <div className="text-xs text-secondary/40 font-medium">
+                Mostrando {inicio + 1}–{Math.min(fin, librosOrdenados.length)} de {librosOrdenados.length} libros
+              </div>
+
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setPagina(paginaAjustada - 1)}
+                  disabled={paginaAjustada <= 1}
+                  className="p-1.5 rounded-md hover:bg-gray-100 disabled:opacity-20 disabled:hover:bg-transparent transition-colors text-secondary"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setPagina(paginaAjustada + 1)}
+                  disabled={paginaAjustada >= totalPaginas}
+                  className="p-1.5 rounded-md hover:bg-gray-100 disabled:opacity-20 disabled:hover:bg-transparent transition-colors text-secondary"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </Card>
   )
 }
-
