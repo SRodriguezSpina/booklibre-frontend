@@ -1,13 +1,13 @@
 import axios from "axios"
 import type { RegisterData, LoginData, AuthResponseUsuario } from "../types/UsuarioTypes"
-import { API_BASE_URL } from "../env"
+import { API_BASE_URL, AUTH_PATH } from "../env"
 
 class AuthService {
   // ── Auth ──────────────────────────────────────────────────────────────────
 
   async login(data: LoginData): Promise<AuthResponseUsuario> {
     const response = await axios.post<AuthResponseUsuario>(
-      `${API_BASE_URL}/api/login`,
+      `${API_BASE_URL}${AUTH_PATH('login')}`,
       data,
     )
     if (response.data.success && response.data.usuario) {
@@ -19,7 +19,7 @@ class AuthService {
 
   async registro(data: RegisterData): Promise<AuthResponseUsuario> {
     const response = await axios.post<AuthResponseUsuario>(
-      `${API_BASE_URL}/api/registro`,
+      `${API_BASE_URL}${AUTH_PATH('registro')}`,
       data,
     )
     return response.data
