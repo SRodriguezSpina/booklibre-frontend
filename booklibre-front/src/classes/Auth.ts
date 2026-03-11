@@ -18,8 +18,6 @@ export class Auth {
   // Register-only fields
   nombre: string = ""
   email: string = ""
-  ciudad: string = ""
-  celular: string = ""
   confirmarPassword: string = ""
 
   static loginFields: FieldConfig[] = [
@@ -29,10 +27,7 @@ export class Auth {
 
   static registerFields: FieldConfig[] = [
     { name: "nombre",   label: "Nombre",   placeholder: "Tu nombre" },
-    { name: "usuario",  label: "Usuario",  placeholder: "Nombre de usuario" },
     { name: "email",    label: "Email",    type: "email", placeholder: "tu@email.com" },
-    { name: "ciudad",   label: "Ciudad",   placeholder: "Tu ciudad" },
-    { name: "celular",  label: "Celular",  type: "tel",   placeholder: "Ej: 1123456789" },
     { name: "password", label: "Contraseña", placeholder: "Mínimo 6 caracteres", isPassword: true },
     { name: "confirmarPassword", label: "Repetí tu contraseña", placeholder: "Repetí la contraseña", isPassword: true },
   ]
@@ -48,18 +43,10 @@ export class Auth {
     return {
       nombre:   !this.nombre.trim()
         ? "El nombre es obligatorio" : undefined,
-      usuario:  !this.usuario.trim()
-        ? "El usuario es obligatorio" : undefined,
       email:    !this.email.trim()
         ? "El email es obligatorio"
         : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)
         ? "Ingresá un email válido" : undefined,
-      ciudad:   !this.ciudad.trim()
-        ? "La ciudad es obligatoria" : undefined,
-      celular:  !this.celular.trim()
-        ? "El celular es obligatorio"
-        : !/^\d+$/.test(this.celular)
-        ? "Ingresá solo números" : undefined,
       password: !this.password
         ? "La contraseña es obligatoria"
         : this.password.length < 6
@@ -82,10 +69,7 @@ export class Auth {
   toRegisterDTO(): RegisterData {
     return {
       nombre: this.nombre,
-      usuario: this.usuario,
       email: this.email,
-      ciudad: this.ciudad,
-      celular: this.celular,
       password: this.password,
       confirmarPassword: this.confirmarPassword,
     }
