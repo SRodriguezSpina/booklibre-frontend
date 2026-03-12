@@ -23,7 +23,7 @@ export interface LibroDTO {
   genero: Genero
   autor: string
   paginas: number
-  isbn: number
+  isbn: string
   idioma: Idioma
   editorial: string
   estado: EstadoLibro

@@ -2,19 +2,23 @@ import { useState } from "react"
 import { useParams } from "react-router-dom"
 import { useOnInit } from "../utils/hooks"
 import { libroService } from "../services/libroService"
+import { authService } from "../services/AuthService" // ¡Faltaba importar esto!
 import { Libro } from "../classes/Libro"
 
 export const DetalleLibro = () => {
   const { id } = useParams()
-  const [libro, setLibro] = useState<Libro | null>(null)
+  const [libro, setLibro] = useState<Libro>()
   const [loading, setLoading] = useState(true)
 
   useOnInit(() => {
     const fetchLibro = async () => {
       try {
         if (id) {
-          const data = await libroService.getLibroById(Number(id))
+          const usuarioId = authService.obtenerIdUsuarioActual() || 1
+          const data = await libroService.getLibroById(Number(id), usuarioId)
+          console.log(data)
           setLibro(data)
+          console.log(usuarioId);
         }
       } catch (error) {
         console.error("Error fetching libro", error)
@@ -91,7 +95,7 @@ export const DetalleLibro = () => {
                 {libro.genero || "CIENCIA FICCIÓN"}
               </span>
               <div className="flex text-yellow-400 text-sm">
-                ★★★★★ <span className="text-secondary opacity-60 ml-1">({/*libro.ranking ||*/ "4.8"})</span>
+                ★★★★★ <span className="text-secondary opacity-60 ml-1">({/*libro.ranking ||*/})</span>
               </div>
             </div>
             <h1 className="text-4xl font-extrabold text-secondary-dark mb-4">{libro.titulo}</h1>
@@ -111,7 +115,7 @@ export const DetalleLibro = () => {
           <div>
             <h3 className="font-bold text-xl mb-3">Sinopsis</h3>
             <p className="text-secondary leading-relaxed mb-4">
-              {libro.descripcion || "El Gran Gatsby es una novela de 1925 del escritor estadounidense F. Scott Fitzgerald. Ambientada en la Era del Jazz en Long Island..."}
+              {libro.descripcion}
             </p>
           </div>
 
@@ -130,14 +134,14 @@ export const DetalleLibro = () => {
               <div className="col-span-2 md:col-span-1">
                 <p className="text-xs text-secondary font-bold uppercase opacity-70 mb-1">Bibliokarmas</p>
                 <span className="bg-green-100 text-green-700 font-bold px-3 py-1 rounded-md">
-                  +{/*libro.bibliokarma ||*/ 1235}
+                  +{libro.bibliokarma}
                 </span>
               </div>
 
               {/* Fila 2 */}
               <div>
                 <p className="text-xs text-secondary font-bold uppercase opacity-70 mb-1">Género</p>
-                <p className="font-semibold">{libro.genero || "Ficción Clásica"}</p>
+                <p className="font-semibold">{libro.genero}</p>
               </div>
               <div>
                 <p className="text-xs text-secondary font-bold uppercase opacity-70 mb-1">Páginas</p>
@@ -145,21 +149,21 @@ export const DetalleLibro = () => {
               </div>
               <div>
                 <p className="text-xs text-secondary font-bold uppercase opacity-70 mb-1">Idioma</p>
-                <p className="font-semibold">{libro.idioma || "Inglés"}</p>
+                <p className="font-semibold">{libro.idioma}</p>
               </div>
               <div>
                 <p className="text-xs text-secondary font-bold uppercase opacity-70 mb-1">Editorial</p>
-                <p className="font-semibold">{/*libro.editorial ||*/ "Scribner"}</p>
+                <p className="font-semibold">{libro.editorial}</p>
               </div>
 
               {/* Fila 3 */}
               <div>
                 <p className="text-xs text-secondary font-bold uppercase opacity-70 mb-1">ISBN-13</p>
-                <p className="font-semibold">{libro.isbn || "978-0743273565"}</p>
+                <p className="font-semibold">{libro.isbn}</p>
               </div>
               <div>
                 <p className="text-xs text-secondary font-bold uppercase opacity-70 mb-1">Publicado</p>
-                <p className="font-semibold">{libro.fechaPublicacion || "10 Abril, 1925"}</p>
+                <p className="font-semibold">{libro.fechaPublicacion}</p>
               </div>
               <div>
                 <p className="text-xs text-secondary font-bold uppercase opacity-70 mb-1">Estado</p>
@@ -167,7 +171,7 @@ export const DetalleLibro = () => {
               </div>
               <div>
                 <p className="text-xs text-secondary font-bold uppercase opacity-70 mb-1">Ranking</p>
-                <p className="font-semibold">{/*libro.ranking ||*/ "4.5"}</p>
+                <p className="font-semibold">{/*libro.ranking ||*/}</p>
               </div>
             </div>
           </div>

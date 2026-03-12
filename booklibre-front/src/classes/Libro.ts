@@ -24,7 +24,7 @@ export class Libro {
   descripcion?: string
   genero?: Genero
   paginas?: number
-  isbn?: number
+  isbn?: string
   idioma?: Idioma
   editorial?: string
   fechaPublicacion?: string
