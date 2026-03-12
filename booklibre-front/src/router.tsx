@@ -21,7 +21,7 @@ export function AppRouter() {
           <Route path="login" element={<AuthPage key="login" mode="login" />} />
           <Route path="register" element={<AuthPage key="register" mode="register" />} />
           <Route path="libros/:id" element={<DetalleLibro />} />
-
+          <Route path="libros/:id/editar" element={<EditarLibro />} />
           <Route path="perfil" element={<PerfilUsuarioLayout />}>
             <Route index element={<PerfilUsuario />} />
           </Route>

@@ -76,7 +76,7 @@ export const DetalleLibro = () => {
               <span>14 Días</span>
             </div>
 
-            <button className="w-full bg-[#fc8b83] hover:bg-[#fa7a71] text-white font-bold py-3 rounded-xl transition-colors shadow-sm">
+            <button className="w-full bg-[#fc8b83] text-white font-bold py-3 rounded-xl transition-colors shadow-sm">
               Confirmar Reserva 
             </button>
             <p className="text-xs text-center text-secondary opacity-60 mt-3 px-4">
