@@ -38,6 +38,13 @@ export interface LibroDTO {
 export interface PrestamoDTO {
   id: number
   titulo: string
-  estado: EstadoLibro
   autor: string
+  estado: EstadoLibro // Usamos tu enum/tipo existente
+  propietarioId: number
+  imagenUrl: string
+  alquiladoPorId: number | null
+  fechaDesde: string | null
+  fechaHasta: string | null
+  rating: number
+  bibliokarma: number | null
 }

@@ -41,6 +41,11 @@ export const DetallePrestamos = () => {
     setCurrentPage(1)
     fetchPrestamos(activeTab, query)
   }
+  const totalPages = Math.ceil(libros.length / itemsPerPage)
+  const librosAMostrar = libros.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  )
 
   const handleTabChange = (id: string) => {
     const nuevoTipo = id as TipoPrestamo
@@ -52,13 +57,6 @@ export const DetallePrestamos = () => {
   useOnInit(() => {
     fetchPrestamos(activeTab)
   })
-
-  // Cálculos de UI (estos se quedan aquí porque dependen del estado de la pantalla)
-  const totalPages = Math.ceil(libros.length / itemsPerPage)
-  const librosAMostrar = libros.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  )
 
   return (
     <div className="flex flex-col h-full max-w-6xl mx-auto space-y-8 bg-background">

@@ -17,7 +17,7 @@ export const libroService = {
         },
       },
     )
-    const libros = res.data.map(Libro.fromJson)
+    const libros = res.data.map(Libro.fromPrestamoJson)
     if (!searchQuery.trim()) {
       return libros
     }
