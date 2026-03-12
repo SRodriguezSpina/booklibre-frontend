@@ -11,12 +11,14 @@ export class Libro {
   paginas: number
   isbn: number
   idioma: Idioma
+  editorial : string
   estado: EstadoLibro
   fechaPublicacion: string
   propietarioId: number
   imagenUrl: string
   alquiladoPorId?: number
   fechaDevolucion?: string
+  bibliokarma?: number
 
   constructor(
     id: number,
@@ -28,12 +30,14 @@ export class Libro {
     paginas: number,
     isbn: number,
     idioma: Idioma,
+    editorial: string,
     estado: EstadoLibro,
     fechaPublicacion: string,
     propietarioId: number,
     imagenUrl: string,
     alquiladoPorId?: number,
     fechaDevolucion?: string,
+    bibliokarma?: number,
   ) {
     // Asignación manual
     this.id = id
@@ -45,12 +49,14 @@ export class Libro {
     this.paginas = paginas
     this.isbn = isbn
     this.idioma = idioma
+    this.editorial = editorial
     this.estado = estado
     this.fechaPublicacion = fechaPublicacion
     this.propietarioId = propietarioId
     this.imagenUrl = imagenUrl
     this.alquiladoPorId = alquiladoPorId
     this.fechaDevolucion = fechaDevolucion
+    this.bibliokarma = bibliokarma
   }
 
   static fromJson(json: LibroDTO): Libro {
@@ -64,12 +70,14 @@ export class Libro {
       json.paginas,
       json.isbn,
       json.idioma,
+      json.editorial,
       json.estado,
       json.fechaPublicacion,
       json.propietarioId,
       json.imagenUrl,
       json.alquiladoPorId,
       json.fechaDevolucion,
+      json.bibliokarma,
     )
   }
 

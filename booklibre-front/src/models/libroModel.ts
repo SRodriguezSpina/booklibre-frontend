@@ -29,10 +29,12 @@ export interface LibroDTO {
   paginas: number
   isbn: number
   idioma: Idioma
+  editorial : string
   estado: EstadoLibro
   fechaPublicacion: string
   propietarioId: number
   imagenUrl: string
   alquiladoPorId?: number
   fechaDevolucion?: string // ISO string
+  bibliokarma?: number
 }
