@@ -51,9 +51,9 @@ export class Auth {
         ? "La contraseña es obligatoria"
         : this.password.length < 6
         ? "Mínimo 6 caracteres" : undefined,
-      confirmarPassword: !this.confirmarPassword
+      confirmarPassword: !this.confirmarPassword.trim()
         ? "Repetí tu contraseña"
-        : this.confirmarPassword !== this.password
+        : this.confirmarPassword.trim() !== this.password.trim()
         ? "Las contraseñas no coinciden" : undefined,
     }
   }

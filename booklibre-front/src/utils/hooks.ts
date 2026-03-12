@@ -6,3 +6,5 @@ export const useOnInit = (initialCallBack: () => void) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 }
+
+export const useAlIniciar = useOnInit
