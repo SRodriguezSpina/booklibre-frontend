@@ -1,6 +1,6 @@
 const BASE = import.meta.env.VITE_API_URL
 export const API_BASE_URL = import.meta.env.DEV
-  ? ''
+  ? 'http://localhost:8080'
   : (typeof BASE === 'string' && BASE !== '' ? BASE : 'http://localhost:8080')
 
 const AUTH_PREFIX = import.meta.env.VITE_AUTH_PATH ?? ''
