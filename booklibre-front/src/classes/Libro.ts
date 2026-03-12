@@ -1,13 +1,18 @@
-import type { LibroDTO, TipoLibro, EstadoLibro } from "../models/libroModel"
+import type { LibroDTO, TipoLibro, EstadoLibro, Genero, Idioma } from "../models/libroModel"
 
 export class Libro {
   // Declaración explícita de propiedades
   id: number
   titulo: string
-  autor: string
   tipo: TipoLibro
+  descripcion: string
+  genero: Genero
+  autor: string
   paginas: number
+  isbn: number
+  idioma: Idioma
   estado: EstadoLibro
+  fechaPublicacion: string
   propietarioId: number
   alquiladoPorId?: number
   fechaDevolucion?: string
@@ -15,10 +20,15 @@ export class Libro {
   constructor(
     id: number,
     titulo: string,
-    autor: string,
     tipo: TipoLibro,
+    descripcion: string,
+    genero: Genero,
+    autor: string,
     paginas: number,
+    isbn: number,
+    idioma: Idioma,
     estado: EstadoLibro,
+    fechaPublicacion: string,
     propietarioId: number,
     alquiladoPorId?: number,
     fechaDevolucion?: string,
@@ -26,10 +36,15 @@ export class Libro {
     // Asignación manual
     this.id = id
     this.titulo = titulo
-    this.autor = autor
     this.tipo = tipo
+    this.descripcion = descripcion
+    this.genero = genero
+    this.autor = autor
     this.paginas = paginas
+    this.isbn = isbn
+    this.idioma = idioma
     this.estado = estado
+    this.fechaPublicacion = fechaPublicacion
     this.propietarioId = propietarioId
     this.alquiladoPorId = alquiladoPorId
     this.fechaDevolucion = fechaDevolucion
@@ -39,10 +54,15 @@ export class Libro {
     return new Libro(
       json.id,
       json.titulo,
-      json.autor,
       json.tipo,
+      json.descripcion,
+      json.genero,
+      json.autor,
       json.paginas,
+      json.isbn,
+      json.idioma,
       json.estado,
+      json.fechaPublicacion,
       json.propietarioId,
       json.alquiladoPorId,
       json.fechaDevolucion,

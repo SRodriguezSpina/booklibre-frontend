@@ -18,4 +18,19 @@ export const libroService = {
     )
     return res.data.map(Libro.fromJson)
   },
+
+  async getLibroById(id: number): Promise<Libro> {
+    const res = await axios.get<LibroDTO>(`${REST_SERVER_URL}/libros/${id}`)
+    return Libro.fromJson(res.data)
+  },
+
+  async crearLibro(dto: LibroDTO): Promise<Libro> {
+    const res = await axios.post<LibroDTO>(`${REST_SERVER_URL}/libros`, dto)
+    return Libro.fromJson(res.data)
+  },
+
+  async actualizarLibro(dto: LibroDTO): Promise<Libro> {
+    const res = await axios.put<LibroDTO>(`${REST_SERVER_URL}/libros/${dto.id}`, dto)
+    return Libro.fromJson(res.data)
+  },
 }
