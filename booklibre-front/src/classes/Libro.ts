@@ -1,72 +1,70 @@
-import type { LibroDTO, TipoLibro, EstadoLibro, Genero, Idioma } from "../models/libroModel"
+import type {
+  LibroDTO,
+  TipoLibro,
+  EstadoLibro,
+  Genero,
+  Idioma,
+  PrestamoDTO,
+} from "../models/libroModel"
 
 export class Libro {
-  // Declaración explícita de propiedades
+  // ... propiedades anteriores ...
   id: number
   titulo: string
-  tipo: TipoLibro
-  descripcion: string
-  genero: Genero
   autor: string
-  paginas: number
-  isbn: number
-  idioma: Idioma
   estado: EstadoLibro
-  fechaPublicacion: string
   propietarioId: number
+  imagenUrl: string
   alquiladoPorId?: number
-  fechaDevolucion?: string
+  bibliokarma?: number
+  rating: number
+  fechaDesde?: string
+  fechaDevolucion?: string // Mapea a fechaHasta del DTO
+  tipo?: TipoLibro
+  descripcion?: string
+  genero?: Genero
+  paginas?: number
+  isbn?: string
+  idioma?: Idioma
+  editorial?: string
+  fechaPublicacion?: string
 
-  constructor(
-    id: number,
-    titulo: string,
-    tipo: TipoLibro,
-    descripcion: string,
-    genero: Genero,
-    autor: string,
-    paginas: number,
-    isbn: number,
-    idioma: Idioma,
-    estado: EstadoLibro,
-    fechaPublicacion: string,
-    propietarioId: number,
-    alquiladoPorId?: number,
-    fechaDevolucion?: string,
-  ) {
-    // Asignación manual
-    this.id = id
-    this.titulo = titulo
-    this.tipo = tipo
-    this.descripcion = descripcion
-    this.genero = genero
-    this.autor = autor
-    this.paginas = paginas
-    this.isbn = isbn
-    this.idioma = idioma
-    this.estado = estado
-    this.fechaPublicacion = fechaPublicacion
-    this.propietarioId = propietarioId
-    this.alquiladoPorId = alquiladoPorId
-    this.fechaDevolucion = fechaDevolucion
+  constructor(data: Partial<Libro>) {
+    Object.assign(this, data)
+    // Aseguramos valores por defecto para los obligatorios si fuera necesario
+    this.id = data.id || 0
+    this.titulo = data.titulo || ""
+    this.autor = data.autor || ""
+    this.estado = data.estado || ("DISPONIBLE" as EstadoLibro)
+    this.propietarioId = data.propietarioId || 0
+    this.imagenUrl = data.imagenUrl || ""
+    this.rating = data.rating || 0
   }
 
+  // Mapeador para el DTO de Libro completo (el que ya tenías)
   static fromJson(json: LibroDTO): Libro {
-    return new Libro(
-      json.id,
-      json.titulo,
-      json.tipo,
-      json.descripcion,
-      json.genero,
-      json.autor,
-      json.paginas,
-      json.isbn,
-      json.idioma,
-      json.estado,
-      json.fechaPublicacion,
-      json.propietarioId,
-      json.alquiladoPorId,
-      json.fechaDevolucion,
-    )
+    return new Libro({
+      ...json,
+      // Adaptamos nombres si varían
+    })
+  }
+
+  // NUEVO: Mapeador para el DTO de Préstamo
+  static fromPrestamoJson(json: PrestamoDTO): Libro {
+    return new Libro({
+      id: json.id,
+      titulo: json.titulo,
+      autor: json.autor,
+      estado: json.estado,
+      propietarioId: json.propietarioId,
+      imagenUrl: json.imagenUrl,
+      alquiladoPorId: json.alquiladoPorId ?? undefined,
+      fechaDesde: json.fechaDesde ?? undefined,
+      fechaDevolucion: json.fechaHasta ?? undefined, // fechaHasta -> fechaDevolucion
+      rating: json.rating,
+      bibliokarma: json.bibliokarma ?? undefined,
+      // Los campos faltantes quedan como undefined
+    })
   }
 
   estoyDisponible(): boolean {

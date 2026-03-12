@@ -31,7 +31,7 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
           {getEtiqueta()}
         </div>
         <img
-          src={`https://covers.openlibrary.org/b/isbn/${libro.id}-L.jpg`}
+          src={libro.imagenUrl}
           alt={libro.titulo}
           className="w-full h-full object-cover"
         />
@@ -42,7 +42,9 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
           <h3 className="font-bold text-secondary-dark line-clamp-1">
             {libro.titulo}
           </h3>
-          <span className="text-accent text-sm font-extrabold">★ 4.8</span>
+          <span className="text-accent text-sm font-extrabold">
+            ★{libro.rating}
+          </span>
         </div>
         <p className="text-xs text-secondary opacity-80">{libro.autor}</p>
 
@@ -62,7 +64,7 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
               📅 Rango:
             </span>
             <span className="text-secondary-dark font-semibold">
-              {libro.fechaDevolucion || "Sin fecha"}
+              {libro.fechaDesde}-{libro.fechaDevolucion || "Sin fecha"}
             </span>
           </div>
 
@@ -70,7 +72,7 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
             <span className="text-secondary-light font-bold uppercase tracking-tighter">
               💎 Bibliokarma:
             </span>
-            <span className="text-primary font-black">+240 </span>
+            <span className="text-primary font-black">{libro.bibliokarma}</span>
           </div>
         </div>
 

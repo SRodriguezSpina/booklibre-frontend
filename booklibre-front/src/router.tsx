@@ -6,6 +6,7 @@ import { EditarLibro } from "./pages/EditarLibro.tsx"
 import { AuthPage } from "./pages/AuthPage"
 import { PerfilUsuario } from "./pages/PerfilUsuario"
 import { PerfilUsuarioLayout } from "./layouts/PerfilUsuarioLayout"
+import { DetalleLibro } from "./pages/DetalleLibro"
 import { NotFound } from "./pages/NotFound"
 
 export function AppRouter() {
@@ -19,7 +20,8 @@ export function AppRouter() {
           <Route path="mis-prestamos" element={<DetallePrestamos />} />
           <Route path="login" element={<AuthPage key="login" mode="login" />} />
           <Route path="register" element={<AuthPage key="register" mode="register" />} />
-
+          <Route path="libros/:id" element={<DetalleLibro />} />
+          <Route path="libros/:id/editar" element={<EditarLibro />} />
           <Route path="perfil" element={<PerfilUsuarioLayout />}>
             <Route index element={<PerfilUsuario />} />
           </Route>
