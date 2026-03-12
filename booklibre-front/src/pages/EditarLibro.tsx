@@ -17,24 +17,23 @@ const fromValues = (values: Values): LibroForm => {
   const instance = new LibroForm()
   Object.assign(instance, {
     ...values,
-    paginas: values.paginas === "" ? "" : Number(values.paginas),
-    isbn:    values.isbn    === "" ? "" : Number(values.isbn),
+    paginas: values.paginas === "" ? "" : Number(values.paginas)
   })
   return instance
 }
 
 const toValues = (form: LibroForm): Values => ({
-  titulo:           form.titulo,
-  autor:            form.autor,
-  descripcion:      form.descripcion,
-  tipo:             form.tipo,
-  genero:           form.genero,
-  paginas:          String(form.paginas),
-  isbn:             String(form.isbn),
-  idioma:           form.idioma,
-  estado:           form.estado,
+  titulo: form.titulo,
+  autor: form.autor,
+  descripcion: form.descripcion,
+  tipo: form.tipo,
+  genero: form.genero,
+  paginas: String(form.paginas),
+  isbn: String(form.isbn),
+  idioma: form.idioma,
+  estado: form.estado,
   fechaPublicacion: form.fechaPublicacion,
-  propietarioId:    String(form.propietarioId),
+  propietarioId: String(form.propietarioId),
 })
 
 export const EditarLibro = () => {
@@ -58,7 +57,8 @@ export const EditarLibro = () => {
       return
     }
     try {
-      const libro = await libroService.getLibroById(Number(id))
+      const usuarioId = authService.obtenerIdUsuarioActual() || 1
+      const libro = await libroService.getLibroById(Number(id), usuarioId)
       setValues(toValues(LibroForm.fromLibro(libro)))
       const params = new URLSearchParams(window.location.search)
       setReadOnly(params.get("readOnly") === "true")
@@ -223,9 +223,8 @@ const Field = ({ label, type = "text", placeholder, value, error, disabled, onCh
       placeholder={placeholder}
       disabled={disabled}
       onChange={(e) => onChange(e.target.value)}
-      className={`w-full px-4 py-2.5 rounded-lg border bg-background text-secondary-dark text-sm placeholder:text-secondary-light outline-none transition-colors focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed ${
-        error ? "border-red-400" : "border-accent"
-      }`}
+      className={`w-full px-4 py-2.5 rounded-lg border bg-background text-secondary-dark text-sm placeholder:text-secondary-light outline-none transition-colors focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed ${error ? "border-red-400" : "border-accent"
+        }`}
     />
     {error && <p className="text-xs text-red-500">{error}</p>}
   </div>
@@ -249,9 +248,8 @@ const SelectField = ({ label, value, error, disabled, options, onChange }: Selec
       value={value}
       disabled={disabled}
       onChange={(e) => onChange(e.target.value)}
-      className={`w-full px-4 py-2.5 rounded-lg border bg-background text-secondary-dark text-sm outline-none transition-colors focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed ${
-        error ? "border-red-400" : "border-accent"
-      }`}
+      className={`w-full px-4 py-2.5 rounded-lg border bg-background text-secondary-dark text-sm outline-none transition-colors focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed ${error ? "border-red-400" : "border-accent"
+        }`}
     >
       {options.map((opt) => (
         <option key={opt.value} value={opt.value}>
