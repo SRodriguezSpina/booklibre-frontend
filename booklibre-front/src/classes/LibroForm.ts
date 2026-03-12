@@ -48,7 +48,7 @@ export class LibroForm {
     {
       name: "isbn",
       label: "ISBN",
-      type: "number",
+      type: "text",
       placeholder: "Código ISBN...",
     },
     {
@@ -97,7 +97,7 @@ export class LibroForm {
     form.tipo = libro.tipo || "";
     form.genero = libro.genero || "";
     form.paginas = libro.paginas || "";
-    form.isbn = libro.isbn || ""; // Ahora asume que viene el string del ISBN
+    form.isbn = libro.isbn || "";
     form.idioma = libro.idioma || "";
     form.estado = libro.estado;
     form.fechaPublicacion = libro.fechaPublicacion || "";
@@ -118,10 +118,7 @@ export class LibroForm {
         this.paginas === "" || Number(this.paginas) <= 0
           ? "Ingresá una cantidad de páginas válida"
           : undefined,
-      isbn:
-        this.isbn === "" || Number(this.isbn) <= 0
-          ? "Ingresá un ISBN válido"
-          : undefined,
+      isbn:!this.isbn.trim() ? "Ingresá un ISBN válido" : undefined,
       idioma: !this.idioma ? "El idioma es obligatorio" : undefined,
       estado: !this.estado ? "El estado es obligatorio" : undefined,
       fechaPublicacion: !this.fechaPublicacion
