@@ -9,64 +9,66 @@ interface LibroCardProps {
 export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
   const esPrestamoRecibido = tipoVista === "prestados-a-mi"
   const proximoAVencer = libro.estaProximoAVencer()
+  const estaDisponible = libro.estoyDisponible()
 
   const getBadgeStyles = () => {
-    // Próximo a vencer: Fondo amarillo, texto negro/café para contraste
     if (proximoAVencer) return "bg-yellow-400 text-yellow-950"
-
-    // Activo (Alquilado): Fondo azul, texto blanco
-    if (libro.alquiladoPorId) return "bg-blue-600 text-white"
-
-    // Devuelto: Fondo rojo, texto blanco
+    if (estaDisponible) return "bg-blue-600 text-white"
     return "bg-red-600 text-white"
   }
 
   const getEtiqueta = () => {
     if (proximoAVencer) return "PRÓXIMO A VENCER"
-    if (libro.alquiladoPorId) return "ACTIVO"
+    if (estaDisponible) return "ACTIVO"
     return "DEVUELTO"
   }
 
   return (
     <div className="bg-surface rounded-xl shadow-sm border border-accent overflow-hidden flex flex-col h-full hover:shadow-md transition-shadow">
-      <div className="relative h-64 bg-gray-100">
-        {/* Badge con los nuevos estilos */}
+      {/* 1. Contenedor de Imagen: Altura fija */}
+      <div className="relative h-90 bg-gray-100 flex items-center justify-center">
         <div
           className={`absolute top-3 right-3 px-3 py-1 rounded-full text-[10px] font-black z-10 shadow-md uppercase tracking-wider ${getBadgeStyles()}`}
         >
           {getEtiqueta()}
         </div>
-
         <img
           src={libro.imagenUrl}
           alt={libro.titulo}
-          className="w-full h-full object-cover"
+          className="h-full object-cover"
         />
       </div>
-      <div className="p-4 flex flex-col flex-1 gap-2">
-        <div className="flex justify-between items-start">
-          <h3 className="font-bold text-secondary-dark line-clamp-1">
-            {libro.titulo}
-          </h3>
-          <span className="text-accent text-sm font-extrabold">
-            ★{libro.rating}
-          </span>
-        </div>
-        <p className="text-xs text-secondary opacity-80">{libro.autor}</p>
 
-        <div className="mt-auto pt-3 border-t border-accent space-y-2">
+      {/* 2. Contenedor de Información: flex-1 lo hace crecer para ocupar el alto sobrante */}
+      <div className="p-4 flex flex-col flex-1 flex-grow">
+        {/* ESTE DIV es la clave: flex-grow hace que esta sección ocupe todo el espacio 
+            disponible, empujando el footer (mt-auto) hacia el final */}
+        <div className="flex-grow flex flex-col gap-1">
+          <div className="flex justify-between items-start gap-2">
+            <h3 className="font-bold text-secondary-dark line-clamp-2 leading-tight">
+              {libro.titulo}
+            </h3>
+            <span className="text-accent text-sm font-extrabold shrink-0">
+              ★{libro.rating}
+            </span>
+          </div>
+          <p className="text-xs text-secondary opacity-80">{libro.autor}</p>
+        </div>
+
+        {/* 3. Footer: mt-auto asegura que siempre esté abajo del flex-grow anterior */}
+        <div className="mt-auto pt-3 border-t border-accent space-y-2 flex flex-col">
           <div className="flex items-center gap-2 text-[11px]">
-            <span className="text-secondary-light font-bold uppercase tracking-tighter">
+            <span className="text-secondary-light font-bold uppercase tracking-tighter shrink-0">
               👤 {esPrestamoRecibido ? "Prestado por:" : "Prestado a:"}
             </span>
-            <span className="text-secondary-dark font-semibold">
+            <span className="text-secondary-dark font-semibold truncate">
               Usuario{" "}
               {esPrestamoRecibido ? libro.propietarioId : libro.alquiladoPorId}
             </span>
           </div>
 
           <div className="flex items-center gap-2 text-[11px]">
-            <span className="text-secondary-light font-bold uppercase tracking-tighter">
+            <span className="text-secondary-light font-bold uppercase tracking-tighter shrink-0">
               📅 Rango:
             </span>
             <span className="text-secondary-dark font-semibold">
@@ -75,21 +77,24 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
           </div>
 
           <div className="flex items-center gap-2 text-[11px]">
-            <span className="text-secondary-light font-bold uppercase tracking-tighter">
+            <span className="text-secondary-light font-bold uppercase tracking-tighter shrink-0">
               💎 Bibliokarma:
             </span>
             <span className="text-primary font-black">{libro.bibliokarma}</span>
           </div>
-        </div>
 
-        {esPrestamoRecibido && (
-          <button
-            onClick={() => console.log("Abrir modal calificación")}
-            className="mt-3 w-full py-2 bg-primary text-white rounded-lg text-xs font-bold hover:bg-primary-dark active:bg-accent transition-all shadow-sm"
-          >
-            ★ Calificar
-          </button>
-        )}
+          {/* Botón condicional dentro del footer */}
+          {esPrestamoRecibido &&
+            !libro.estoyDisponible() &&
+            !libro.estaProximoAVencer() && (
+              <button
+                onClick={() => console.log("Abrir modal calificación")}
+                className="mt-2 w-full py-2 bg-background rounded-lg text-xs font-bold hover:bg-primary-dark hover:text-white active:bg-accent transition-all shadow-sm border border-accent/20"
+              >
+                ★ Calificar
+              </button>
+            )}
+        </div>
       </div>
     </div>
   )

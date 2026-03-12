@@ -59,7 +59,6 @@ export const DetallePrestamos = () => {
 
   return (
     <div className="flex flex-col h-full max-w-6xl mx-auto space-y-8 bg-background">
-      {/* ... Títulos y Párrafos ... */}
       <h1 className="text-3xl text-primary mb-4 mt-1">Préstamos de libros</h1>
 
       <p className="text-secondary-dark mb-4 opacity-70">
