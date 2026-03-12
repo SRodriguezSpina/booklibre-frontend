@@ -11,9 +11,14 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
   const proximoAVencer = libro.estaProximoAVencer()
 
   const getBadgeStyles = () => {
-    if (proximoAVencer) return "bg-accent text-primary-dark"
-    if (libro.alquiladoPorId) return "bg-primary-light text-primary-dark"
-    return "bg-secondary-light text-secondary-dark"
+    // Próximo a vencer: Fondo amarillo, texto negro/café para contraste
+    if (proximoAVencer) return "bg-yellow-400 text-yellow-950"
+
+    // Activo (Alquilado): Fondo azul, texto blanco
+    if (libro.alquiladoPorId) return "bg-blue-600 text-white"
+
+    // Devuelto: Fondo rojo, texto blanco
+    return "bg-red-600 text-white"
   }
 
   const getEtiqueta = () => {
@@ -24,19 +29,20 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
 
   return (
     <div className="bg-surface rounded-xl shadow-sm border border-accent overflow-hidden flex flex-col h-full hover:shadow-md transition-shadow">
-      <div className="relative h-64 bg-background">
+      <div className="relative h-64 bg-gray-100">
+        {/* Badge con los nuevos estilos */}
         <div
-          className={`absolute top-3 right-3 px-2 py-1 rounded text-[10px] font-bold z-10 shadow-sm ${getBadgeStyles()}`}
+          className={`absolute top-3 right-3 px-3 py-1 rounded-full text-[10px] font-black z-10 shadow-md uppercase tracking-wider ${getBadgeStyles()}`}
         >
           {getEtiqueta()}
         </div>
+
         <img
           src={libro.imagenUrl}
           alt={libro.titulo}
           className="w-full h-full object-cover"
         />
       </div>
-
       <div className="p-4 flex flex-col flex-1 gap-2">
         <div className="flex justify-between items-start">
           <h3 className="font-bold text-secondary-dark line-clamp-1">
