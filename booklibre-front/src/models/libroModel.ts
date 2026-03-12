@@ -7,17 +7,13 @@ export type EstadoLibro =
   | "Malo"
 export type TipoPrestamo = "prestados-a-mi" | "prestados-por-mi"
 export type Genero =
-  | "Drama" 
+  | "Drama"
   | "Ciencia ficcion"
   | "Romance"
   | "Autoayuda"
   | "Diseño"
   | "Literatura Clasica"
-export type Idioma =
-  | "Español"
-  | "Ingles"
-  | "Frances"
-  | "Portugues"
+export type Idioma = "Español" | "Ingles" | "Frances" | "Portugues"
 
 export interface LibroDTO {
   id: number
@@ -29,7 +25,7 @@ export interface LibroDTO {
   paginas: number
   isbn: number
   idioma: Idioma
-  editorial : string
+  editorial: string
   estado: EstadoLibro
   fechaPublicacion: string
   propietarioId: number
@@ -37,4 +33,18 @@ export interface LibroDTO {
   alquiladoPorId?: number
   fechaDevolucion?: string // ISO string
   bibliokarma?: number
+}
+
+export interface PrestamoDTO {
+  id: number
+  titulo: string
+  autor: string
+  estado: EstadoLibro // Usamos tu enum/tipo existente
+  propietarioId: number
+  imagenUrl: string
+  alquiladoPorId: number | null
+  fechaDesde: string | null
+  fechaHasta: string | null
+  rating: number
+  bibliokarma: number | null
 }
