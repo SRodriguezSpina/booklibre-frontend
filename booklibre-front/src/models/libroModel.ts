@@ -35,3 +35,18 @@ export interface LibroDTO {
   alquiladoPorId?: number
   fechaDevolucion?: string // ISO string
 }
+
+export interface LibroHome {
+  id: number
+  img: string
+  genero: Genero
+  titulo: string
+  autor: string
+  calificacion: number  /*o float?*/ 
+  isbn: string
+  idioma: Idioma
+  tipo: TipoLibro
+  biblokarma: number
+  estado: EstadoLibro
+  duenio: string
+}

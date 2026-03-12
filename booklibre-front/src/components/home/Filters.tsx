@@ -28,7 +28,10 @@ export const Filters = ({ onApplyFilters }: Props) => {
         generos: []
     })
 
-    const updateFilter = (key: keyof FiltersState, value: any) => {
+    const updateFilter = <K extends keyof FiltersState>(
+        key: K,
+        value: FiltersState[K]
+    ) => {
         setFilters((prev) => ({
             ...prev,
             [key]: value
@@ -77,24 +80,24 @@ export const Filters = ({ onApplyFilters }: Props) => {
             <div>
                 <h4>Rango de páginas</h4>
                 <div>
-                    <input type="number" onChange={(e) => updateFilter("paginasMin", Number(e.target.value))}/>
-                    <input type="number" onChange={(e) => updateFilter("paginasMax", Number(e.target.value))}/>
+                    <input type="number" onChange={(e) => updateFilter("paginasMin", Number(e.target.value))} />
+                    <input type="number" onChange={(e) => updateFilter("paginasMax", Number(e.target.value))} />
                 </div>
             </div>
             <div>
                 {/* rango de fechas */}
                 <h4>Rango de fechas para reservar</h4>
                 <div>
-                    <input type="date" onChange={(e) => updateFilter("fechaDesde", e.target.value)}/>
-                    <input type="date" onChange={(e) => updateFilter("fechaHasta", e.target.value)}/>
+                    <input type="date" onChange={(e) => updateFilter("fechaDesde", e.target.value)} />
+                    <input type="date" onChange={(e) => updateFilter("fechaHasta", e.target.value)} />
                 </div>
             </div>
             <div>
                 {/* detalles (isbn + prestado por X usuario) */}
                 <h4>Detalles</h4>
                 <div>
-                    <input type="text" onChange={(e) => updateFilter("isbn", e.target.value)}/>
-                    <input type="text" onChange={(e) => updateFilter("prestadoPor", e.target.value)}/>
+                    <input type="text" onChange={(e) => updateFilter("isbn", e.target.value)} />
+                    <input type="text" onChange={(e) => updateFilter("prestadoPor", e.target.value)} />
                 </div>
             </div>
             <button onClick={handleApply}>Aplicar filtros</button>
