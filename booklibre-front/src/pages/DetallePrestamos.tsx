@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Tabs } from "../components/Tabs"
+import { Tabs } from "../components/ui/Tabs"
 import { LibroCard } from "../components/libros/LibroCard"
 import { Paginacion } from "../components/perfil/Paginacion"
 import { libroService } from "../services/libroService"
@@ -16,16 +16,15 @@ export const DetallePrestamos = () => {
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [searchQuery, setSearchQuery] = useState<string>("") // Se usa para la petición
   const itemsPerPage = 4
-  const tabs: { id: TipoPrestamo; label: string }[] = [
-    { id: "prestados-a-mi", label: "Prestados a mí" },
-    { id: "prestados-por-mi", label: "Prestados por mí" },
+  const pestañas = [
+    { id: "prestados-a-mi", etiqueta: "Prestados a mí" },
+    { id: "prestados-por-mi", etiqueta: "Prestados por mí" },
   ]
   // Función de carga centralizada
   const fetchPrestamos = async (tipo: TipoPrestamo, query: string = "") => {
     setLoading(true)
     try {
       const usuarioId = authService.obtenerIdUsuarioActual() || 1
-      // El service resuelve el filtrado
       const data = await libroService.obtenerPrestamos(usuarioId, tipo, query)
       setLibros(data)
     } catch (error) {
@@ -74,7 +73,11 @@ export const DetallePrestamos = () => {
         />
       </div>
 
-      <Tabs tabs={tabs} active={activeTab} onChange={handleTabChange} />
+      <Tabs
+        pestañas={pestañas}
+        idActivo={activeTab}
+        alCambiar={handleTabChange}
+      />
 
       <main className="mt-6 flex flex-col flex-1 gap-6">
         {loading ? (
