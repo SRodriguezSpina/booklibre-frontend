@@ -32,6 +32,7 @@ export interface LibroDTO {
   estado: EstadoLibro
   fechaPublicacion: string
   propietarioId: number
+  imagenUrl: string
   alquiladoPorId?: number
   fechaDevolucion?: string // ISO string
 }

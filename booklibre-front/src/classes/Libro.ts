@@ -14,6 +14,7 @@ export class Libro {
   estado: EstadoLibro
   fechaPublicacion: string
   propietarioId: number
+  imagenUrl: string
   alquiladoPorId?: number
   fechaDevolucion?: string
 
@@ -30,6 +31,7 @@ export class Libro {
     estado: EstadoLibro,
     fechaPublicacion: string,
     propietarioId: number,
+    imagenUrl: string,
     alquiladoPorId?: number,
     fechaDevolucion?: string,
   ) {
@@ -46,6 +48,7 @@ export class Libro {
     this.estado = estado
     this.fechaPublicacion = fechaPublicacion
     this.propietarioId = propietarioId
+    this.imagenUrl = imagenUrl
     this.alquiladoPorId = alquiladoPorId
     this.fechaDevolucion = fechaDevolucion
   }
@@ -64,6 +67,7 @@ export class Libro {
       json.estado,
       json.fechaPublicacion,
       json.propietarioId,
+      json.imagenUrl,
       json.alquiladoPorId,
       json.fechaDevolucion,
     )
