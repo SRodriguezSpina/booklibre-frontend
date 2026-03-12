@@ -7,17 +7,13 @@ export type EstadoLibro =
   | "Malo"
 export type TipoPrestamo = "prestados-a-mi" | "prestados-por-mi"
 export type Genero =
-  | "Drama" 
+  | "Drama"
   | "Ciencia ficcion"
   | "Romance"
   | "Autoayuda"
   | "Diseño"
   | "Literatura Clasica"
-export type Idioma =
-  | "Español"
-  | "Ingles"
-  | "Frances"
-  | "Portugues"
+export type Idioma = "Español" | "Ingles" | "Frances" | "Portugues"
 
 export interface LibroDTO {
   id: number
@@ -34,5 +30,13 @@ export interface LibroDTO {
   propietarioId: number
   imagenUrl: string
   alquiladoPorId?: number
-  fechaDevolucion?: string // ISO string
+  fechaDevolucion?: string
+}
+
+export interface PrestamoDTO {
+  id: number
+  titulo: string
+  estado: EstadoLibro
+
+  bibliokarma: number
 }
