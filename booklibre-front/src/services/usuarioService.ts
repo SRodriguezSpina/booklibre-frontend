@@ -1,19 +1,30 @@
 import axios from 'axios'
 import { API_BASE_URL } from '../env'
-import type { Usuario } from '../models/usuarioModel'
+import type { Usuario, UsuarioUpdateRequest } from '../models/usuarioModel'
 
 class UsuarioService {
+  // ── Obtener usuario ────────────────────────────────────────────────────────
   async obtenerUsuario(id: number): Promise<Usuario> {
-    const response = await axios.get<Usuario>(`${API_BASE_URL}/usuarios/${id}`)
-    return response.data
+    const res = await axios.get<Usuario>(`${API_BASE_URL}/usuarios/${id}`)
+    return res.data
   }
 
+  // ── Actualizar usuario ─────────────────────────────────────────────────────
   async actualizarUsuario(usuario: Usuario): Promise<Usuario> {
-    const response = await axios.put<Usuario>(
+    const payload: UsuarioUpdateRequest = {
+      nombre: usuario.nombre,
+      desc: usuario.desc,
+      email: usuario.email,
+      celular: usuario.celular,
+      ciudad: usuario.ciudad,
+      tipoUsuario: usuario.tipoUsuario,
+    }
+
+    const res = await axios.put<Usuario>(
       `${API_BASE_URL}/usuarios/${usuario.id}`,
-      usuario,
+      payload,
     )
-    return response.data
+    return res.data
   }
 }
 

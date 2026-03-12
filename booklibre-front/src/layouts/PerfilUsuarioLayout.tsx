@@ -25,7 +25,7 @@ export const PerfilUsuarioLayout = () => {
     //   setCargando(false)
     //   return
     // }
-    const id = 1
+    const id = 2
      //POR AHORA ESTA HARDCODEADO PARA QUE FUNCIONE EL TESTING
 
     try {
@@ -38,7 +38,7 @@ export const PerfilUsuarioLayout = () => {
     }
   }
 
-  useAlIniciar(cargarUsuario)
+  useAlIniciar(cargarUsuario)//Custom hook que hace el efecto únicamente al montar el componente
 
   if (cargando) return <Spinner />
   if (error) return <ErrorCard error={error} alReintentar={cargarUsuario} />

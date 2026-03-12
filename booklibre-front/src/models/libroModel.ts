@@ -48,3 +48,12 @@ export interface PrestamoDTO {
   rating: number
   bibliokarma: number | null
 }
+
+export type LibroUsuarioItemDTO = {
+  id: number
+  titulo: string
+  autor: string
+  genero: string
+  disponible: boolean
+  fechaAgregado: string | null
+}

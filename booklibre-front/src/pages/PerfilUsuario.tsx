@@ -1,7 +1,7 @@
 import { useOutletContext } from 'react-router-dom'
 import { useOnInit } from '../utils/hooks'
 import { libroService } from '../services/libroService'
-import { Libro } from '../classes/Libro'
+import type { LibroUsuarioItemDTO } from '../models/libroModel'
 import type { Usuario } from '../models/usuarioModel'
 import { useEffect, useState } from 'react'
 import type { ContextoPerfilUsuario } from '../layouts/PerfilUsuarioLayout'
@@ -14,13 +14,13 @@ import { toast } from 'react-toastify'
 
 export const PerfilUsuario = () => {
   const { usuario, setUsuario } = useOutletContext<ContextoPerfilUsuario>()
-  const [libros, setLibros] = useState<Libro[]>([])
+  const [libros, setLibros] = useState<LibroUsuarioItemDTO[]>([])
   const [editando, setEditando] = useState(false)
   const [borradorUsuario, setBorradorUsuario] = useState<Usuario>(usuario)
 
   const cargarLibros = async () => {
     try {
-      const response = await libroService.obtenerLibrosDeUsuario(usuario.id)
+      const response = await libroService.obtenerLibrosUsuarioPerfil(usuario.id) // OBTENGO LOS LIBROS DEL USUARIO POR ID
       setLibros(response)
     } catch {
       setLibros([])
@@ -29,7 +29,7 @@ export const PerfilUsuario = () => {
   }
 
   useOnInit(() => {
-    void cargarLibros()
+    void cargarLibros() //CUSTOM HOOK PARA CARGAR A INFO EN MI VISTA 
   })
 
   useEffect(() => {
@@ -64,7 +64,7 @@ export const PerfilUsuario = () => {
     toast.info('Funcionalidad para agregar libro próximamente.')
   }
 
-  const cantidadPrestados = libros.filter((l) => !l.estoyDisponible()).length
+  const cantidadPrestados = libros.filter((l) => !l.disponible).length
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
