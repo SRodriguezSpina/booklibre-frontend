@@ -8,8 +8,16 @@ import { useOnInit } from "../utils/hooks"
 type Values = Record<string, string>
 
 const emptyValues = (): Values => ({
-  titulo: "", autor: "", descripcion: "", tipo: "", genero: "",
-  paginas: "", isbn: "", idioma: "", estado: "", fechaPublicacion: "",
+  titulo: "",
+  autor: "",
+  descripcion: "",
+  tipo: "",
+  genero: "",
+  paginas: "",
+  isbn: "",
+  idioma: "",
+  estado: "",
+  fechaPublicacion: "",
   propietarioId: "",
 })
 
@@ -17,7 +25,7 @@ const fromValues = (values: Values): LibroForm => {
   const instance = new LibroForm()
   Object.assign(instance, {
     ...values,
-    paginas: values.paginas === "" ? "" : Number(values.paginas)
+    paginas: values.paginas === "" ? "" : Number(values.paginas),
   })
   return instance
 }
@@ -45,10 +53,9 @@ export const EditarLibro = () => {
   const [errors, setErrors] = useState<Record<string, string | undefined>>({})
   const [serverError, setServerError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [readOnly, setReadOnly] = useState(false)
   const [loading, setLoading] = useState(!esNuevo)
 
-  const titulo = readOnly ? "Detalle del libro" : esNuevo ? "Nuevo libro" : "Editar libro"
+  const titulo = esNuevo ? "Nuevo libro" : "Editar libro"
 
   useOnInit(async () => {
     if (esNuevo) {
@@ -60,8 +67,6 @@ export const EditarLibro = () => {
       const usuarioId = authService.obtenerIdUsuarioActual() || 1
       const libro = await libroService.getLibroById(Number(id), usuarioId)
       setValues(toValues(LibroForm.fromLibro(libro)))
-      const params = new URLSearchParams(window.location.search)
-      setReadOnly(params.get("readOnly") === "true")
     } catch {
       navigate("/home")
     } finally {
@@ -129,7 +134,6 @@ export const EditarLibro = () => {
             placeholder={field.placeholder}
             value={values[field.name] ?? ""}
             error={errors[field.name]}
-            disabled={readOnly}
             onChange={(v) => handleChange(field.name, v)}
           />
         ))}
@@ -139,8 +143,10 @@ export const EditarLibro = () => {
           label="Tipo"
           value={values.tipo}
           error={errors.tipo}
-          disabled={readOnly}
-          options={[{ value: "", label: "Seleccioná una opción" }, ...LibroForm.tipoOptions]}
+          options={[
+            { value: "", label: "Seleccioná una opción" },
+            ...LibroForm.tipoOptions,
+          ]}
           onChange={(v) => handleChange("tipo", v)}
         />
 
@@ -148,8 +154,10 @@ export const EditarLibro = () => {
           label="Género"
           value={values.genero}
           error={errors.genero}
-          disabled={readOnly}
-          options={[{ value: "", label: "Seleccioná una opción" }, ...LibroForm.generoOptions]}
+          options={[
+            { value: "", label: "Seleccioná una opción" },
+            ...LibroForm.generoOptions,
+          ]}
           onChange={(v) => handleChange("genero", v)}
         />
 
@@ -157,8 +165,10 @@ export const EditarLibro = () => {
           label="Idioma"
           value={values.idioma}
           error={errors.idioma}
-          disabled={readOnly}
-          options={[{ value: "", label: "Seleccioná una opción" }, ...LibroForm.idiomaOptions]}
+          options={[
+            { value: "", label: "Seleccioná una opción" },
+            ...LibroForm.idiomaOptions,
+          ]}
           onChange={(v) => handleChange("idioma", v)}
         />
 
@@ -166,8 +176,10 @@ export const EditarLibro = () => {
           label="Estado"
           value={values.estado}
           error={errors.estado}
-          disabled={readOnly}
-          options={[{ value: "", label: "Seleccioná una opción" }, ...LibroForm.estadoOptions]}
+          options={[
+            { value: "", label: "Seleccioná una opción" },
+            ...LibroForm.estadoOptions,
+          ]}
           onChange={(v) => handleChange("estado", v)}
         />
 
@@ -178,21 +190,25 @@ export const EditarLibro = () => {
         )}
 
         <div className="flex gap-3 pt-2">
-          {!readOnly && (
+          {
             <button
               type="submit"
               disabled={isSubmitting}
               className="flex-1 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary-dark transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? "Guardando..." : esNuevo ? "Crear libro" : "Guardar cambios"}
+              {isSubmitting
+                ? "Guardando..."
+                : esNuevo
+                  ? "Crear libro"
+                  : "Guardar cambios"}
             </button>
-          )}
+          }
           <button
             type="button"
             onClick={() => navigate(-1)}
             className="flex-1 py-2.5 bg-surface border border-accent text-secondary-dark rounded-lg text-sm font-bold hover:bg-accent transition-all"
           >
-            {readOnly ? "Volver" : "Descartar cambios"}
+            {"Descartar cambios"}
           </button>
         </div>
       </form>
@@ -212,7 +228,15 @@ interface FieldProps {
   onChange: (value: string) => void
 }
 
-const Field = ({ label, type = "text", placeholder, value, error, disabled, onChange }: FieldProps) => (
+const Field = ({
+  label,
+  type = "text",
+  placeholder,
+  value,
+  error,
+  disabled,
+  onChange,
+}: FieldProps) => (
   <div className="flex flex-col gap-1">
     <label className="text-xs font-bold text-secondary-light uppercase tracking-wider">
       {label} <span className="text-primary">*</span>
@@ -223,8 +247,9 @@ const Field = ({ label, type = "text", placeholder, value, error, disabled, onCh
       placeholder={placeholder}
       disabled={disabled}
       onChange={(e) => onChange(e.target.value)}
-      className={`w-full px-4 py-2.5 rounded-lg border bg-background text-secondary-dark text-sm placeholder:text-secondary-light outline-none transition-colors focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed ${error ? "border-red-400" : "border-accent"
-        }`}
+      className={`w-full px-4 py-2.5 rounded-lg border bg-background text-secondary-dark text-sm placeholder:text-secondary-light outline-none transition-colors focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed ${
+        error ? "border-red-400" : "border-accent"
+      }`}
     />
     {error && <p className="text-xs text-red-500">{error}</p>}
   </div>
@@ -239,7 +264,14 @@ interface SelectFieldProps {
   onChange: (value: string) => void
 }
 
-const SelectField = ({ label, value, error, disabled, options, onChange }: SelectFieldProps) => (
+const SelectField = ({
+  label,
+  value,
+  error,
+  disabled,
+  options,
+  onChange,
+}: SelectFieldProps) => (
   <div className="flex flex-col gap-1">
     <label className="text-xs font-bold text-secondary-light uppercase tracking-wider">
       {label} <span className="text-primary">*</span>
@@ -248,8 +280,9 @@ const SelectField = ({ label, value, error, disabled, options, onChange }: Selec
       value={value}
       disabled={disabled}
       onChange={(e) => onChange(e.target.value)}
-      className={`w-full px-4 py-2.5 rounded-lg border bg-background text-secondary-dark text-sm outline-none transition-colors focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed ${error ? "border-red-400" : "border-accent"
-        }`}
+      className={`w-full px-4 py-2.5 rounded-lg border bg-background text-secondary-dark text-sm outline-none transition-colors focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed ${
+        error ? "border-red-400" : "border-accent"
+      }`}
     >
       {options.map((opt) => (
         <option key={opt.value} value={opt.value}>
