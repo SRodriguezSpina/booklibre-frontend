@@ -62,4 +62,11 @@ export interface LibroHome {
   biblokarma: number
   estado: EstadoLibro
   duenio: string
+export type LibroUsuarioItemDTO = {
+  id: number
+  titulo: string
+  autor: string
+  genero: string
+  disponible: boolean
+  fechaAgregado: string | null
 }

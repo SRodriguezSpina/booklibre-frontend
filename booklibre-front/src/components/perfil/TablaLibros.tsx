@@ -1,16 +1,16 @@
 import { Badge } from '../ui'
 import { Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
-import { Libro } from '../../classes/Libro'
+import type { LibroUsuarioItemDTO } from '../../models/libroModel'
 
 export type PropsTablaLibros = {
-  libros: Libro[]
+  libros: LibroUsuarioItemDTO[]
   campoOrden: 'titulo' | 'estado' | 'fecha'
   sentidoOrden: 'ascendente' | 'descendente'
   alCambiarOrden: (campo: 'titulo' | 'estado' | 'fecha') => void
 }
 
-const getBadge = (libro: Libro) =>
-  libro.estoyDisponible()
+const getBadge = (disponible: boolean) =>
+  disponible
     ? { variante: 'exito' as const, texto: 'Disponible' }
     : { variante: 'advertencia' as const, texto: 'Prestado' }
 
@@ -21,8 +21,8 @@ const IconoOrden = ({ activo, sentido }: { activo: boolean; sentido: 'ascendente
     : <ChevronDown className="ml-1 w-3 h-3 text-secondary" />
 }
 
-const formatearFecha = (fechaStr?: string) => {
-  if (!fechaStr) return 'Sin préstamo activo'
+const formatearFecha = (fechaStr: string | null) => {
+  if (!fechaStr) return '—'
   return new Date(fechaStr)
     .toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' })
     .replace('.', '')
@@ -50,7 +50,7 @@ export const TablaLibros = ({ libros, campoOrden, sentidoOrden, alCambiarOrden }
                 className="inline-flex items-center hover:text-secondary transition-colors"
                 onClick={() => alCambiarOrden('estado')}
               >
-                Estado
+                Disponible
                 <IconoOrden activo={campoOrden === 'estado'} sentido={sentidoOrden} />
               </button>
             </th>
@@ -60,7 +60,7 @@ export const TablaLibros = ({ libros, campoOrden, sentidoOrden, alCambiarOrden }
                 className="inline-flex items-center hover:text-secondary transition-colors"
                 onClick={() => alCambiarOrden('fecha')}
               >
-                Devolución
+                Agregado
                 <IconoOrden activo={campoOrden === 'fecha'} sentido={sentidoOrden} />
               </button>
             </th>
@@ -69,7 +69,7 @@ export const TablaLibros = ({ libros, campoOrden, sentidoOrden, alCambiarOrden }
         </thead>
         <tbody className="divide-y divide-gray-50">
           {libros.map((libro) => {
-            const { variante, texto } = getBadge(libro)
+            const { variante, texto } = getBadge(libro.disponible)
             return (
               <tr key={libro.id} className="group hover:bg-gray-50/50 transition-colors">
                 <td className="py-4">
@@ -80,6 +80,7 @@ export const TablaLibros = ({ libros, campoOrden, sentidoOrden, alCambiarOrden }
                     <div>
                       <div className="font-bold text-secondary text-base">{libro.titulo}</div>
                       <div className="text-xs text-secondary/50 font-medium">{libro.autor}</div>
+                      <div className="text-xs text-secondary/40 font-medium">{libro.genero}</div>
                     </div>
                   </div>
                 </td>
@@ -87,7 +88,7 @@ export const TablaLibros = ({ libros, campoOrden, sentidoOrden, alCambiarOrden }
                   <Badge variante={variante}>{texto}</Badge>
                 </td>
                 <td className="py-4 text-secondary/60 font-medium">
-                  {formatearFecha(libro.fechaDevolucion)}
+                  {formatearFecha(libro.fechaAgregado)}
                 </td>
                 <td className="py-4">
                   <div className="flex justify-end gap-2 pr-4 text-secondary/40">

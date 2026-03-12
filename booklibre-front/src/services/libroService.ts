@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Libro } from "../classes/Libro";
-import type { LibroDTO, PrestamoDTO, TipoPrestamo } from "../models/libroModel";
+import type { LibroDTO, LibroUsuarioItemDTO, PrestamoDTO, TipoPrestamo } from "../models/libroModel";
 import { API_BASE_URL } from "../env";
 
 export const libroService = {
@@ -36,6 +36,14 @@ export const libroService = {
     return res.data.map(Libro.fromJson);
   },
 
+  // ⇩⇩⇩ NUEVO MÉTODO SOLO PARA PERFIL USUARIO
+  async obtenerLibrosUsuarioPerfil(usuarioId: number): Promise<LibroUsuarioItemDTO[]> {
+    const res = await axios.get<LibroUsuarioItemDTO[]>(
+      `${API_BASE_URL}/usuarios/${usuarioId}/libros`,
+    )
+    return res.data
+  },
+  
   async getLibroById(id: number, usuarioId: number): Promise<Libro> {
     const res = await axios.get<LibroDTO>(`${API_BASE_URL}/libros/${id}`, {
       params: {
