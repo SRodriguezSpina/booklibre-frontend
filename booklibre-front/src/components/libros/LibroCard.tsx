@@ -11,9 +11,9 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
   const proximoAVencer = libro.estaProximoAVencer()
 
   const getBadgeStyles = () => {
-    if (proximoAVencer) return "bg-orange-100 text-orange-600"
-    if (libro.alquiladoPorId) return "bg-blue-100 text-blue-600"
-    return "bg-red-100 text-red-600"
+    if (proximoAVencer) return "bg-accent text-primary-dark"
+    if (libro.alquiladoPorId) return "bg-primary-light text-primary-dark"
+    return "bg-secondary-light text-secondary-dark"
   }
 
   const getEtiqueta = () => {
@@ -23,61 +23,61 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-full hover:shadow-md transition-shadow">
-      {/* Contenedor de Imagen y Badge */}
-      <div className="relative h-64 bg-gray-200">
+    <div className="bg-surface rounded-xl shadow-sm border border-accent overflow-hidden flex flex-col h-full hover:shadow-md transition-shadow">
+      <div className="relative h-64 bg-background">
         <div
-          className={`absolute top-3 right-3 px-2 py-1 rounded text-[10px] font-bold z-10 ${getBadgeStyles()}`}
+          className={`absolute top-3 right-3 px-2 py-1 rounded text-[10px] font-bold z-10 shadow-sm ${getBadgeStyles()}`}
         >
           {getEtiqueta()}
         </div>
         <img
-          src={`https://covers.openlibrary.org/b/isbn/${libro.id}-L.jpg`} // Placeholder usando el ID/ISBN
+          src={`https://covers.openlibrary.org/b/isbn/${libro.id}-L.jpg`}
           alt={libro.titulo}
           className="w-full h-full object-cover"
         />
       </div>
 
-      {/* Contenido */}
       <div className="p-4 flex flex-col flex-1 gap-2">
         <div className="flex justify-between items-start">
-          <h3 className="font-bold text-gray-800 line-clamp-1">
-            {libro.titulo} [cite: 14]
+          <h3 className="font-bold text-secondary-dark line-clamp-1">
+            {libro.titulo}
           </h3>
-          <span className="text-yellow-500 text-sm">★ 4.8</span>
+          <span className="text-accent text-sm font-extrabold">★ 4.8</span>
         </div>
-        <p className="text-xs text-gray-500">{libro.autor} [cite: 18]</p>
+        <p className="text-xs text-secondary opacity-80">{libro.autor}</p>
 
-        <div className="mt-auto pt-3 border-t border-gray-50 space-y-2">
+        <div className="mt-auto pt-3 border-t border-accent space-y-2">
           <div className="flex items-center gap-2 text-[11px]">
-            <span className="text-gray-400">
+            <span className="text-secondary-light font-bold uppercase tracking-tighter">
               👤 {esPrestamoRecibido ? "Prestado por:" : "Prestado a:"}
             </span>
-            <span className="text-gray-700 font-medium">
+            <span className="text-secondary-dark font-semibold">
               Usuario{" "}
               {esPrestamoRecibido ? libro.propietarioId : libro.alquiladoPorId}
             </span>
           </div>
 
           <div className="flex items-center gap-2 text-[11px]">
-            <span className="text-gray-400">📅 Rango:</span>
-            <span className="text-gray-700 font-medium">
+            <span className="text-secondary-light font-bold uppercase tracking-tighter">
+              📅 Rango:
+            </span>
+            <span className="text-secondary-dark font-semibold">
               {libro.fechaDevolucion || "Sin fecha"}
-            </span>{" "}
-            [cite: 32]
+            </span>
           </div>
 
           <div className="flex items-center gap-2 text-[11px]">
-            <span className="text-gray-400">💎 BIBLOKARMA:</span>
-            <span className="text-gray-700 font-bold">+240</span>
+            <span className="text-secondary-light font-bold uppercase tracking-tighter">
+              💎 Bibliokarma:
+            </span>
+            <span className="text-primary font-black">+240 </span>
           </div>
         </div>
 
-        {/* Acción de Calificar - Solo si me lo prestaron y está devuelto/cerca de vencer */}
         {esPrestamoRecibido && (
           <button
             onClick={() => console.log("Abrir modal calificación")}
-            className="mt-3 w-full py-2 bg-blue-50 text-blue-600 rounded-lg text-xs font-semibold hover:bg-blue-100 transition-colors"
+            className="mt-3 w-full py-2 bg-primary text-white rounded-lg text-xs font-bold hover:bg-primary-dark active:bg-accent transition-all shadow-sm"
           >
             ★ Calificar
           </button>
