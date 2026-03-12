@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Tabs } from "../components/ui/Tabs"
 import { LibroCard } from "../components/libros/LibroCard"
-import { Paginacion } from "../components/perfil/Paginacion"
+import { Paginacion } from "../components/Paginacion"
 import { libroService } from "../services/libroService"
 import { authService } from "../services/AuthService"
 import { useOnInit } from "../utils/hooks"

@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
 import { Boton, Card, Tabs, type Pestaña } from '../ui'
-import { Libro } from '../../classes/Libro'
+import type { LibroUsuarioItemDTO } from '../../models/libroModel'
 import { TablaLibros } from './TablaLibros'
-import { Paginacion } from './Paginacion'
+import { Paginacion } from '../Paginacion'
 
 export type PropsGestionMisLibros = {
-  libros: Libro[]
+  libros: LibroUsuarioItemDTO[]
   onAgregar: () => void
 }
 
@@ -18,18 +18,18 @@ const pestañas: Pestaña[] = [
   { id: 'prestados', etiqueta: 'Prestados' },
 ]
 
-const ESTRATEGIAS_FILTRO: Record<Filtro, (l: Libro) => boolean> = {
+const ESTRATEGIAS_FILTRO: Record<Filtro, (l: LibroUsuarioItemDTO) => boolean> = {
   todos: () => true,
-  disponibles: (l) => l.estoyDisponible(),
-  prestados: (l) => !l.estoyDisponible(),
+  disponibles: (l) => l.disponible,
+  prestados: (l) => !l.disponible,
 }
 
-const COMPARADORES_ORDEN: Record<CampoOrden, (a: Libro, b: Libro) => number> = {
+const COMPARADORES_ORDEN: Record<CampoOrden, (a: LibroUsuarioItemDTO, b: LibroUsuarioItemDTO) => number> = {
   titulo: (a, b) => a.titulo.localeCompare(b.titulo),
-  estado: (a, b) => Number(a.estoyDisponible()) - Number(b.estoyDisponible()),
+  estado: (a, b) => Number(a.disponible) - Number(b.disponible),
   fecha: (a, b) => {
-    const fa = a.fechaDevolucion ? new Date(a.fechaDevolucion).getTime() : 0
-    const fb = b.fechaDevolucion ? new Date(b.fechaDevolucion).getTime() : 0
+    const fa = a.fechaAgregado ? new Date(a.fechaAgregado).getTime() : 0
+    const fb = b.fechaAgregado ? new Date(b.fechaAgregado).getTime() : 0
     return fa - fb
   },
 }
