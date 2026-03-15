@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom"
-import { NavbarSuperior } from "../components/NavbarSuperior"
+import { NavbarSuperior } from "../components/ui/NavbarSuperior"
 
 export function MainLayoutWrapper() {
   return (

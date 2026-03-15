@@ -2,7 +2,7 @@ import { useMemo, useState } from "react"
 import { Boton, Card, Tabs, type Pestaña } from "../ui"
 import type { LibroUsuarioItemDTO } from "../../models/libroModel"
 import { TablaLibros } from "./TablaLibros"
-import { Paginacion } from "../Paginacion"
+import { Paginacion } from "../ui/Paginacion"
 import { useNavigate } from "react-router-dom"
 
 export type PropsGestionMisLibros = {
