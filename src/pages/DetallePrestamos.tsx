@@ -51,7 +51,6 @@ export const DetallePrestamos = () => {
     )
   }, [todosLosLibros, activeTab, searchQuery, usuarioId])
 
-  // 4. Lógica de UI simple
   const handleSearch = (query: string) => {
     setSearchQuery(query)
     setCurrentPage(1)
