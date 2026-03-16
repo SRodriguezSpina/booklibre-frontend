@@ -1,5 +1,9 @@
 import { Libro } from "../../classes/Libro"
+import { useState } from "react"
 import type { TipoPrestamo } from "../../models/libroModel"
+import { ModalCalificacion } from "./ModalCalificacion"
+import { libroService } from "../../services/libroService"
+import { authService } from "../../services/AuthService"
 
 interface LibroCardProps {
   libro: Libro
@@ -7,20 +11,34 @@ interface LibroCardProps {
 }
 
 export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const esPrestamoRecibido = tipoVista === "prestados-a-mi"
   const proximoAVencer = libro.estaProximoAVencer()
   const estaDisponible = libro.estoyDisponible()
-
-  const getBadgeStyles = () => {
-    if (proximoAVencer) return "bg-yellow-400 text-yellow-950"
-    if (estaDisponible) return "bg-blue-600 text-white"
-    return "bg-red-600 text-white"
+  const usuarioActualId = authService.obtenerIdUsuarioActual() || 1
+  const handleCalificar = async (valor: number, comentario: string) => {
+    await libroService.calificarLibro(
+      libro.id,
+      usuarioActualId,
+      valor,
+      comentario,
+    )
+    console.log("Enviando:", { valor, comentario })
+    setIsModalOpen(false)
+    alert("¡Gracias por calificar!")
   }
-
   const getEtiqueta = () => {
+    if (libro.estaDevuelto()) return "DEVUELTO"
     if (proximoAVencer) return "PRÓXIMO A VENCER"
     if (estaDisponible) return "ACTIVO"
-    return "DEVUELTO"
+    return "EN PRÉSTAMO" // Estado por defecto si no es ninguna de las anteriores
+  }
+
+  const getBadgeStyles = () => {
+    if (libro.estaDevuelto()) return "bg-red-600 text-white"
+    if (proximoAVencer) return "bg-yellow-400 text-yellow-950"
+    if (estaDisponible) return "bg-blue-600 text-white"
+    return "bg-green-600 text-white"
   }
 
   return (
@@ -40,10 +58,10 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
       </div>
 
       {/* 2. Contenedor de Información: flex-1 lo hace crecer para ocupar el alto sobrante */}
-      <div className="p-4 flex flex-col flex-1 flex-grow">
+      <div className="p-4 flex flex-col flex-1 grow">
         {/* ESTE DIV es la clave: flex-grow hace que esta sección ocupe todo el espacio 
             disponible, empujando el footer (mt-auto) hacia el final */}
-        <div className="flex-grow flex flex-col gap-1">
+        <div className="grow flex flex-col gap-1">
           <div className="flex justify-between items-start gap-2">
             <h3 className="font-bold text-secondary-dark line-clamp-2 leading-tight">
               {libro.titulo}
@@ -83,19 +101,24 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
             <span className="text-primary font-black">{libro.bibliokarma}</span>
           </div>
 
-          {/* Botón condicional dentro del footer */}
-          {esPrestamoRecibido &&
-            !libro.estoyDisponible() &&
-            !libro.estaProximoAVencer() && (
-              <button
-                onClick={() => console.log("Abrir modal calificación")}
-                className="mt-2 w-full py-2 bg-background rounded-lg text-xs font-bold hover:bg-primary-dark hover:text-white active:bg-accent transition-all shadow-sm border border-accent/20"
-              >
-                ★ Calificar
-              </button>
-            )}
+          {/* Botón de Calificar modificado */}
+          {/* Solo mostramos "Calificar" si el préstamo fue devuelto */}
+          {esPrestamoRecibido && libro.estaDevuelto() && (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="mt-2 w-full py-2 bg-background rounded-lg text-xs font-bold hover:bg-primary-dark hover:text-white transition-all shadow-sm border border-accent/20"
+            >
+              ★ Calificar
+            </button>
+          )}
         </div>
       </div>
+      <ModalCalificacion
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleCalificar}
+        tituloLibro={libro.titulo}
+      />
     </div>
   )
 }
