@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom"
-import navBarLogo from "../assets/icons/booklibre-logo.svg"
+import navBarLogo from "../../assets/icons/booklibre-logo.svg" // Asegúrate de tener este logo en tu carpeta de assets
 
 interface NavItemProps {
   text: string
