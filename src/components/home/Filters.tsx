@@ -1,7 +1,13 @@
 import { useState } from "react"
 
 export type FiltersState = {
-    generos?: string[]
+    cienciaFiccion: boolean
+    drama: boolean
+    autoayuda: boolean
+    romance: boolean
+    disenio: boolean
+    literaturaClasica: boolean
+    // ^ estados individuales en géneros
     isbn?: string
     prestadoPor?: string
     paginasMin?: number
@@ -10,23 +16,21 @@ export type FiltersState = {
     fechaHasta?: string
 }
 
-const GENEROS = [
-    "Ciencia Ficción",
-    "Drama",
-    "Autoayuda",
-    "Romance",
-    "Diseño",
-    "Lietratura Clásica"
-]
-
 type Props = {
     onApplyFilters: (filters: FiltersState) => void
 }
 
+export const INITIAL_FILTERS: FiltersState = {
+    cienciaFiccion: false,
+    drama: false,
+    autoayuda: false,
+    romance: false,
+    disenio: false,
+    literaturaClasica: false
+}
+
 export const Filters = ({ onApplyFilters }: Props) => {
-    const [filters, setFilters] = useState<FiltersState>({
-        generos: []
-    })
+    const [filters, setFilters] = useState<FiltersState>(INITIAL_FILTERS)
 
     const updateFilter = <K extends keyof FiltersState>(
         key: K,
@@ -38,24 +42,6 @@ export const Filters = ({ onApplyFilters }: Props) => {
         }))
     }
 
-    const toggleGenero = (genero: string) => {
-        setFilters((prev) => {
-
-            const generosActuales = prev.generos ?? []
-            if (generosActuales.includes(genero)) {
-                return {
-                    ...prev,
-                    generos: generosActuales.filter(g => g !== genero)
-                }
-            }
-
-            return {
-                ...prev,
-                generos: [...generosActuales, genero]
-            }
-        })
-    }
-
     const handleApply = () => {
         onApplyFilters(filters)
     }
@@ -65,16 +51,59 @@ export const Filters = ({ onApplyFilters }: Props) => {
             <div>
                 <h4>Géneros</h4>
                 <div>
-                    {GENEROS.map((genero) => (
-                        <label key={genero}>
-                            <input
-                                type="checkbox"
-                                checked={filters.generos?.includes(genero)}
-                                onChange={() => toggleGenero(genero)}
-                            />
-                            {genero}
-                        </label>
-                    ))}
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={filters.cienciaFiccion}
+                            onChange={(e) => updateFilter("cienciaFiccion", e.target.checked)}
+                        />
+                        Ciencia Ficción
+                    </label>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={filters.drama}
+                            onChange={(e) => updateFilter("drama", e.target.checked)}
+                        />
+                        Drama
+                    </label>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={filters.autoayuda}
+                            onChange={(e) => updateFilter("autoayuda", e.target.checked)}
+                        />
+                        Autoayuda
+                    </label>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={filters.romance}
+                            onChange={(e) => updateFilter("romance", e.target.checked)}
+                        />
+                        Romance
+                    </label>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={filters.disenio}
+                            onChange={(e) => updateFilter("disenio", e.target.checked)}
+                        />
+                        Diseño
+                    </label>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={filters.literaturaClasica}
+                            onChange={(e) => updateFilter("literaturaClasica", e.target.checked)}
+                        />
+                        Literatura Clásica
+                    </label>
                 </div>
             </div>
             <div>
@@ -85,7 +114,6 @@ export const Filters = ({ onApplyFilters }: Props) => {
                 </div>
             </div>
             <div>
-                {/* rango de fechas */}
                 <h4>Rango de fechas para reservar</h4>
                 <div>
                     <input type="date" onChange={(e) => updateFilter("fechaDesde", e.target.value)} />
@@ -93,7 +121,6 @@ export const Filters = ({ onApplyFilters }: Props) => {
                 </div>
             </div>
             <div>
-                {/* detalles (isbn + prestado por X usuario) */}
                 <h4>Detalles</h4>
                 <div>
                     <input type="text" onChange={(e) => updateFilter("isbn", e.target.value)} />
