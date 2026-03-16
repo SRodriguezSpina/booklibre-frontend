@@ -92,4 +92,17 @@ export const libroService = {
         libro.autor.toLowerCase().includes(q),
     )
   },
+  // libroService.ts
+  async calificarLibro(
+    libroId: number,
+    usuarioId: number,
+    valor: number,
+    comentario: string,
+  ) {
+    return await axios.post(`${API_BASE_URL}/libros/${libroId}/calificar`, {
+      usuarioId,
+      valor,
+      comentario,
+    })
+  },
 }

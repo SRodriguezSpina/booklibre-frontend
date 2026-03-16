@@ -10,6 +10,7 @@ import type {
 export class Libro {
   // ... propiedades anteriores ...
   id: number
+  prestamoId?: number // Para el caso de PrestamoDTO, donde el ID del libro viene como "id" pero queremos mapearlo a "libroId"
   titulo: string
   autor: string
   estado: EstadoLibro
@@ -67,17 +68,29 @@ export class Libro {
     })
   }
 
-  estoyDisponible(): boolean {
-    return !this.alquiladoPorId
-  }
-
-  estaProximoAVencer(): boolean {
+  estaDevuelto(): boolean {
     if (!this.fechaDevolucion) return false
     const hoy = new Date()
     const fechaFin = new Date(this.fechaDevolucion)
+    // Seteamos ambos a medianoche para comparar solo el día
+    hoy.setHours(0, 0, 0, 0)
+    fechaFin.setHours(0, 0, 0, 0)
+    return fechaFin < hoy
+  }
+
+  estoyDisponible(): boolean {
+    // Está disponible si no tiene fecha de devolución o si ya se devolvió
+    return !this.fechaDevolucion || this.estaDevuelto()
+  }
+
+  estaProximoAVencer(): boolean {
+    if (!this.fechaDevolucion || this.estaDevuelto()) return false
+    const hoy = new Date()
+    const fechaFin = new Date(this.fechaDevolucion)
+    // Calculamos la diferencia en días
     const diffTiempo = fechaFin.getTime() - hoy.getTime()
     const diffDias = Math.ceil(diffTiempo / (1000 * 60 * 60 * 24))
-
-    return diffDias >= 0 && diffDias <= 2
+    // Por ejemplo, avisar si faltan 3 días o menos
+    return diffDias >= 0 && diffDias <= 3
   }
 }
