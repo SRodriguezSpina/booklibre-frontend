@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { homeService } from '../services/homeService'
+import { authService } from '../services/AuthService.ts';
 import { SearchBar } from '../components/ui/SearchBar';
 import { Filters, INITIAL_FILTERS } from '../components/home/Filters';
 import type { FiltersState } from '../components/home/Filters';
@@ -9,6 +10,7 @@ import { Paginacion } from '../components/ui/Paginacion'
 import { useOnInit } from '../utils/hooks.ts'
 
 const ITEMS_POR_PAGINA = 6
+const userId = authService.obtenerIdUsuarioActual() ?? 0
 
 export const Home = () => {
     const [query, setQuery] = useState('')
@@ -19,7 +21,7 @@ export const Home = () => {
 
     const search = async (q: string, f: FiltersState, page: number = 0) => {
         try {
-            const data = await homeService.search(q, f, page, ITEMS_POR_PAGINA)
+            const data = await homeService.search(q, f, page, ITEMS_POR_PAGINA, userId)
             setBooks(data.content)
             setTotalPaginas(data.totalPages)
         } catch (error: unknown) {

@@ -24,7 +24,8 @@ class HomeService {
         query: string = '',
         filters: FiltersState = INITIAL_FILTERS,
         page: number = 0,
-        size: number = 6
+        size: number = 6,
+        userId: number
     ) : Promise<SearchResponse> {
         const generos = Object.entries(filters)
             .filter(([key, value]) => value === true && Object.keys(GENERO_MAP).includes(key))
@@ -32,7 +33,7 @@ class HomeService {
             .join(',')
 
         const response = await axios.get<SearchResponse>(`${API_BASE_URL}/libros/home`, {
-            params: { query, generos, page, size }
+            params: { query, generos, page, size, userId }
         })
         return response.data
     }
