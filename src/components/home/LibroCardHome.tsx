@@ -4,7 +4,7 @@ import { Star } from 'lucide-react'
 
 type LibroCardProps = {
     id: number
-    img: string
+    imagenUrl: string
     // --
     genero: string
     titulo: string
@@ -20,11 +20,11 @@ type LibroCardProps = {
     duenio: string
 }
 
-export const LibroCardHome = ({ id, img, genero, titulo, autor, calificacion, isbn, idioma, tipo, biblokarma, estado, duenio }: LibroCardProps) => {
+export const LibroCardHome = ({ id, imagenUrl, genero, titulo, autor, calificacion, isbn, idioma, tipo, biblokarma, estado, duenio }: LibroCardProps) => {
     return (
         <Link to={`/libro/${id}`} className='flex flex-col bg-surface rounded-2xl overflow-hidden shadow-sm border border-accent hover:shadow-md transition-shadow w-56'>
             <div className='w-full h-52 overflow-hidden'>
-                <img src={img} className='w-full h-full object-cover' />
+                <img src={imagenUrl} className='w-full h-full object-cover' />
             </div>
 
             <div className='flex flex-col gap-1 px-4 pt-3'>

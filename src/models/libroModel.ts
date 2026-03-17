@@ -55,7 +55,7 @@ export interface PrestamoDTO {
 
 export interface LibroHome {
   id: number
-  img: string
+  imagenUrl: string
   genero: Genero
   titulo: string
   autor: string
