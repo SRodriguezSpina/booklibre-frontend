@@ -77,8 +77,6 @@ export type LibroUsuarioItemDTO = {
   fechaAgregado: string | null
 }
 
-// al final de libroModel.ts, sin tocar nada de lo que ya está:
-
 export const GENERO_LABEL: Record<string, string> = {
     CIENCIA_FICCION: 'Ciencia Ficción',
     DRAMA: 'Drama',
