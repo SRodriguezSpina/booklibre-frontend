@@ -91,7 +91,7 @@ export const GestionMisLibros = ({ libros }: PropsGestionMisLibros) => {
         </h2>
         <Boton
           tipo="secundario"
-          alClic={() => navigate("/Libros/nuevo/editar")} // Navegación al formulario de nuevo libro
+          onClick={() => navigate("/Libros/nuevo/editar")} // Navegación al formulario de nuevo libro
           className="px-5 py-2 text-sm rounded-full shadow-sm"
         >
           + Agregar nuevo libro
@@ -132,7 +132,7 @@ export const GestionMisLibros = ({ libros }: PropsGestionMisLibros) => {
             </p>
             <Boton
               tipo="secundario"
-              alClic={() => setFiltro("todos")}
+              onClick={() => setFiltro("todos")}
               className="mt-4 px-4 py-2 text-xs"
             >
               Ver todos los libros

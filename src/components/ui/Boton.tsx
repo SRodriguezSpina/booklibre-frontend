@@ -10,7 +10,7 @@ export type VarianteBoton =
 export type PropsBoton = {
   tipo?: VarianteBoton
   children?: ReactNode
-  alClic?: (e: React.MouseEvent<HTMLButtonElement>) => void
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
   deshabilitado?: boolean
   className?: string
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"]
@@ -30,7 +30,7 @@ const estilosPorVariante: Record<VarianteBoton, string> = {
 export function Boton({
   tipo = "primario",
   children,
-  alClic,
+  onClick,
   deshabilitado = false,
   className = "",
   type = "button",
@@ -43,7 +43,7 @@ export function Boton({
     <button
       type={type}
       className={`${clasesBase} ${estilosPorVariante[tipo]} ${className}`}
-      onClick={alClic}
+      onClick={onClick}
       disabled={deshabilitado}
       data-testid={idPrueba}
     >

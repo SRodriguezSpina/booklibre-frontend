@@ -2,25 +2,25 @@ import { useOutletContext } from 'react-router-dom'
 import { useOnInit } from '../utils/hooks'
 import { libroService } from '../services/libroService'
 import type { LibroUsuarioItemDTO } from '../models/libroModel'
-import type { Usuario } from '../models/usuarioModel'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { ContextoPerfilUsuario } from '../layouts/PerfilUsuarioLayout'
+import { Usuario } from '../classes/usuario'
 import { PerfilResumen } from '../components/perfil/PerfilResumen'
 import { MisDatosCard } from '../components/perfil/MisDatosCard'
 import { EstadisticaCard } from '../components/perfil/EstadisticaCard'
 import { GestionMisLibros } from '../components/perfil/GestionMisLibros'
+import { ModalEditarPerfil } from '../components/perfil/ModalEditarPerfil'
 import { usuarioService } from '../services/usuarioService'
 import { toast } from 'react-toastify'
 
 export const PerfilUsuario = () => {
   const { usuario, setUsuario } = useOutletContext<ContextoPerfilUsuario>()
   const [libros, setLibros] = useState<LibroUsuarioItemDTO[]>([])
-  const [editando, setEditando] = useState(false)
-  const [borradorUsuario, setBorradorUsuario] = useState<Usuario>(usuario)
+  const [modalEditarAbierto, setModalEditarAbierto] = useState(false)
 
   const cargarLibros = async () => {
     try {
-      const response = await libroService.obtenerLibrosUsuarioPerfil(usuario.id) // OBTENGO LOS LIBROS DEL USUARIO POR ID
+      const response = await libroService.obtenerLibrosUsuarioPerfil(usuario.id)
       setLibros(response)
     } catch {
       setLibros([])
@@ -28,35 +28,17 @@ export const PerfilUsuario = () => {
     }
   }
 
-  useOnInit(() => {
-    void cargarLibros() //CUSTOM HOOK PARA CARGAR A INFO EN MI VISTA 
-  })
+  useOnInit(cargarLibros)
 
-  useEffect(() => {
-    if (!editando) {
-      setBorradorUsuario(usuario)
-    }
-  }, [usuario, editando])
-
-  const comenzarEdicion = () => {
-    setBorradorUsuario(usuario)
-    setEditando(true)
-  }
-
-  const cancelarEdicion = () => {
-    setBorradorUsuario(usuario)
-    setEditando(false)
-  }
-
-  const guardarEdicion = async () => {
+  const guardarDesdeModal = async (u: Usuario) => {
     try {
-      const usuarioActualizado = await usuarioService.actualizarUsuario(borradorUsuario)
-      setUsuario(usuarioActualizado)
-      setEditando(false)
+      const data = await usuarioService.actualizarUsuario(u)
+      setUsuario(new Usuario(data))
       toast.success('¡Perfil actualizado con éxito!')
     } catch (error) {
       toast.error('No se pudieron guardar los cambios.')
       console.error(error)
+      throw error
     }
   }
 
@@ -68,21 +50,11 @@ export const PerfilUsuario = () => {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
-      <PerfilResumen
-        usuario={borradorUsuario}
-        editando={editando}
-        onEditar={comenzarEdicion}
-      />
+      <PerfilResumen usuario={usuario} onEditar={() => setModalEditarAbierto(true)} />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-4 space-y-6">
-          <MisDatosCard
-            usuario={borradorUsuario}
-            editando={editando}
-            onCambioUsuario={setBorradorUsuario}
-            onGuardar={guardarEdicion}
-            onCancelar={cancelarEdicion}
-          />
+          <MisDatosCard usuario={usuario} />
 
           <div className="grid grid-cols-2 gap-4">
             <EstadisticaCard
@@ -102,6 +74,14 @@ export const PerfilUsuario = () => {
           <GestionMisLibros libros={libros} onAgregar={manejarAgregarLibro} />
         </div>
       </div>
+
+      {modalEditarAbierto && (
+        <ModalEditarPerfil
+          onClose={() => setModalEditarAbierto(false)}
+          usuario={usuario}
+          onGuardar={guardarDesdeModal}
+        />
+      )}
     </div>
   )
 }
