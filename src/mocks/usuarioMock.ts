@@ -1,6 +1,6 @@
-import type { Usuario } from '../models/usuarioModel'
+import { Usuario } from '../classes/usuario'
 
-export const usuarioMock: Usuario = {
+export const usuarioMock = new Usuario({
   id: 1,
   nombre: 'Emilia Romero',
   desc: 'Lectora ávida y coleccionista de clásicos.',
@@ -10,9 +10,9 @@ export const usuarioMock: Usuario = {
   tipoUsuario: 'Lector',
   bibliokarmas: 2345,
   fechaRegistro: '2021-03-15',
-}
+})
 
-export const usuarioMock2: Usuario = {
+export const usuarioMock2 = new Usuario({
   id: 2,
   nombre: 'Juan Perez',
   desc: 'Publicador de libros de ciencia ficción.',
@@ -22,4 +22,4 @@ export const usuarioMock2: Usuario = {
   tipoUsuario: 'Publicador',
   bibliokarmas: 1234,
   fechaRegistro: '2021-03-15',
-}
+})

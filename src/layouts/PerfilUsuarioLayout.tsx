@@ -1,11 +1,10 @@
 import { useState } from "react"
 import { Outlet } from "react-router-dom"
 import { Spinner, ErrorCard, type ErrorPersonalizado } from "../components/ui"
-import type { Usuario } from "../models/usuarioModel"
+import { Usuario } from '../classes/usuario'
 import { useAlIniciar } from "../utils/hooks"
 import { obtenerMensajeError } from "../utils/errorHandler"
 import { usuarioService } from "../services/usuarioService"
-// import { authService } from '../services/AuthService'
 
 export type ContextoPerfilUsuario = {
   usuario: Usuario
@@ -24,12 +23,12 @@ export const PerfilUsuarioLayout = () => {
     //   setCargando(false)
     //   return
     // }
-    const id = 1
+    const id = 3
     //POR AHORA ESTA HARDCODEADO PARA QUE FUNCIONE EL TESTING
 
     try {
-      const response = await usuarioService.obtenerUsuario(id)
-      setUsuario(response)
+      const data = await usuarioService.obtenerUsuario(id)
+      setUsuario(new Usuario(data))
     } catch (e: unknown) {
       setError(obtenerMensajeError(e))
     } finally {

@@ -1,9 +1,8 @@
 import { Avatar, Boton } from '../ui'
-import type { Usuario } from '../../models/usuarioModel'
+import type { Usuario } from '../../classes/usuario'
 
 export type PropsPerfilResumen = {
   usuario: Usuario
-  editando: boolean
   onEditar: () => void
 }
 
@@ -13,7 +12,7 @@ const etiquetaTipoUsuario: Record<Usuario['tipoUsuario'], string> = {
   LectorPublicador: 'Lector & Publicador',
 }
 
-export const PerfilResumen = ({ usuario, editando, onEditar }: PropsPerfilResumen) => {
+export const PerfilResumen = ({ usuario, onEditar }: PropsPerfilResumen) => {
   return (
     <section className="bg-gradient-to-r from-surface to-accent/10 rounded-3xl border border-white/70 shadow-[0_18px_40px_rgba(15,23,42,0.08)] px-8 py-6 flex items-center justify-between gap-8">
       <div className="flex items-center gap-5">
@@ -43,11 +42,9 @@ export const PerfilResumen = ({ usuario, editando, onEditar }: PropsPerfilResume
       </div>
 
       <div className="min-w-[150px] flex justify-end gap-3 font-semibold">
-        {!editando && (
-          <Boton tipo="secundario" className="px-5 py-2.5 text-sm rounded-full shadow-sm" alClic={onEditar}>
-            Editar perfil
-          </Boton>
-        )}
+        <Boton tipo="secundario" className="px-5 py-2.5 text-sm rounded-full shadow-sm" onClick={onEditar}>
+          Editar perfil
+        </Boton>
       </div>
     </section>
   )
