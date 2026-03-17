@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { GENERO_LABEL, IDIOMA_LABEL, ESTADO_LABEL, TIPO_LABEL } from '../../models/libroModel'
 
 type LibroCardProps = {
     id: number
@@ -26,7 +27,7 @@ export const LibroCardHome = ({id, img, genero, titulo, autor, calificacion, isb
             </div>
 
             <div>
-                <span>{genero}</span>
+                <span>{GENERO_LABEL[genero] ?? genero}</span>
                 {/* icono estrallas (calificacion) */}
                 <span>{calificacion}</span>
                 <h3>{titulo}</h3>
@@ -35,10 +36,10 @@ export const LibroCardHome = ({id, img, genero, titulo, autor, calificacion, isb
 
             <div>
                 <span>{isbn}</span>
-                <span>{idioma}</span>
-                <span>{tipo}</span>
+                <span>{IDIOMA_LABEL[idioma] ?? idioma}</span>
+                <span>{TIPO_LABEL[tipo] ?? tipo}</span>
                 <span>+{biblokarma}</span>
-                <span>{estado}</span>
+                <span>{ESTADO_LABEL[estado] ?? estado}</span>
             </div>
             <div>
                 <span>@{duenio}</span>

@@ -1,11 +1,14 @@
 export type TipoLibro = "Común" | "Con dedicatoria" | "Coleccionable"
+
 export type EstadoLibro =
   | "Excelente"
   | "Muy bueno"
   | "Bueno"
   | "Regular"
   | "Malo"
+
 export type TipoPrestamo = "prestados-a-mi" | "prestados-por-mi"
+
 export type Genero =
   | "Drama"
   | "Ciencia ficcion"
@@ -13,7 +16,8 @@ export type Genero =
   | "Autoayuda"
   | "Diseño"
   | "Literatura Clasica"
-export type Idioma = "Español" | "Ingles" | "Frances" | "Portugues"
+
+  export type Idioma = "Español" | "Ingles" | "Frances" | "Portugues"
 
 export interface LibroDTO {
   id: number
@@ -71,4 +75,36 @@ export type LibroUsuarioItemDTO = {
   genero: string
   disponible: boolean
   fechaAgregado: string | null
+}
+
+// al final de libroModel.ts, sin tocar nada de lo que ya está:
+
+export const GENERO_LABEL: Record<string, string> = {
+    CIENCIA_FICCION: 'Ciencia Ficción',
+    DRAMA: 'Drama',
+    AUTOAYUDA: 'Autoayuda',
+    ROMANCE: 'Romance',
+    DISENO: 'Diseño',
+    LITERATURA_CLASICA: 'Literatura Clásica',
+}
+
+export const IDIOMA_LABEL: Record<string, string> = {
+    ESPANOL: 'Español',
+    INGLES: 'Inglés',
+    FRANCES: 'Francés',
+    PORTUGUES: 'Portugués',
+}
+
+export const ESTADO_LABEL: Record<string, string> = {
+    EXCELENTE: 'Excelente',
+    MUY_BUENO: 'Muy bueno',
+    BUENO: 'Bueno',
+    REGULAR: 'Regular',
+    MALO: 'Malo',
+}
+
+export const TIPO_LABEL: Record<string, string> = {
+    Comun: 'Común',
+    ConDedicatoria: 'Con dedicatoria',
+    Coleccionable: 'Coleccionable',
 }

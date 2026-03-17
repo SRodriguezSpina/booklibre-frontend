@@ -20,6 +20,7 @@ type Props = {
     onApplyFilters: (filters: FiltersState) => void
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const INITIAL_FILTERS: FiltersState = {
     cienciaFiccion: false,
     drama: false,
@@ -116,8 +117,15 @@ export const Filters = ({ onApplyFilters }: Props) => {
             <div>
                 <h4>Rango de fechas para reservar</h4>
                 <div>
-                    <input type="date" onChange={(e) => updateFilter("fechaDesde", e.target.value)} />
-                    <input type="date" onChange={(e) => updateFilter("fechaHasta", e.target.value)} />
+                    <label>
+                        Desde:
+                        <input type="date" onChange={(e) => updateFilter("fechaDesde", e.target.value)} />
+                    </label>
+                    <label>
+                        Hasta:
+                        <input type="date" onChange={(e) => updateFilter("fechaHasta", e.target.value)} />
+                    </label>
+                    
                 </div>
             </div>
             <div>
