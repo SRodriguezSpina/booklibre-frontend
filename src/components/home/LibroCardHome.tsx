@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'
 import { GENERO_LABEL, IDIOMA_LABEL, ESTADO_LABEL, TIPO_LABEL } from '../../models/libroModel'
+import { Star } from 'lucide-react'
 
 type LibroCardProps = {
     id: number
-    img: string
+    imagenUrl: string
     // --
     genero: string
     titulo: string
@@ -19,30 +20,54 @@ type LibroCardProps = {
     duenio: string
 }
 
-export const LibroCardHome = ({id, img, genero, titulo, autor, calificacion, isbn, idioma, tipo, biblokarma, estado, duenio}: LibroCardProps) => {
-    return(
-        <Link to={`/libro/${id}`} className=''>
-            <div>
-                <img src={img} className=''/>
+export const LibroCardHome = ({ id, imagenUrl, genero, titulo, autor, calificacion, isbn, idioma, tipo, biblokarma, estado, duenio }: LibroCardProps) => {
+    return (
+        <Link to={`/libro/${id}`} className='flex flex-col bg-surface rounded-2xl overflow-hidden shadow-sm border border-accent hover:shadow-md transition-shadow w-56'>
+            <div className='w-full h-52 overflow-hidden'>
+                <img src={imagenUrl} className='w-full h-full object-cover' />
             </div>
 
-            <div>
-                <span>{GENERO_LABEL[genero] ?? genero}</span>
-                {/* icono estrallas (calificacion) */}
-                <span>{calificacion}</span>
-                <h3>{titulo}</h3>
-                <span>{autor}</span>
+            <div className='flex flex-col gap-1 px-4 pt-3'>
+                <div className='flex justify-between items-center'>
+                    <span className='text-xs font-semibold text-primary'>{GENERO_LABEL[genero] ?? genero}</span>
+                    <div className='flex items-center gap-1 text-xs text-secondary-light'>
+                        <Star size={12} className='fill-yellow-400 text-yellow-400' />
+                        <span>{calificacion}</span>
+                    </div>
+                </div>
+                <h3 className='text-sm font-bold text-secondary-dark leading-tight line-clamp-2'>{titulo}</h3>
+                <span className='text-xs text-secondary-light'>{autor}</span>
             </div>
 
-            <div>
-                <span>{isbn}</span>
-                <span>{IDIOMA_LABEL[idioma] ?? idioma}</span>
-                <span>{TIPO_LABEL[tipo] ?? tipo}</span>
-                <span>+{biblokarma}</span>
-                <span>{ESTADO_LABEL[estado] ?? estado}</span>
+            <div className='grid grid-cols-2 gap-x-3 gap-y-1 px-4 pt-3 text-xs text-secondary'>
+                <div>
+                    <p className='text-secondary-light uppercase tracking-wide text-[10px]'>ISBN</p>
+                    <p className='font-medium truncate'>{isbn}</p>
+                </div>
+                <div>
+                    <p className='text-secondary-light uppercase tracking-wide text-[10px]'>Idioma</p>
+                    <p className='font-medium'>{IDIOMA_LABEL[idioma] ?? idioma}</p>
+                </div>
+                <div>
+                    <p className='text-secondary-light uppercase tracking-wide text-[10px]'>Tipo</p>
+                    <p className='font-medium'>{TIPO_LABEL[tipo] ?? tipo}</p>
+                </div>
+                <div>
+                    <p className='text-secondary-light uppercase tracking-wide text-[10px]'>Biblokarma</p>
+                    <p className='font-medium text-primary'>+{biblokarma}</p>
+                </div>
             </div>
-            <div>
-                <span>@{duenio}</span>
+            <div className='px-4 pt-2'>
+                <span className='inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-accent text-primary-dark'>
+                    {ESTADO_LABEL[estado] ?? estado}
+                </span>
+            </div>
+
+            <div className='flex items-center gap-2 px-4 py-3 mt-auto border-t border-accent'>
+                <div className='w-6 h-6 rounded-full bg-primary-light flex items-center justify-center text-white text-[10px] font-bold'>
+                    {duenio.charAt(0).toUpperCase()}
+                </div>
+                <span className='text-xs text-secondary-light'>@{duenio}</span>
             </div>
         </Link>
     )

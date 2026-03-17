@@ -47,29 +47,36 @@ export const Home = () => {
     }
 
     return (
-        <main className="max-w-5xl mx-auto px-4 py-6 flex flex-col gap-6">
-            <section>
+        <main className='max-w-6xl mx-auto px-4 py-6'>
+            <section className='mb-6'>
+                <h1 className='text-2xl font-bold text-secondary-dark mb-1'>Encuentra tu próxima lectura</h1>
+                <p className='text-sm text-secondary-light mb-4'> Explorá miles de libros disponibles para préstamo en nuestra comunidad.</p>
                 <SearchBar
                     onSearch={(query) => handleSearch(query)}
                     placeholder='Buscar por título...'
                 />
             </section>
-            <section>
-                <Filters
-                    onApplyFilters={(filters: FiltersState) => handleApplyFilters(filters)}
-                />
-            </section>
-            <section>
-                {/* resultados y el paginador abajo */}
-                {books.map((book) => (
-                    <LibroCardHome key={book.id} {...book} />
-                ))}
-                <Paginacion
-                    pagina={currentPage}
-                    totalPaginas={totalPaginas}
-                    alCambiar={handlePageChange}
-                />
-            </section>
+
+            <div className='flex gap-6'>
+                <aside className='w-56 shrink-0'>
+                    <Filters
+                        onApplyFilters={(filters: FiltersState) => handleApplyFilters(filters)}
+                    />
+                </aside>
+
+                <section className="flex-1 flex flex-col gap-6">
+                    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+                        {books.map((book) => (
+                            <LibroCardHome key={book.id} {...book} />
+                        ))}
+                    </div>
+                    <Paginacion
+                        pagina={currentPage}
+                        totalPaginas={totalPaginas}
+                        alCambiar={handlePageChange}
+                    />
+                </section>
+            </div>
         </main>
     )
 }

@@ -55,7 +55,7 @@ export interface PrestamoDTO {
 
 export interface LibroHome {
   id: number
-  img: string
+  imagenUrl: string
   genero: Genero
   titulo: string
   autor: string
@@ -76,8 +76,6 @@ export type LibroUsuarioItemDTO = {
   disponible: boolean
   fechaAgregado: string | null
 }
-
-// al final de libroModel.ts, sin tocar nada de lo que ya está:
 
 export const GENERO_LABEL: Record<string, string> = {
     CIENCIA_FICCION: 'Ciencia Ficción',
