@@ -15,7 +15,6 @@ class AuthService {
       localStorage.setItem("nombreUsuario", response.data.usuario.nombre)
     }
     return response.data
-    window.location.href = "/home"
   }
 
   async registro(data: RegisterData): Promise<AuthResponseUsuario> {
