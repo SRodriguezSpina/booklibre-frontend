@@ -93,4 +93,8 @@ export class Libro {
     // Por ejemplo, avisar si faltan 3 días o menos
     return diffDias >= 0 && diffDias <= 3
   }
+
+  estaCalificado(): boolean {
+    return this.rating > 0
+  }
 }
