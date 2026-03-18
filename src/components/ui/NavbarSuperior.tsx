@@ -1,7 +1,11 @@
 import { NavLink, useNavigate } from "react-router-dom"
 import { TrendingUp, LogOut } from "lucide-react"
 import navBarLogo from "../../assets/icons/booklibre-logo.svg"
+import { usuarioService } from "../../services/usuarioService"
 import { authService } from "../../services/AuthService"
+import type { UsuarioData } from "../../classes/usuario"
+import { useState } from "react"
+import { useOnInit } from "../../utils/hooks"
 
 interface NavItemProps {
   text: string
@@ -14,10 +18,9 @@ export const NavItem = ({ text, to }: NavItemProps) => {
       <NavLink
         to={to}
         className={({ isActive }) =>
-          `text-sm font-medium transition-colors duration-200 ${
-            isActive
-              ? "text-primary-dark"
-              : "text-secondary hover:text-primary-dark"
+          `text-sm font-medium transition-colors duration-200 ${isActive
+            ? "text-primary-dark"
+            : "text-secondary hover:text-primary-dark"
           }`
         }
       >
@@ -28,6 +31,19 @@ export const NavItem = ({ text, to }: NavItemProps) => {
 }
 
 export const NavbarSuperior = () => {
+  const [usuario, setUsuario] = useState<UsuarioData | null>(null)
+  const userId = authService.obtenerIdUsuarioActual()
+
+  useOnInit(() => {
+    if (userId) {
+      usuarioService.obtenerUsuario(userId)
+        .then(setUsuario)
+        .catch(console.error)
+    }
+  })
+  const nombre = usuario?.nombre ?? 'Usuario'
+  const inicial = nombre.charAt(0).toUpperCase()
+  const bibliokarmas = usuario?.bibliokarmas ?? 0
   const navigate = useNavigate()
 
   const items: NavItemProps[] = [
@@ -36,9 +52,6 @@ export const NavbarSuperior = () => {
     { text: "Perfil", to: "/perfil" },
   ]
 
-  const nombre = authService.obtenerNombreUsuarioActual() ?? "Usuario"
-  const inicial = nombre.charAt(0).toUpperCase()
-
   const handleLogout = () => {
     authService.logout()
     navigate("/login")
@@ -46,7 +59,7 @@ export const NavbarSuperior = () => {
 
   return (
     <nav className="bg-surface border-b border-accent h-14 w-full flex items-center justify-between px-8">
-      
+
       {/* logo + links */}
       <div className="flex items-center gap-8">
         <div className="flex items-center gap-2">
@@ -64,7 +77,7 @@ export const NavbarSuperior = () => {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1.5 text-xs text-secondary">
           <TrendingUp size={14} className="text-primary" />
-          <span>Bibliokarma 2345</span>
+          <span>Bibliokarma {bibliokarmas}</span>
         </div>
         <div className="w-8 h-8 rounded-full bg-primary-dark flex items-center justify-center text-surface text-sm font-bold">
           {inicial}
