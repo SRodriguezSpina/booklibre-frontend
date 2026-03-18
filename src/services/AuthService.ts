@@ -19,7 +19,7 @@ class AuthService {
 
   async registro(data: RegisterData): Promise<AuthResponseUsuario> {
     const response = await axios.post<AuthResponseUsuario>(
-      `${API_BASE_URL}${AUTH_PATH('registro')}`,
+      `${API_BASE_URL}${AUTH_PATH('register')}`,
       data,
     )
     return response.data

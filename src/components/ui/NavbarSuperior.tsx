@@ -1,5 +1,5 @@
-import { NavLink } from "react-router-dom"
-import { TrendingUp } from "lucide-react"
+import { NavLink, useNavigate } from "react-router-dom"
+import { TrendingUp, LogOut } from "lucide-react"
 import navBarLogo from "../../assets/icons/booklibre-logo.svg"
 import { authService } from "../../services/AuthService"
 
@@ -28,6 +28,8 @@ export const NavItem = ({ text, to }: NavItemProps) => {
 }
 
 export const NavbarSuperior = () => {
+  const navigate = useNavigate()
+
   const items: NavItemProps[] = [
     { text: "Inicio", to: "/home" },
     { text: "Mis Préstamos", to: "/mis-prestamos" },
@@ -36,6 +38,11 @@ export const NavbarSuperior = () => {
 
   const nombre = authService.obtenerNombreUsuarioActual() ?? "Usuario"
   const inicial = nombre.charAt(0).toUpperCase()
+
+  const handleLogout = () => {
+    authService.logout()
+    navigate("/login")
+  }
 
   return (
     <nav className="bg-surface border-b border-accent h-14 w-full flex items-center justify-between px-8">
@@ -62,6 +69,13 @@ export const NavbarSuperior = () => {
         <div className="w-8 h-8 rounded-full bg-primary-dark flex items-center justify-center text-surface text-sm font-bold">
           {inicial}
         </div>
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-1.5 text-xs font-medium text-secondary hover:text-secondary-dark border border-accent rounded-lg px-3 py-1.5 hover:bg-accent/30 transition-colors"
+        >
+          <LogOut size={13} />
+          Salir
+        </button>
       </div>
 
     </nav>

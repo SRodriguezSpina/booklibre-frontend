@@ -12,16 +12,15 @@ export type FieldConfig = {
 
 export class Auth {
   // Login fields
-  usuario: string = ""
+  email: string = ""
   password: string = ""
 
   // Register-only fields
   nombre: string = ""
-  email: string = ""
   confirmarPassword: string = ""
 
   static loginFields: FieldConfig[] = [
-    { name: "usuario", label: "Usuario", placeholder: "Tu nombre de usuario" },
+    { name: "email", label: "Email", placeholder: "Tu email" },
     { name: "password", label: "Contraseña", placeholder: "Tu contraseña", isPassword: true },
   ]
 
@@ -34,7 +33,7 @@ export class Auth {
 
   validateLogin(): Record<string, string | undefined> {
     return {
-      usuario:  !this.usuario.trim() ? "El usuario es obligatorio"    : undefined,
+      email:  !this.email.trim() ? "El email es obligatorio"    : undefined,
       password: !this.password       ? "La contraseña es obligatoria" : undefined,
     }
   }
@@ -63,7 +62,7 @@ export class Auth {
   }
 
   toLoginDTO(): LoginData {
-    return { usuario: this.usuario, password: this.password }
+    return { email: this.email, password: this.password }
   }
 
   toRegisterDTO(): RegisterData {
