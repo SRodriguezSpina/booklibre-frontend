@@ -32,19 +32,27 @@ export const INITIAL_FILTERS: FiltersState = {
 
 export const Filters = ({ onApplyFilters }: Props) => {
     const [filters, setFilters] = useState<FiltersState>(INITIAL_FILTERS)
+    const [errors, setErrors] = useState<{ paginas?: string; fechas?: string }>({})
 
-    const updateFilter = <K extends keyof FiltersState>(
-        key: K,
-        value: FiltersState[K]
-    ) => {
-        setFilters((prev) => ({
-            ...prev,
-            [key]: value
-        }))
+    const updateFilter = <K extends keyof FiltersState>(key: K, value: FiltersState[K]) => {
+        setFilters((prev) => ({ ...prev, [key]: value }))
+        setErrors({})
     }
 
+    const validar = (): boolean => {
+        const nuevosErrores: { paginas?: string; fechas?: string } = {}
+
+        if (filters.paginasMin && filters.paginasMax && filters.paginasMin >= filters.paginasMax) {
+            nuevosErrores.paginas = 'El mínimo debe ser menor al máximo'
+        }
+        if (filters.fechaDesde && filters.fechaHasta && filters.fechaDesde >= filters.fechaHasta) {
+            nuevosErrores.fechas = 'La fecha de inicio debe ser anterior a la fecha final'
+        }
+        setErrors(nuevosErrores)
+        return Object.keys(nuevosErrores).length === 0
+    }
     const handleApply = () => {
-        onApplyFilters(filters)
+        if (validar()) onApplyFilters(filters)
     }
 
     return (
@@ -80,6 +88,7 @@ export const Filters = ({ onApplyFilters }: Props) => {
                     <input
                         type="number"
                         placeholder="Min"
+                        min={1}
                         onChange={(e) => updateFilter("paginasMin", Number(e.target.value))}
                         className="w-full border border-accent rounded-lg px-2 py-1 text-xs outline-none focus:border-primary"
                     />
@@ -87,10 +96,12 @@ export const Filters = ({ onApplyFilters }: Props) => {
                     <input
                         type="number"
                         placeholder="Max"
+                        min={1}
                         onChange={(e) => updateFilter("paginasMax", Number(e.target.value))}
                         className="w-full border border-accent rounded-lg px-2 py-1 text-xs outline-none focus:border-primary"
                     />
                 </div>
+                {errors.paginas && <p className="text-[10px] text-red-400 mt-1">{errors.paginas}</p>}
             </div>
 
             <div>
@@ -113,6 +124,7 @@ export const Filters = ({ onApplyFilters }: Props) => {
                         />
                     </label>
                 </div>
+                {errors.fechas && <p className="text-[10px] text-red-400 mt-1">{errors.fechas}</p>}
             </div>
 
             <div>
