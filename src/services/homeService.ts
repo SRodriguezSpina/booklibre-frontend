@@ -26,14 +26,22 @@ class HomeService {
         page: number = 0,
         size: number = 6,
         userId: number
-    ) : Promise<SearchResponse> {
+    ): Promise<SearchResponse> {
         const generos = Object.entries(filters)
             .filter(([key, value]) => value === true && Object.keys(GENERO_MAP).includes(key))
             .map(([key]) => GENERO_MAP[key])
             .join(',')
 
         const response = await axios.get<SearchResponse>(`${API_BASE_URL}/libros/home`, {
-            params: { query, generos, page, size, userId }
+            params: {
+                query, generos, page, size, userId,
+                paginasMin: filters.paginasMin || undefined,
+                paginasMax: filters.paginasMax || undefined,
+                fechaDesde: filters.fechaDesde || undefined,
+                fechaHasta: filters.fechaHasta || undefined,
+                isbn: filters.isbn || undefined,
+                prestadoPor: filters.prestadoPor || undefined
+            }
         })
         return response.data
     }
