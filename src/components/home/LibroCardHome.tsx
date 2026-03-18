@@ -22,7 +22,7 @@ type LibroCardProps = {
 
 export const LibroCardHome = ({ id, imagenUrl, genero, titulo, autor, calificacion, isbn, idioma, tipo, biblokarma, estado, duenio }: LibroCardProps) => {
     return (
-        <Link to={`/libro/${id}`} className='flex flex-col bg-surface rounded-2xl overflow-hidden shadow-sm border border-accent hover:shadow-md transition-shadow w-56'>
+        <Link to={`/libros/${id}`} className='flex flex-col bg-surface rounded-2xl overflow-hidden shadow-sm border border-accent hover:shadow-md transition-shadow w-56'>
             <div className='w-full h-52 overflow-hidden'>
                 <img src={imagenUrl} className='w-full h-full object-cover' />
             </div>

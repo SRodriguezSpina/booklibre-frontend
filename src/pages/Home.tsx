@@ -12,7 +12,7 @@ import { LibroCardHome } from "../components/home/LibroCardHome"
 import { useOnInit } from "../utils/hooks.ts"
 
 const ITEMS_POR_PAGINA = 6
-const userId = authService.obtenerIdUsuarioActual() ?? 1
+
 
 export const Home = () => {
   const [query, setQuery] = useState("")
@@ -21,6 +21,8 @@ export const Home = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPaginas, setTotalPaginas] = useState(1)
   const [loading, setLoading] = useState(false)
+
+  const userId = authService.obtenerIdUsuarioActual() ?? 1
 
   const search = async (q: string, f: FiltersState, page: number = 0) => {
     setLoading(true)
