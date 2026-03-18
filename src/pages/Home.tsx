@@ -2,11 +2,13 @@ import { useState } from "react"
 import { homeService } from "../services/homeService"
 import { authService } from "../services/AuthService.ts"
 import { SearchBar } from "../components/ui/SearchBar"
+import { Paginacion } from "../components/ui/Paginacion"
+import { Spinner } from "../components/ui/Spinner.tsx"
 import { Filters, INITIAL_FILTERS } from "../components/home/Filters"
 import type { FiltersState } from "../components/home/Filters"
 import type { LibroHome } from "../models/libroModel"
 import { LibroCardHome } from "../components/home/LibroCardHome"
-import { Paginacion } from "../components/ui/Paginacion"
+
 import { useOnInit } from "../utils/hooks.ts"
 
 const ITEMS_POR_PAGINA = 6
@@ -18,8 +20,10 @@ export const Home = () => {
   const [books, setBooks] = useState<LibroHome[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPaginas, setTotalPaginas] = useState(1)
+  const [loading, setLoading] = useState(false)
 
   const search = async (q: string, f: FiltersState, page: number = 0) => {
+    setLoading(true)
     try {
       const data = await homeService.search(
         q,
@@ -32,6 +36,8 @@ export const Home = () => {
       setTotalPaginas(data.totalPages)
     } catch (error: unknown) {
       console.error(error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -81,16 +87,22 @@ export const Home = () => {
         </aside>
 
         <section className="flex-1 flex flex-col gap-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {books.map((book) => (
-              <LibroCardHome key={book.id} {...book} />
-            ))}
-          </div>
-          <Paginacion
-            pagina={currentPage}
-            totalPaginas={totalPaginas}
-            alCambiar={handlePageChange}
-          />
+          {loading ? (
+            <Spinner />
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {books.map((book) => (
+                  <LibroCardHome key={book.id} {...book} />
+                ))}
+              </div>
+              <Paginacion
+                pagina={currentPage}
+                totalPaginas={totalPaginas}
+                alCambiar={handlePageChange}
+              />
+            </>
+          )}
         </section>
       </div>
     </main>
