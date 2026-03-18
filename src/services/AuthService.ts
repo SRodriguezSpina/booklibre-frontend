@@ -15,11 +15,12 @@ class AuthService {
       localStorage.setItem("nombreUsuario", response.data.usuario.nombre)
     }
     return response.data
+    window.location.href = "/home"
   }
 
   async registro(data: RegisterData): Promise<AuthResponseUsuario> {
     const response = await axios.post<AuthResponseUsuario>(
-      `${API_BASE_URL}${AUTH_PATH('registro')}`,
+      `${API_BASE_URL}${AUTH_PATH('register')}`,
       data,
     )
     return response.data

@@ -1,3 +1,5 @@
+import type { UsuarioResponse } from "../models/usuarioModel"
+
 export type RegisterData = {
     nombre: string,
     email: string,
@@ -6,18 +8,12 @@ export type RegisterData = {
 }
 
 export type LoginData = {
-    usuario: string,
+    email: string,
     password: string
 }
 
 export type AuthResponseUsuario = {
     success: boolean,
     message: string,
-    usuario: InfoUsuarioResponse
-}
-
-export type InfoUsuarioResponse = {
-    id: number,
-    nombre: string,
-    email: string
+    usuario: UsuarioResponse
 }
