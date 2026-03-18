@@ -4,6 +4,7 @@ import type { TipoPrestamo } from "../../models/libroModel"
 import { ModalCalificacion } from "./ModalCalificacion"
 import { libroService } from "../../services/libroService"
 import { authService } from "../../services/AuthService"
+import { useNavigate } from "react-router-dom"
 
 interface LibroCardProps {
   libro: Libro
@@ -11,7 +12,10 @@ interface LibroCardProps {
 }
 
 export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
+  const [yaCalificado, setYaCalificado] = useState(libro.estaCalificado())
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [ratingLocal, setRatingLocal] = useState(libro.rating)
+  const navigate = useNavigate()
   const esPrestamoRecibido = tipoVista === "prestados-a-mi"
   const proximoAVencer = libro.estaProximoAVencer()
   const estaDisponible = libro.estoyDisponible()
@@ -23,9 +27,14 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
       valor,
       comentario,
     )
+    setRatingLocal(valor)
+    setYaCalificado(true)
     console.log("Enviando:", { valor, comentario })
     setIsModalOpen(false)
     alert("¡Gracias por calificar!")
+  }
+  const goToDetail = () => {
+    navigate(`/libros/${libro.id}`)
   }
   const getEtiqueta = () => {
     if (libro.estaDevuelto()) return "DEVUELTO"
@@ -43,8 +52,10 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
 
   return (
     <div className="bg-surface rounded-xl shadow-sm border border-accent overflow-hidden flex flex-col h-full hover:shadow-md transition-shadow">
-      {/* 1. Contenedor de Imagen: Altura fija */}
-      <div className="relative h-90 bg-gray-100 flex items-center justify-center">
+      <div
+        onClick={goToDetail}
+        className="relative h-90 bg-gray-100 flex items-center justify-center cursor-pointer group"
+      >
         <div
           className={`absolute top-3 right-3 px-3 py-1 rounded-full text-[10px] font-black z-10 shadow-md uppercase tracking-wider ${getBadgeStyles()}`}
         >
@@ -59,18 +70,16 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
 
       {/* 2. Contenedor de Información: flex-1 lo hace crecer para ocupar el alto sobrante */}
       <div className="p-4 flex flex-col flex-1 grow">
-        {/* ESTE DIV es la clave: flex-grow hace que esta sección ocupe todo el espacio 
-            disponible, empujando el footer (mt-auto) hacia el final */}
         <div className="grow flex flex-col gap-1">
           <div className="flex justify-between items-start gap-2">
             <h3 className="font-bold text-secondary-dark line-clamp-2 leading-tight">
               {libro.titulo}
             </h3>
-            <span className="text-accent text-sm font-extrabold shrink-0">
-              ★{libro.rating}
+            <span className="text-primary text-sm font-extrabold shrink-0">
+              ★{ratingLocal}
             </span>
           </div>
-          <p className="text-xs text-secondary opacity-80">{libro.autor}</p>
+          <p className="text-xs text-primary opacity-80">{libro.autor}</p>
         </div>
 
         {/* 3. Footer: mt-auto asegura que siempre esté abajo del flex-grow anterior */}
@@ -100,18 +109,25 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
             </span>
             <span className="text-primary font-black">{libro.bibliokarma}</span>
           </div>
-
-          {/* Botón de Calificar modificado */}
-          {/* Solo mostramos "Calificar" si el préstamo fue devuelto */}
-          {esPrestamoRecibido && libro.estaDevuelto() && (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="mt-2 w-full py-2 bg-background rounded-lg text-xs font-bold hover:bg-primary-dark hover:text-white transition-all shadow-sm border border-accent/20"
-            >
-              ★ Calificar
-            </button>
-          )}
         </div>
+        {/* Botón de Calificar modificado */}
+        {/* Solo mostramos "Calificar" si el préstamo fue devuelto */}
+        <button
+          onClick={() => !yaCalificado && setIsModalOpen(true)}
+          className={`mt-2 w-full py-2 rounded-lg text-xs font-bold transition-all shadow-sm border
+          ${
+            esPrestamoRecibido && libro.estaDevuelto()
+              ? "visible"
+              : "invisible pointer-events-none"
+          }
+          ${
+            yaCalificado
+              ? "bg-green-100 text-green-700 border-green-200 cursor-default"
+              : "bg-background hover:bg-primary-dark hover:text-white border-accent/20 cursor-pointer"
+          }`}
+        >
+          {yaCalificado ? "✓ Calificado" : "★ Calificar"}
+        </button>
       </div>
       <ModalCalificacion
         isOpen={isModalOpen}
