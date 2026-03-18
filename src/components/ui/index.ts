@@ -12,4 +12,6 @@ export { Badge } from './Badge'
 export type { PropsBadge, VarianteBadge } from './Badge'
 export { Avatar } from './Avatar'
 export type { PropsAvatar } from './Avatar'
+export { DetalleFila, DetalleItem } from './DetalleGrid'
+export type { DetalleFilaProps, DetalleItemProps } from './DetalleGrid'
 
