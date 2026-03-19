@@ -64,7 +64,7 @@ export const PerfilUsuario = () => {
             />
             <EstadisticaCard
               valor={libros.length}
-              etiqueta="Mis Libros"
+              etiqueta="Libros Leídos"
               claseFondo="bg-[#f5f3ff]"
             />
           </div>

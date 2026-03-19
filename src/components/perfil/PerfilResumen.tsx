@@ -1,15 +1,10 @@
+import { Settings } from 'lucide-react'
 import { Avatar, Boton } from '../ui'
 import type { Usuario } from '../../classes/usuario'
 
 export type PropsPerfilResumen = {
   usuario: Usuario
   onEditar: () => void
-}
-
-const etiquetaTipoUsuario: Record<Usuario['tipoUsuario'], string> = {
-  Lector: 'Lector',
-  Publicador: 'Publicador',
-  LectorPublicador: 'Lector & Publicador',
 }
 
 export const PerfilResumen = ({ usuario, onEditar }: PropsPerfilResumen) => {
@@ -22,19 +17,16 @@ export const PerfilResumen = ({ usuario, onEditar }: PropsPerfilResumen) => {
             {usuario.nombre}
           </div>
           {usuario.desc && (
-            <div className="text-secondary/70 text-sm mt-1 font-medium">
+            <div className="text-primary/70 text-sm mt-1 font-semibold">
               {usuario.desc}
             </div>
           )}
-          <div className="text-secondary/50 text-xs mt-0.5 font-medium">
-            {etiquetaTipoUsuario[usuario.tipoUsuario]}
-          </div>
-          <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-secondary/50 font-medium tracking-tight">
+          <div className="flex flex-wrap items-center gap-5 mt-3 text-sm text-secondary/60 font-semibold tracking-tight">
             {usuario.fechaRegistro && (
               <span>📅 Se unió en {new Date(usuario.fechaRegistro).getFullYear()}</span>
             )}
             <span>📍 {usuario.ciudad}</span>
-            <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">
+            <span className="bg-primary/10 text-primary px-3 py-1 rounded-full font-bold">
               Bibliokarmas {usuario.bibliokarmas}
             </span>
           </div>
@@ -42,8 +34,9 @@ export const PerfilResumen = ({ usuario, onEditar }: PropsPerfilResumen) => {
       </div>
 
       <div className="min-w-[150px] flex justify-end gap-3 font-semibold">
-        <Boton tipo="secundario" className="px-5 py-2.5 text-sm rounded-full shadow-sm" onClick={onEditar}>
-          Editar perfil
+        <Boton tipo="secundario" className="px-5 py-2.5 text-sm rounded-2xl shadow-sm" onClick={onEditar}>
+          <Settings className="h-4 w-4" />
+          Editar Perfil
         </Boton>
       </div>
     </section>
