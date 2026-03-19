@@ -12,6 +12,7 @@ export class Libro {
   prestamoId?: number // Para el caso de PrestamoDTO, donde el ID del libro viene como "id" pero queremos mapearlo a "libroId"
   titulo: string
   autor: string
+  autorImg?: string
   estado: EstadoLibro
   propietarioId: number
   imagenUrl: string
