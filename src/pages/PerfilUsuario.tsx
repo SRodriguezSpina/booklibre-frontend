@@ -67,6 +67,23 @@ export const PerfilUsuario = () => {
     navigate('/Libros/nuevo/editar')
   }
 
+  const manejarEliminarLibro = async (libroId: number) => {
+    try {
+      await libroService.eliminarLibro(libroId, usuario.id)
+      toast.success('Libro eliminado.')
+      await cargarLibros()
+    } catch (e: unknown) {
+      const err = obtenerMensajeError(e)
+      if (err.estado === 401) {
+        authService.logout()
+        navigate('/auth/login')
+        return
+      }
+      toast.error(err.mensaje || 'No se pudo eliminar el libro.')
+      console.error(e)
+    }
+  }
+
   const cantidadPrestados = libros.filter((l) => !l.disponible).length
 
   return (
@@ -95,6 +112,7 @@ export const PerfilUsuario = () => {
           <GestionMisLibros
             libros={libros}
             onAgregar={manejarAgregarLibro}
+            onEliminar={manejarEliminarLibro}
             cargando={cargandoLibros}
             error={errorLibros}
             onReintentar={() => void cargarLibros()}

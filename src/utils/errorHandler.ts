@@ -15,10 +15,15 @@ export const obtenerMensajeError = (error: unknown): ErrorPersonalizado => {
 
   if (error instanceof AxiosError) {
     estado = error.response?.status ?? error.status ?? 0
-    const mensajeBackend = (error.response?.data as { message?: string } | undefined)?.message
+    const data = error.response?.data as
+      | { message?: string; error?: string }
+      | undefined
+    const mensajeBackend = data?.message
 
     if (estado >= 400 && estado < 500 && mensajeBackend) {
       mensaje = mensajeBackend
+    } else if (estado === 409) {
+      mensaje = data?.error ?? 'Conflicto: no se pudo completar la operación.'
     } else {
       mensaje = 'Ocurrió un error al conectarse al backend. Intente nuevamente más tarde'
     }

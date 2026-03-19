@@ -14,6 +14,7 @@ export type PropsTablaLibros = {
   campoOrden: "titulo" | "estado" | "fecha"
   sentidoOrden: "ascendente" | "descendente"
   alCambiarOrden: (campo: "titulo" | "estado" | "fecha") => void
+  alEliminar: (libroId: number) => void
 }
 
 const getBadge = (disponible: boolean) =>
@@ -52,6 +53,7 @@ export const TablaLibros = ({
   campoOrden,
   sentidoOrden,
   alCambiarOrden,
+  alEliminar,
 }: PropsTablaLibros) => {
   const navigate = useNavigate() // Inicialización
 
@@ -147,8 +149,15 @@ export const TablaLibros = ({
                     </button>
                     <button
                       type="button"
-                      className="p-2 hover:bg-white hover:text-red-500 hover:shadow-md rounded-full transition-all"
+                      disabled={!libro.disponible}
+                      title={
+                        libro.disponible
+                          ? 'Eliminar libro'
+                          : 'No se puede eliminar un libro prestado'
+                      }
+                      className="p-2 rounded-full transition-all hover:bg-white hover:shadow-md disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:shadow-none disabled:cursor-not-allowed hover:text-red-500"
                       aria-label="Eliminar"
+                      onClick={() => alEliminar(libro.id)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

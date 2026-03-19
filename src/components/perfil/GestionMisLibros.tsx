@@ -8,6 +8,7 @@ import { Paginacion } from "../ui/Paginacion"
 export type PropsGestionMisLibros = {
   libros: LibroUsuarioItemDTO[]
   onAgregar: () => void
+  onEliminar?: (libroId: number) => void | Promise<void>
   cargando?: boolean
   error?: string | null
   onReintentar?: () => void
@@ -45,6 +46,7 @@ const COMPARADORES_ORDEN: Record<
 export const GestionMisLibros = ({
   libros,
   onAgregar,
+  onEliminar,
   cargando = false,
   error = null,
   onReintentar,
@@ -94,7 +96,7 @@ export const GestionMisLibros = ({
         <Boton
           tipo="secundario"
           onClick={onAgregar}
-          className="bg-rose-100 text-rose-700 hover:bg-rose-200 border-transparent px-4 py-2 text-sm rounded-2xl shadow-sm"
+          className="bg-rose-100 text-rose-700 hover:bg-rose-200 border border-black/40 px-4 py-2 text-sm rounded-2xl shadow-sm"
         >
           <Plus className="h-4 w-4" />
           Agregar Nuevo Libro
@@ -176,6 +178,11 @@ export const GestionMisLibros = ({
                 campoOrden={campoOrden}
                 sentidoOrden={sentidoOrden}
                 alCambiarOrden={cambiarOrden}
+                alEliminar={(id) => {
+                  if (!onEliminar) return
+                  const ok = window.confirm('¿Eliminar este libro? Esta acción no se puede deshacer.')
+                  if (ok) void onEliminar(id)
+                }}
               />
 
               <div className="text-xs text-secondary/40 font-medium mt-4">
