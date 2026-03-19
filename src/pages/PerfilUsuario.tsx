@@ -12,20 +12,34 @@ import { GestionMisLibros } from '../components/perfil/GestionMisLibros'
 import { ModalEditarPerfil } from '../components/perfil/ModalEditarPerfil'
 import { usuarioService } from '../services/usuarioService'
 import { toast } from 'react-toastify'
+import { obtenerMensajeError } from '../utils/errorHandler'
+import { authService } from '../services/AuthService'
 
 export const PerfilUsuario = () => {
   const { usuario, setUsuario } = useOutletContext<ContextoPerfilUsuario>()
   const navigate = useNavigate()
   const [libros, setLibros] = useState<LibroUsuarioItemDTO[]>([])
+  const [cargandoLibros, setCargandoLibros] = useState(false)
+  const [errorLibros, setErrorLibros] = useState<string | null>(null)
   const [modalEditarAbierto, setModalEditarAbierto] = useState(false)
 
   const cargarLibros = async () => {
+    setCargandoLibros(true)
+    setErrorLibros(null)
     try {
       const response = await libroService.obtenerLibrosUsuarioPerfil(usuario.id)
       setLibros(response)
-    } catch {
+    } catch (e: unknown) {
       setLibros([])
-      toast.error('No se pudieron cargar tus libros.')
+      const err = obtenerMensajeError(e)
+      if (err.estado === 401) {
+        authService.logout()
+        navigate('/auth/login')
+        return
+      }
+      setErrorLibros(err.mensaje || 'No se pudieron cargar tus libros.')
+    } finally {
+      setCargandoLibros(false)
     }
   }
 
@@ -36,10 +50,16 @@ export const PerfilUsuario = () => {
       const data = await usuarioService.actualizarUsuario(u)
       setUsuario(new Usuario(data))
       toast.success('¡Perfil actualizado con éxito!')
-    } catch (error) {
-      toast.error('No se pudieron guardar los cambios.')
-      console.error(error)
-      throw error
+    } catch (e: unknown) {
+      const err = obtenerMensajeError(e)
+      if (err.estado === 401) {
+        authService.logout()
+        navigate('/auth/login')
+        throw e
+      }
+      toast.error(err.mensaje || 'No se pudieron guardar los cambios.')
+      console.error(e)
+      throw e
     }
   }
 
@@ -72,7 +92,13 @@ export const PerfilUsuario = () => {
         </div>
 
         <div className="lg:col-span-8">
-          <GestionMisLibros libros={libros} onAgregar={manejarAgregarLibro} />
+          <GestionMisLibros
+            libros={libros}
+            onAgregar={manejarAgregarLibro}
+            cargando={cargandoLibros}
+            error={errorLibros}
+            onReintentar={() => void cargarLibros()}
+          />
         </div>
       </div>
 

@@ -8,6 +8,9 @@ import { Paginacion } from "../ui/Paginacion"
 export type PropsGestionMisLibros = {
   libros: LibroUsuarioItemDTO[]
   onAgregar: () => void
+  cargando?: boolean
+  error?: string | null
+  onReintentar?: () => void
 }
 
 type Filtro = "todos" | "disponibles" | "prestados"
@@ -39,7 +42,13 @@ const COMPARADORES_ORDEN: Record<
   },
 }
 
-export const GestionMisLibros = ({ libros, onAgregar }: PropsGestionMisLibros) => {
+export const GestionMisLibros = ({
+  libros,
+  onAgregar,
+  cargando = false,
+  error = null,
+  onReintentar,
+}: PropsGestionMisLibros) => {
   const [filtro, setFiltro] = useState<Filtro>("todos")
   const [pagina, setPagina] = useState(1)
   const [campoOrden, setCampoOrden] = useState<CampoOrden>("titulo")
@@ -49,22 +58,19 @@ export const GestionMisLibros = ({ libros, onAgregar }: PropsGestionMisLibros) =
   const porPagina = 3
 
   const librosFiltrados = useMemo(
-    () => libros.filter(ESTRATEGIAS_FILTRO[filtro]),
+    () => libros.filter(ESTRATEGIAS_FILTRO[filtro]), //Filtramos los libros según el filtro seleccionado
     [libros, filtro],
   )
 
-  const librosOrdenados = useMemo(() => {
-    const comparador = COMPARADORES_ORDEN[campoOrden]
+  const librosOrdenados = useMemo(() => { 
+    const comparador = COMPARADORES_ORDEN[campoOrden] 
     return [...librosFiltrados].sort((a, b) => {
       const resultado = comparador(a, b)
       return sentidoOrden === "ascendente" ? resultado : -resultado
     })
   }, [librosFiltrados, campoOrden, sentidoOrden])
 
-  const totalPaginas = Math.max(
-    1,
-    Math.ceil(librosOrdenados.length / porPagina),
-  )
+  const totalPaginas = Math.max(1,Math.ceil(librosOrdenados.length / porPagina)) // Math.max(1,Math.ceil(librosOrdenados.length / porPagina)) es el número de páginas que se necesitan para mostrar todos los libros
   const paginaAjustada = Math.min(pagina, totalPaginas)
   const inicio = (paginaAjustada - 1) * porPagina
   const fin = inicio + porPagina
@@ -72,9 +78,7 @@ export const GestionMisLibros = ({ libros, onAgregar }: PropsGestionMisLibros) =
 
   const cambiarOrden = (campo: CampoOrden) => {
     if (campoOrden === campo) {
-      setSentidoOrden(
-        sentidoOrden === "ascendente" ? "descendente" : "ascendente",
-      )
+      setSentidoOrden(sentidoOrden === "ascendente" ? "descendente" : "ascendente") //Si el campo orden es el mismo, invertimos el sentido de orden
     } else {
       setCampoOrden(campo)
       setSentidoOrden("ascendente")
@@ -110,7 +114,34 @@ export const GestionMisLibros = ({ libros, onAgregar }: PropsGestionMisLibros) =
         </div>
 
         <div className="px-6 pb-6 pt-2">
-          {libros.length === 0 ? (
+          {cargando ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="text-secondary font-bold text-lg">
+                Cargando tus libros…
+              </div>
+              <p className="text-secondary/50 text-sm mt-1">
+                Esto puede tardar unos segundos.
+              </p>
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="text-secondary font-bold text-lg">
+                No se pudieron cargar tus libros
+              </div>
+              <p className="text-secondary/50 text-sm mt-1 max-w-md">
+                {error}
+              </p>
+              {onReintentar && (
+                <Boton
+                  tipo="secundario"
+                  onClick={onReintentar}
+                  className="mt-4 px-4 py-2 text-xs"
+                >
+                  Reintentar
+                </Boton>
+              )}
+            </div>
+          ) : libros.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                 📚
