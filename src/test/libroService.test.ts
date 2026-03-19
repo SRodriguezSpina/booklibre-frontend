@@ -9,10 +9,6 @@ import { libroService } from '../services/libroService'
 import { Libro } from '../classes/Libro'
 import type { LibroDTO, PrestamoDTO, LibroUsuarioItemDTO } from '../models/libroModel'
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Fixtures
-// ─────────────────────────────────────────────────────────────────────────────
-
 const libroDTOMock: LibroDTO = {
   id: 1,
   titulo: 'Clean Code',
@@ -65,10 +61,6 @@ const libroUsuarioItemMock: LibroUsuarioItemDTO = {
   fechaAgregado: '2026-01-15',
   imagenUrl: 'https://example.com/cover.jpg',
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// obtenerTodosLosPrestamos
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('libroService - obtenerTodosLosPrestamos', () => {
 
@@ -140,10 +132,6 @@ describe('libroService - obtenerTodosLosPrestamos', () => {
     await expect(libroService.obtenerTodosLosPrestamos(1)).rejects.toThrow('Network Error')
   })
 })
-
-// ─────────────────────────────────────────────────────────────────────────────
-// filtrarPrestamos
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('libroService - filtrarPrestamos', () => {
 
@@ -226,10 +214,6 @@ describe('libroService - filtrarPrestamos', () => {
   })
 })
 
-// ─────────────────────────────────────────────────────────────────────────────
-// getLibroById
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('libroService - getLibroById', () => {
 
   beforeEach(() => { vi.clearAllMocks() })
@@ -295,10 +279,6 @@ describe('libroService - getLibroById', () => {
   })
 })
 
-// ─────────────────────────────────────────────────────────────────────────────
-// crearLibro
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('libroService - crearLibro', () => {
 
   beforeEach(() => { vi.clearAllMocks() })
@@ -362,10 +342,6 @@ describe('libroService - crearLibro', () => {
   })
 })
 
-// ─────────────────────────────────────────────────────────────────────────────
-// actualizarLibro
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('libroService - actualizarLibro', () => {
 
   beforeEach(() => { vi.clearAllMocks() })
@@ -428,10 +404,6 @@ describe('libroService - actualizarLibro', () => {
   })
 })
 
-// ─────────────────────────────────────────────────────────────────────────────
-// eliminarLibro
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('libroService - eliminarLibro', () => {
 
   beforeEach(() => { vi.clearAllMocks() })
@@ -480,10 +452,6 @@ describe('libroService - eliminarLibro', () => {
     await expect(libroService.eliminarLibro(1, 3)).rejects.toThrow('Forbidden')
   })
 })
-
-// ─────────────────────────────────────────────────────────────────────────────
-// obtenerLibrosUsuarioPerfil
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('libroService - obtenerLibrosUsuarioPerfil', () => {
 
@@ -542,10 +510,6 @@ describe('libroService - obtenerLibrosUsuarioPerfil', () => {
   })
 })
 
-// ─────────────────────────────────────────────────────────────────────────────
-// obtenerPrestamosFiltrados
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('libroService - obtenerPrestamosFiltrados', () => {
 
   beforeEach(() => { vi.clearAllMocks() })
@@ -598,10 +562,6 @@ describe('libroService - obtenerPrestamosFiltrados', () => {
     await expect(libroService.obtenerPrestamosFiltrados(1)).rejects.toThrow('Network Error')
   })
 })
-
-// ─────────────────────────────────────────────────────────────────────────────
-// calificarLibro
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('libroService - calificarLibro', () => {
 
