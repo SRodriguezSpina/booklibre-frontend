@@ -9,6 +9,10 @@ import { libroService } from '../services/libroService'
 import { Libro } from '../classes/Libro'
 import type { LibroDTO, PrestamoDTO, LibroUsuarioItemDTO } from '../models/libroModel'
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Fixtures
+// ─────────────────────────────────────────────────────────────────────────────
+
 const libroDTOMock: LibroDTO = {
   id: 1,
   titulo: 'Clean Code',
@@ -30,17 +34,26 @@ const libroDTOMock: LibroDTO = {
 }
 
 const prestamoDTOMock: PrestamoDTO = {
-  id: 10,
-  titulo: 'Dune',
-  autor: 'Frank Herbert',
-  estado: 'MUY_BUENO',
+  id: 1,
+  titulo: '1984',
+  autor: 'George Orwell',
+  estado: 'EXCELENTE',
   propietarioId: 3,
-  imagenUrl: 'https://example.com/dune.jpg',
+  imagenUrl: '',
   alquiladoPorId: 1,
   fechaDesde: '2026-03-01',
   fechaHasta: '2026-03-20',
-  rating: 4,
+  rating: 0,
   bibliokarma: 1550,
+}
+
+const prestamoDTOMock2: PrestamoDTO = {
+  ...prestamoDTOMock,
+  id: 2,
+  titulo: 'Dune',
+  autor: 'Frank Herbert',
+  alquiladoPorId: 2,
+  propietarioId: 1, // prestado por el usuario 1
 }
 
 const libroUsuarioItemMock: LibroUsuarioItemDTO = {
@@ -52,6 +65,10 @@ const libroUsuarioItemMock: LibroUsuarioItemDTO = {
   fechaAgregado: '2026-01-15',
   imagenUrl: 'https://example.com/cover.jpg',
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// obtenerTodosLosPrestamos
+// ─────────────────────────────────────────────────────────────────────────────
 
 describe('libroService - obtenerTodosLosPrestamos', () => {
 
@@ -81,7 +98,7 @@ describe('libroService - obtenerTodosLosPrestamos', () => {
 
     const result = await libroService.obtenerTodosLosPrestamos(1)
 
-    expect(result[0].titulo).toBe('Dune')
+    expect(result[0].titulo).toBe('1984')
   })
 
   it('mapea fechaHasta del DTO a fechaDevolucion del Libro', async () => {
@@ -109,18 +126,12 @@ describe('libroService - obtenerTodosLosPrestamos', () => {
   })
 
   it('mapea múltiples préstamos correctamente', async () => {
-    const segundoPrestamo: PrestamoDTO = {
-      ...prestamoDTOMock,
-      id: 11,
-      titulo: '1984',
-      autor: 'George Orwell',
-    }
-    mockedAxios.get.mockResolvedValueOnce({ data: [prestamoDTOMock, segundoPrestamo] })
+    mockedAxios.get.mockResolvedValueOnce({ data: [prestamoDTOMock, prestamoDTOMock2] })
 
     const result = await libroService.obtenerTodosLosPrestamos(1)
 
     expect(result).toHaveLength(2)
-    expect(result[1].titulo).toBe('1984')
+    expect(result[1].titulo).toBe('Dune')
   })
 
   it('propaga el error si axios falla', async () => {
@@ -130,93 +141,82 @@ describe('libroService - obtenerTodosLosPrestamos', () => {
   })
 })
 
+// ─────────────────────────────────────────────────────────────────────────────
+// filtrarPrestamos
+// ─────────────────────────────────────────────────────────────────────────────
+
 describe('libroService - filtrarPrestamos', () => {
 
   const usuarioId = 1
 
-  // Libro prestado A mí (alquiladoPorId === usuarioId)
+  // alquiladoPorId === usuarioId → prestado A mí
   const libroRecibido = Libro.fromPrestamoJson({
     ...prestamoDTOMock,
     id: 1,
-    titulo: 'Dune',
-    autor: 'Frank Herbert',
+    titulo: '1984',
+    autor: 'George Orwell',
     alquiladoPorId: usuarioId,
+    propietarioId: 3,
   })
 
-  // Libro prestado POR mí (propietarioId === usuarioId, alquiladoPorId !== usuarioId)
-  const libroPrestado = Libro.fromPrestamoJson({
+  // propietarioId === usuarioId, alquiladoPorId !== usuarioId → prestado POR mí
+  const libroEmitido = Libro.fromPrestamoJson({
     ...prestamoDTOMock,
     id: 2,
-    titulo: 'Clean Code',
-    autor: 'Robert C. Martin',
+    titulo: 'Dune',
+    autor: 'Frank Herbert',
     propietarioId: usuarioId,
     alquiladoPorId: 99,
   })
 
+  const libros = [libroRecibido, libroEmitido]
+
   it('filtra solo los libros prestados a mí', () => {
-    const result = libroService.filtrarPrestamos(
-      [libroRecibido, libroPrestado], 'prestados-a-mi', usuarioId
-    )
+    const result = libroService.filtrarPrestamos(libros, 'prestados-a-mi', usuarioId)
+    expect(result).toHaveLength(1)
+    expect(result[0].titulo).toBe('1984')
+  })
+
+  it('filtra solo los libros prestados por mí', () => {
+    const result = libroService.filtrarPrestamos(libros, 'prestados-por-mi', usuarioId)
     expect(result).toHaveLength(1)
     expect(result[0].titulo).toBe('Dune')
   })
 
-  it('filtra solo los libros prestados por mí', () => {
-    const result = libroService.filtrarPrestamos(
-      [libroRecibido, libroPrestado], 'prestados-por-mi', usuarioId
-    )
-    expect(result).toHaveLength(1)
-    expect(result[0].titulo).toBe('Clean Code')
-  })
-
   it('devuelve lista vacía si no hay libros que coincidan con el tipo', () => {
-    const result = libroService.filtrarPrestamos(
-      [libroRecibido], 'prestados-por-mi', usuarioId
-    )
+    const result = libroService.filtrarPrestamos([libroRecibido], 'prestados-por-mi', usuarioId)
     expect(result).toHaveLength(0)
   })
 
   it('filtra por búsqueda de título (case-insensitive)', () => {
-    const result = libroService.filtrarPrestamos(
-      [libroRecibido, libroPrestado], 'prestados-a-mi', usuarioId, 'dune'
-    )
+    const result = libroService.filtrarPrestamos(libros, 'prestados-a-mi', usuarioId, '1984')
     expect(result).toHaveLength(1)
-    expect(result[0].titulo).toBe('Dune')
+    expect(result[0].titulo).toBe('1984')
   })
 
   it('filtra por búsqueda de autor (case-insensitive)', () => {
-    const result = libroService.filtrarPrestamos(
-      [libroRecibido, libroPrestado], 'prestados-a-mi', usuarioId, 'frank'
-    )
+    const result = libroService.filtrarPrestamos(libros, 'prestados-a-mi', usuarioId, 'orwell')
     expect(result).toHaveLength(1)
-    expect(result[0].autor).toBe('Frank Herbert')
+    expect(result[0].autor).toBe('George Orwell')
   })
 
   it('búsqueda en mayúsculas encuentra resultados en minúsculas', () => {
-    const result = libroService.filtrarPrestamos(
-      [libroRecibido], 'prestados-a-mi', usuarioId, 'DUNE'
-    )
+    const result = libroService.filtrarPrestamos(libros, 'prestados-a-mi', usuarioId, 'GEORGE')
     expect(result).toHaveLength(1)
   })
 
   it('query que no coincide con nada devuelve lista vacía', () => {
-    const result = libroService.filtrarPrestamos(
-      [libroRecibido, libroPrestado], 'prestados-a-mi', usuarioId, 'xyz123'
-    )
+    const result = libroService.filtrarPrestamos(libros, 'prestados-a-mi', usuarioId, 'xyz123')
     expect(result).toHaveLength(0)
   })
 
   it('query vacío no filtra por texto', () => {
-    const result = libroService.filtrarPrestamos(
-      [libroRecibido, libroPrestado], 'prestados-a-mi', usuarioId, ''
-    )
-    expect(result).toHaveLength(1) // solo el recibido, el tipo sigue aplicando
+    const result = libroService.filtrarPrestamos(libros, 'prestados-a-mi', usuarioId, '')
+    expect(result).toHaveLength(1)
   })
 
   it('sin query devuelve todos los del tipo correcto', () => {
-    const result = libroService.filtrarPrestamos(
-      [libroRecibido, libroPrestado], 'prestados-a-mi', usuarioId
-    )
+    const result = libroService.filtrarPrestamos(libros, 'prestados-a-mi', usuarioId)
     expect(result).toHaveLength(1)
   })
 
@@ -225,6 +225,10 @@ describe('libroService - filtrarPrestamos', () => {
     expect(result).toHaveLength(0)
   })
 })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// getLibroById
+// ─────────────────────────────────────────────────────────────────────────────
 
 describe('libroService - getLibroById', () => {
 
@@ -238,6 +242,17 @@ describe('libroService - getLibroById', () => {
     expect(mockedAxios.get).toHaveBeenCalledWith(
       expect.stringContaining('/libros/1'),
       expect.objectContaining({ params: { usuarioId: 2 } })
+    )
+  })
+
+  it('pasa el usuarioId como query param', async () => {
+    mockedAxios.get.mockResolvedValueOnce({ data: libroDTOMock })
+
+    await libroService.getLibroById(1, 42)
+
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+      expect.any(String),
+      { params: { usuarioId: 42 } }
     )
   })
 
@@ -278,18 +293,11 @@ describe('libroService - getLibroById', () => {
 
     await expect(libroService.getLibroById(999, 1)).rejects.toThrow('Not Found')
   })
-
-  it('pasa el usuarioId como query param', async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: libroDTOMock })
-
-    await libroService.getLibroById(1, 42)
-
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-      expect.any(String),
-      { params: { usuarioId: 42 } }
-    )
-  })
 })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// crearLibro
+// ─────────────────────────────────────────────────────────────────────────────
 
 describe('libroService - crearLibro', () => {
 
@@ -305,22 +313,6 @@ describe('libroService - crearLibro', () => {
       libroDTOMock,
       expect.objectContaining({ params: { usuarioId: 3 } })
     )
-  })
-
-  it('devuelve una instancia de Libro', async () => {
-    mockedAxios.post.mockResolvedValueOnce({ data: libroDTOMock })
-
-    const result = await libroService.crearLibro(libroDTOMock, 3)
-
-    expect(result).toBeInstanceOf(Libro)
-  })
-
-  it('el libro devuelto tiene el título del DTO', async () => {
-    mockedAxios.post.mockResolvedValueOnce({ data: libroDTOMock })
-
-    const result = await libroService.crearLibro(libroDTOMock, 3)
-
-    expect(result.titulo).toBe('Clean Code')
   })
 
   it('pasa el usuarioId como query param', async () => {
@@ -347,12 +339,32 @@ describe('libroService - crearLibro', () => {
     )
   })
 
+  it('devuelve una instancia de Libro', async () => {
+    mockedAxios.post.mockResolvedValueOnce({ data: libroDTOMock })
+
+    const result = await libroService.crearLibro(libroDTOMock, 3)
+
+    expect(result).toBeInstanceOf(Libro)
+  })
+
+  it('el libro devuelto tiene el título del DTO', async () => {
+    mockedAxios.post.mockResolvedValueOnce({ data: libroDTOMock })
+
+    const result = await libroService.crearLibro(libroDTOMock, 3)
+
+    expect(result.titulo).toBe('Clean Code')
+  })
+
   it('propaga el error si axios falla', async () => {
     mockedAxios.post.mockRejectedValueOnce(new Error('Server Error'))
 
     await expect(libroService.crearLibro(libroDTOMock, 3)).rejects.toThrow('Server Error')
   })
 })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// actualizarLibro
+// ─────────────────────────────────────────────────────────────────────────────
 
 describe('libroService - actualizarLibro', () => {
 
@@ -365,6 +377,29 @@ describe('libroService - actualizarLibro', () => {
 
     expect(mockedAxios.put).toHaveBeenCalledWith(
       expect.stringContaining('/libros/1'),
+      libroDTOMock
+    )
+  })
+
+  it('usa el id del DTO para construir la URL', async () => {
+    const dtoConId5 = { ...libroDTOMock, id: 5 }
+    mockedAxios.put.mockResolvedValueOnce({ data: dtoConId5 })
+
+    await libroService.actualizarLibro(dtoConId5)
+
+    expect(mockedAxios.put).toHaveBeenCalledWith(
+      expect.stringContaining('/libros/5'),
+      expect.anything()
+    )
+  })
+
+  it('envía el DTO completo como body', async () => {
+    mockedAxios.put.mockResolvedValueOnce({ data: libroDTOMock })
+
+    await libroService.actualizarLibro(libroDTOMock)
+
+    expect(mockedAxios.put).toHaveBeenCalledWith(
+      expect.any(String),
       libroDTOMock
     )
   })
@@ -386,35 +421,16 @@ describe('libroService - actualizarLibro', () => {
     expect(result.titulo).toBe('Clean Code 2nd Ed')
   })
 
-  it('envía el DTO completo como body', async () => {
-    mockedAxios.put.mockResolvedValueOnce({ data: libroDTOMock })
-
-    await libroService.actualizarLibro(libroDTOMock)
-
-    expect(mockedAxios.put).toHaveBeenCalledWith(
-      expect.any(String),
-      libroDTOMock
-    )
-  })
-
-  it('usa el id del DTO para construir la URL', async () => {
-    const dtoConId5 = { ...libroDTOMock, id: 5 }
-    mockedAxios.put.mockResolvedValueOnce({ data: dtoConId5 })
-
-    await libroService.actualizarLibro(dtoConId5)
-
-    expect(mockedAxios.put).toHaveBeenCalledWith(
-      expect.stringContaining('/libros/5'),
-      expect.anything()
-    )
-  })
-
   it('propaga el error si axios falla', async () => {
     mockedAxios.put.mockRejectedValueOnce(new Error('Not Found'))
 
     await expect(libroService.actualizarLibro(libroDTOMock)).rejects.toThrow('Not Found')
   })
 })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// eliminarLibro
+// ─────────────────────────────────────────────────────────────────────────────
 
 describe('libroService - eliminarLibro', () => {
 
@@ -450,12 +466,6 @@ describe('libroService - eliminarLibro', () => {
     expect(result).toBeUndefined()
   })
 
-  it('propaga el error si axios falla', async () => {
-    mockedAxios.delete.mockRejectedValueOnce(new Error('Forbidden'))
-
-    await expect(libroService.eliminarLibro(1, 3)).rejects.toThrow('Forbidden')
-  })
-
   it('llama a delete exactamente una vez', async () => {
     mockedAxios.delete.mockResolvedValueOnce({})
 
@@ -463,7 +473,17 @@ describe('libroService - eliminarLibro', () => {
 
     expect(mockedAxios.delete).toHaveBeenCalledTimes(1)
   })
+
+  it('propaga el error si axios falla', async () => {
+    mockedAxios.delete.mockRejectedValueOnce(new Error('Forbidden'))
+
+    await expect(libroService.eliminarLibro(1, 3)).rejects.toThrow('Forbidden')
+  })
 })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// obtenerLibrosUsuarioPerfil
+// ─────────────────────────────────────────────────────────────────────────────
 
 describe('libroService - obtenerLibrosUsuarioPerfil', () => {
 
@@ -522,6 +542,67 @@ describe('libroService - obtenerLibrosUsuarioPerfil', () => {
   })
 })
 
+// ─────────────────────────────────────────────────────────────────────────────
+// obtenerPrestamosFiltrados
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('libroService - obtenerPrestamosFiltrados', () => {
+
+  beforeEach(() => { vi.clearAllMocks() })
+
+  it('devuelve todos los libros si no hay query', async () => {
+    mockedAxios.get.mockResolvedValueOnce({ data: [prestamoDTOMock, prestamoDTOMock2] })
+
+    const result = await libroService.obtenerPrestamosFiltrados(1)
+
+    expect(result).toHaveLength(2)
+  })
+
+  it('filtra por título con query', async () => {
+    mockedAxios.get.mockResolvedValueOnce({ data: [prestamoDTOMock, prestamoDTOMock2] })
+
+    const result = await libroService.obtenerPrestamosFiltrados(1, 'dune')
+
+    expect(result).toHaveLength(1)
+    expect(result[0].titulo).toBe('Dune')
+  })
+
+  it('filtra por autor con query', async () => {
+    mockedAxios.get.mockResolvedValueOnce({ data: [prestamoDTOMock, prestamoDTOMock2] })
+
+    const result = await libroService.obtenerPrestamosFiltrados(1, 'orwell')
+
+    expect(result).toHaveLength(1)
+    expect(result[0].autor).toBe('George Orwell')
+  })
+
+  it('la búsqueda es case-insensitive', async () => {
+    mockedAxios.get.mockResolvedValueOnce({ data: [prestamoDTOMock, prestamoDTOMock2] })
+
+    const result = await libroService.obtenerPrestamosFiltrados(1, 'GEORGE')
+
+    expect(result).toHaveLength(1)
+  })
+
+  it('devuelve lista vacía si la query no coincide con nada', async () => {
+    mockedAxios.get.mockResolvedValueOnce({ data: [prestamoDTOMock, prestamoDTOMock2] })
+
+    const result = await libroService.obtenerPrestamosFiltrados(1, 'zzznomatch')
+
+    expect(result).toHaveLength(0)
+  })
+
+  it('propaga el error si axios falla', async () => {
+    mockedAxios.get.mockRejectedValueOnce(new Error('Network Error'))
+
+    await expect(libroService.obtenerPrestamosFiltrados(1)).rejects.toThrow('Network Error')
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// calificarLibro
+// ─────────────────────────────────────────────────────────────────────────────
+
 describe('libroService - calificarLibro', () => {
 
   beforeEach(() => { vi.clearAllMocks() })
@@ -559,17 +640,17 @@ describe('libroService - calificarLibro', () => {
     )
   })
 
-  it('propaga el error si axios falla', async () => {
-    mockedAxios.post.mockRejectedValueOnce(new Error('Bad Request'))
-
-    await expect(libroService.calificarLibro(1, 2, 5, 'ok')).rejects.toThrow('Bad Request')
-  })
-
   it('llama a post exactamente una vez', async () => {
     mockedAxios.post.mockResolvedValueOnce({})
 
     await libroService.calificarLibro(1, 2, 4, 'Bueno')
 
     expect(mockedAxios.post).toHaveBeenCalledTimes(1)
+  })
+
+  it('propaga el error si axios falla', async () => {
+    mockedAxios.post.mockRejectedValueOnce(new Error('Bad Request'))
+
+    await expect(libroService.calificarLibro(1, 2, 5, 'ok')).rejects.toThrow('Bad Request')
   })
 })
