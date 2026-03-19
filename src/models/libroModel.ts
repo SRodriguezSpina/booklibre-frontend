@@ -60,6 +60,7 @@ export type LibroUsuarioItemDTO = {
   genero: string
   disponible: boolean
   fechaAgregado: string | null
+  imagenUrl?: string | null
 }
 
 export const GENERO_LABEL: Record<string, string> = {
