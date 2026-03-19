@@ -66,6 +66,7 @@ describe("Libro - fromJson", () => {
       editorial: "Prentice Hall",
       fechaPublicacion: "2008-08-01",
       bibliokarma: 1000,
+      estoyReservado: false
     }
     const libro = Libro.fromJson(dto)
     expect(libro.id).toBe(2)

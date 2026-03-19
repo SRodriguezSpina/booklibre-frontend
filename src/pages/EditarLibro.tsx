@@ -64,8 +64,7 @@ export const EditarLibro = () => {
       return
     }
     try {
-      const usuarioId = authService.obtenerIdUsuarioActual() ?? 1
-      const libro = await libroService.getLibroById(Number(id), usuarioId)
+      const libro = await libroService.getLibroById(Number(id))
       setValues(toValues(LibroForm.fromLibro(libro)))
     } catch {
       navigate("/home")

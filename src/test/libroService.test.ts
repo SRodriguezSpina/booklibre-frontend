@@ -27,6 +27,7 @@ const libroDTOMock: LibroDTO = {
   alquiladoPorId: undefined,
   fechaDevolucion: undefined,
   bibliokarma: undefined,
+  estoyReservado: false
 }
 
 const prestamoDTOMock: PrestamoDTO = {
@@ -221,7 +222,7 @@ describe('libroService - getLibroById', () => {
   it('llama al endpoint correcto con el libroId', async () => {
     mockedAxios.get.mockResolvedValueOnce({ data: libroDTOMock })
 
-    await libroService.getLibroById(1, 2)
+    await libroService.getLibroById(1)
 
     expect(mockedAxios.get).toHaveBeenCalledWith(
       expect.stringContaining('/libros/1'),
@@ -232,7 +233,7 @@ describe('libroService - getLibroById', () => {
   it('pasa el usuarioId como query param', async () => {
     mockedAxios.get.mockResolvedValueOnce({ data: libroDTOMock })
 
-    await libroService.getLibroById(1, 42)
+    await libroService.getLibroById(1)
 
     expect(mockedAxios.get).toHaveBeenCalledWith(
       expect.any(String),
@@ -243,7 +244,7 @@ describe('libroService - getLibroById', () => {
   it('devuelve una instancia de Libro', async () => {
     mockedAxios.get.mockResolvedValueOnce({ data: libroDTOMock })
 
-    const result = await libroService.getLibroById(1, 2)
+    const result = await libroService.getLibroById(1)
 
     expect(result).toBeInstanceOf(Libro)
   })
@@ -251,7 +252,7 @@ describe('libroService - getLibroById', () => {
   it('mapea el título correctamente', async () => {
     mockedAxios.get.mockResolvedValueOnce({ data: libroDTOMock })
 
-    const result = await libroService.getLibroById(1, 2)
+    const result = await libroService.getLibroById(1)
 
     expect(result.titulo).toBe('Clean Code')
   })
@@ -259,7 +260,7 @@ describe('libroService - getLibroById', () => {
   it('mapea el autor correctamente', async () => {
     mockedAxios.get.mockResolvedValueOnce({ data: libroDTOMock })
 
-    const result = await libroService.getLibroById(1, 2)
+    const result = await libroService.getLibroById(1)
 
     expect(result.autor).toBe('Robert C. Martin')
   })
@@ -267,7 +268,7 @@ describe('libroService - getLibroById', () => {
   it('mapea el propietarioId correctamente', async () => {
     mockedAxios.get.mockResolvedValueOnce({ data: libroDTOMock })
 
-    const result = await libroService.getLibroById(1, 2)
+    const result = await libroService.getLibroById(1)
 
     expect(result.propietarioId).toBe(3)
   })
@@ -275,7 +276,7 @@ describe('libroService - getLibroById', () => {
   it('propaga el error si axios falla', async () => {
     mockedAxios.get.mockRejectedValueOnce(new Error('Not Found'))
 
-    await expect(libroService.getLibroById(999, 1)).rejects.toThrow('Not Found')
+    await expect(libroService.getLibroById(999)).rejects.toThrow('Not Found')
   })
 })
 
