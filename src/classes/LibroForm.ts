@@ -17,6 +17,7 @@ export class LibroForm {
   isbn: string | "" = "";
   idioma: Idioma | "" = "";
   estado: EstadoLibro | "" = "";
+  estoyReservado: boolean = false;
   fechaPublicacion: string = "";
   propietarioId: number = 0;
 
@@ -88,6 +89,7 @@ export class LibroForm {
     { value: "ConDedicatoria", label: "Con dedicatoria" },
     { value: "Coleccionable",  label: "Coleccionable" },
   ]
+  
 
   static fromLibro(libro: Libro): LibroForm {
     const form = new LibroForm();
@@ -145,6 +147,7 @@ export class LibroForm {
       estado: this.estado as EstadoLibro,
       fechaPublicacion: this.fechaPublicacion,
       propietarioId: this.propietarioId,
+      estoyReservado: this.estoyReservado,
       imagenUrl: "",
       editorial: "",
     };

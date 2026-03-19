@@ -2,30 +2,61 @@ import { useState, useMemo } from "react"
 import { Card, CardHeader } from "../ui/Card"
 import { Boton } from "../ui/Boton"
 import { calcularDiferenciaDias, obtenerFechaHoy, formatearFechaVisual } from "../../utils/dateHandlerReserva"
+import { reservaService } from "../../services/reservaService"
+import axios from "axios"
 
-export const ReservaCard = () => {
+interface ReservaCardProps {
+  libroId: number
+  usuarioId: number
+  onReservaExitosa: () => void
+  estaOcupadoHoy: boolean
+}
+
+export const ReservaCard = ({ libroId, usuarioId, onReservaExitosa, estaOcupadoHoy}: ReservaCardProps) => {
   const [fechaDesde, setFechaDesde] = useState<string>("")
   const [fechaHasta, setFechaHasta] = useState<string>("")
 
   const duracionDias = useMemo(
-    () => calcularDiferenciaDias(fechaDesde, fechaHasta), 
+    () => calcularDiferenciaDias(fechaDesde, fechaHasta),
     [fechaDesde, fechaHasta]
   )
 
   const hoy = obtenerFechaHoy()
   const esReservaValida = fechaDesde !== "" && fechaHasta !== "" && duracionDias > 0
 
-  const handleConfirmar = () => {
+  const handleConfirmar = async () => {
     if (!esReservaValida) return
-    
-    console.log("Enviando al backend reserva desde:", fechaDesde, "hasta:", fechaHasta)
-    // await reservaService.crearReserva({ libroId, fechaDesde, fechaHasta })
+
+    try {
+      await reservaService.crearReserva({
+        libroId,
+        usuarioId,
+        fechaDesde,
+        fechaHasta
+      })
+
+      alert("¡Reserva confirmada con éxito!")
+      setFechaDesde("")
+      setFechaHasta("")
+      onReservaExitosa()
+
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const mensajeDeSpring = error.response?.data?.message
+
+        if (mensajeDeSpring) {
+          alert(mensajeDeSpring)
+          return
+        }
+      }
+      alert("No se pudo confirmar la reserva. Intentá de nuevo.")
+    }
   }
 
   return (
     <Card className="p-6">
-      <CardHeader 
-        titulo="Tu Reserva" 
+      <CardHeader
+        titulo="Tu Reserva"
         className="text-lg text-secondary-dark"
         icono={
           <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -39,10 +70,10 @@ export const ReservaCard = () => {
           <label className="text-xs font-bold text-secondary uppercase opacity-70 mb-1.5 block">
             Recogida
           </label>
-          <input 
-            type="date" 
+          <input
+            type="date"
             value={fechaDesde}
-            min={hoy} 
+            min={hoy}
             onChange={(e) => setFechaDesde(e.target.value)}
             className="w-full bg-background rounded-lg p-2.5 text-sm border border-accent outline-none focus:border-primary text-secondary-dark transition-colors"
           />
@@ -51,12 +82,12 @@ export const ReservaCard = () => {
           <label className="text-xs font-bold text-secondary uppercase opacity-70 mb-1.5 block">
             Devolución
           </label>
-          <input 
-            type="date" 
+          <input
+            type="date"
             value={fechaHasta}
-            min={fechaDesde || hoy} 
+            min={fechaDesde || hoy}
             onChange={(e) => setFechaHasta(e.target.value)}
-            disabled={!fechaDesde} 
+            disabled={!fechaDesde}
             className="w-full bg-background rounded-lg p-2.5 text-sm border border-accent outline-none focus:border-primary text-secondary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           />
         </div>
@@ -76,13 +107,13 @@ export const ReservaCard = () => {
         <span>{duracionDias} {duracionDias === 1 ? 'Día' : 'Días'}</span>
       </div>
 
-      <Boton 
-        tipo="primario" 
-        className="w-full py-3 rounded-xl shadow-sm"
-        deshabilitado={!esReservaValida}
+      <Boton
+        className="w-full"
+        tipo="primario"
         onClick={handleConfirmar}
+        deshabilitado={!esReservaValida || estaOcupadoHoy} 
       >
-        Confirmar Reserva
+        {estaOcupadoHoy ? "Libro no disponible" : "Confirmar Reserva"}
       </Boton>
       <p className="text-xs text-center text-secondary opacity-60 mt-3 px-4">
         Con la reserva no se encontrará disponible en el rango de fechas

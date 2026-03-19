@@ -14,7 +14,7 @@ export const InfoLibro = ({ libro }: InfoLibroProps) => {
       <div>
         <div className="flex items-center gap-3 mb-3">
           <span className="bg-blue-100 text-blue-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-            {libro.genero || "SIN GÉNERO"}
+            {libro.genero}
           </span>
           <div className="flex text-yellow-400 text-sm">
             ★★★★★ <span className="text-secondary opacity-60 ml-1">({libro.rating})</span>
@@ -36,7 +36,7 @@ export const InfoLibro = ({ libro }: InfoLibroProps) => {
       <div>
         <h3 className="font-bold text-xl mb-3 text-secondary-dark">Sinopsis</h3>
         <p className="text-secondary leading-relaxed mb-4">
-          {libro.descripcion || "No hay una descripción disponible."}
+          {libro.descripcion}
         </p>
       </div>
 
@@ -52,7 +52,7 @@ export const InfoLibro = ({ libro }: InfoLibroProps) => {
           <DetalleFila>
             <DetalleItem label="Tipo" colSpan="col-span-2 md:col-span-3">
               <span className="bg-orange-50 text-orange-700 text-xs font-bold px-3 py-1.5 rounded-full flex w-fit items-center gap-1.5 border border-orange-100">
-                 📚 {libro.tipo}
+                {libro.tipo}
               </span>
             </DetalleItem>
             <DetalleItem label="Bibliokarmas" colSpan="col-span-2 md:col-span-1">
