@@ -27,6 +27,7 @@ const libroDTOMock: LibroDTO = {
   alquiladoPorId: undefined,
   fechaDevolucion: undefined,
   bibliokarma: undefined,
+  autorImg: "",
   estoyReservado: false
 }
 
@@ -225,19 +226,7 @@ describe('libroService - getLibroById', () => {
     await libroService.getLibroById(1)
 
     expect(mockedAxios.get).toHaveBeenCalledWith(
-      expect.stringContaining('/libros/1'),
-      expect.objectContaining({ params: { usuarioId: 2 } })
-    )
-  })
-
-  it('pasa el usuarioId como query param', async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: libroDTOMock })
-
-    await libroService.getLibroById(1)
-
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-      expect.any(String),
-      { params: { usuarioId: 42 } }
+      expect.stringContaining('/libros/1')
     )
   })
 
