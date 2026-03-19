@@ -59,35 +59,35 @@ export class LibroForm {
     },
   ] as const;
 
-  static tipoOptions: { value: TipoLibro; label: string }[] = [
-    { value: "Común", label: "Común" },
-    { value: "Con dedicatoria", label: "Con dedicatoria" },
-    { value: "Coleccionable", label: "Coleccionable" },
-  ];
+  static estadoOptions = [
+  { value: "EXCELENTE",  label: "Excelente" },
+  { value: "MUY_BUENO",  label: "Muy bueno" },
+  { value: "BUENO",      label: "Bueno" },
+  { value: "REGULAR",    label: "Regular" },
+  { value: "MALO",       label: "Malo" },
+  ]
 
-  static estadoOptions: { value: EstadoLibro; label: string }[] = [
-    { value: "Excelente", label: "Excelente" },
-    { value: "Muy bueno", label: "Muy bueno" },
-    { value: "Bueno", label: "Bueno" },
-    { value: "Regular", label: "Regular" },
-    { value: "Malo", label: "Malo" },
-  ];
+  static generoOptions = [
+    { value: "DRAMA",             label: "Drama" },
+    { value: "CIENCIA_FICCION",   label: "Ciencia Ficción" },
+    { value: "ROMANCE",           label: "Romance" },
+    { value: "AUTOAYUDA",         label: "Autoayuda" },
+    { value: "DISENO",            label: "Diseño" },
+    { value: "LITERATURA_CLASICA",label: "Literatura Clásica" },
+  ]
 
-  static generoOptions: { value: Genero; label: string }[] = [
-    { value: "Drama", label: "Drama" },
-    { value: "Ciencia ficcion", label: "Ciencia ficcion" },
-    { value: "Romance", label: "Romance" },
-    { value: "Autoayuda", label: "Autoayuda" },
-    { value: "Diseño", label: "Diseño" },
-    { value: "Literatura Clasica", label: "Literatura Clasica" },
-  ];
+  static idiomaOptions = [
+    { value: "ESPANOL",   label: "Español" },
+    { value: "INGLES",    label: "Inglés" },
+    { value: "PORTUGUES", label: "Portugués" },
+    { value: "FRANCES",   label: "Francés" },
+  ]
 
-  static idiomaOptions: { value: Idioma; label: string }[] = [
-    { value: "Español", label: "Español" },
-    { value: "Ingles", label: "Ingles" },
-    { value: "Portugues", label: "Portugues" },
-    { value: "Frances", label: "Frances" },
-  ];
+  static tipoOptions = [
+    { value: "Comun",          label: "Común" },
+    { value: "ConDedicatoria", label: "Con dedicatoria" },
+    { value: "Coleccionable",  label: "Coleccionable" },
+  ]
 
   static fromLibro(libro: Libro): LibroForm {
     const form = new LibroForm();
@@ -104,7 +104,7 @@ export class LibroForm {
     form.propietarioId = libro.propietarioId;
     return form;
   }
-
+  
   validate(): Record<string, string | undefined> {
     return {
       titulo: !this.titulo.trim() ? "El título es obligatorio" : undefined,

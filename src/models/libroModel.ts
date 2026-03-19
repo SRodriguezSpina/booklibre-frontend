@@ -1,23 +1,8 @@
-export type TipoLibro = "Común" | "Con dedicatoria" | "Coleccionable"
-
-export type EstadoLibro =
-  | "Excelente"
-  | "Muy bueno"
-  | "Bueno"
-  | "Regular"
-  | "Malo"
-
+export type EstadoLibro = "EXCELENTE" | "MUY_BUENO" | "BUENO" | "REGULAR" | "MALO"
+export type Genero = "DRAMA" | "CIENCIA_FICCION" | "ROMANCE" | "AUTOAYUDA" | "DISENO" | "LITERATURA_CLASICA"
+export type Idioma = "ESPANOL" | "INGLES" | "FRANCES" | "PORTUGUES"
+export type TipoLibro = "Comun" | "ConDedicatoria" | "Coleccionable"
 export type TipoPrestamo = "prestados-a-mi" | "prestados-por-mi"
-
-export type Genero =
-  | "Drama"
-  | "Ciencia ficcion"
-  | "Romance"
-  | "Autoayuda"
-  | "Diseño"
-  | "Literatura Clasica"
-
-  export type Idioma = "Español" | "Ingles" | "Frances" | "Portugues"
 
 export interface LibroDTO {
   id: number

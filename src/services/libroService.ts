@@ -66,8 +66,12 @@ export const libroService = {
     return Libro.fromJson(res.data)
   },
 
-  async crearLibro(dto: LibroDTO): Promise<Libro> {
-    const res = await axios.post<LibroDTO>(`${API_BASE_URL}/libros`, dto)
+  async crearLibro(dto: LibroDTO, usuarioId: number): Promise<Libro> {
+    const res = await axios.post<LibroDTO>(`${API_BASE_URL}/libros/nuevo`, dto, { 
+      params: { 
+        usuarioId 
+      } 
+    })
     return Libro.fromJson(res.data)
   },
 
