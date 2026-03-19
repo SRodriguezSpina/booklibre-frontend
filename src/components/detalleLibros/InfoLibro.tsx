@@ -24,7 +24,7 @@ export const InfoLibro = ({ libro }: InfoLibroProps) => {
 
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden">
-            <img src="" alt="ImgAutor" />
+            <img src={libro.autorImg} alt="ImgAutor" />
           </div>
           <div>
             <p className="text-xs text-secondary font-bold uppercase opacity-70">Autor</p>

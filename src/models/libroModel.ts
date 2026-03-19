@@ -11,6 +11,7 @@ export interface LibroDTO {
   descripcion: string
   genero: Genero
   autor: string
+  autorImg: string
   paginas: number
   isbn: string
   idioma: Idioma
