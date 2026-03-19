@@ -49,3 +49,19 @@ jobs:
           json-final-path: coverage/coverage-final.json
           threshold-icons: "{0: '🔴', 80: '🟠', 90: '🟢'}"
           file-coverage-mode: all
+
+      - run: npm i coverage-badges-cli -g
+
+      - name: Create Coverage Badges
+        uses: jaywcjlove/coverage-badges-cli@main
+        with:
+          style: flat
+          source: coverage/coverage-summary.json
+          output: coverage/badges.svg
+          jsonPath: totals.percent_covered
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
