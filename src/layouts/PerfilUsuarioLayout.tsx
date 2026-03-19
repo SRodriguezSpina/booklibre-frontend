@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Outlet } from "react-router-dom"
+import { Outlet, useNavigate } from "react-router-dom"
 import { Spinner, ErrorCard, type ErrorPersonalizado } from "../components/ui"
 import { Usuario } from '../classes/usuario'
 import { useAlIniciar } from "../utils/hooks"
@@ -16,6 +16,7 @@ export const PerfilUsuarioLayout = () => {
   const [usuario, setUsuario] = useState<Usuario | null>(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState<ErrorPersonalizado | null>(null)
+  const navigate = useNavigate()
 
   const cargarUsuario = async () => {
     const id = authService.obtenerIdUsuarioActual()
@@ -38,7 +39,15 @@ export const PerfilUsuarioLayout = () => {
   useAlIniciar(cargarUsuario) //Custom hook que hace el efecto únicamente al montar el componente
 
   if (cargando) return <Spinner />
-  if (error) return <ErrorCard error={error} alReintentar={cargarUsuario} />
+  if (error) {
+    const noAutenticado = error.estado === 401 || authService.obtenerIdUsuarioActual() == null
+    return (
+      <ErrorCard
+        error={error}
+        alReintentar={noAutenticado ? () => navigate('/login') : cargarUsuario}
+      />
+    )
+  }
   if (usuario == null) return null
 
   const setUsuarioActualizado = (u: Usuario) => setUsuario(u)
