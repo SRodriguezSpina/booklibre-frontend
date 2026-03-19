@@ -2,10 +2,10 @@ import { useState } from "react"
 import { useParams } from "react-router-dom"
 import { useOnInit } from "../utils/hooks"
 import { libroService } from "../services/libroService"
-import { authService } from "../services/AuthService" // ¡Faltaba importar esto!
+import { authService } from "../services/AuthService"
 import { Libro } from "../classes/Libro"
 
-import { TarjetaReserva } from "../components/detalleLibros/ReservaCard"
+import { ReservaCard } from "../components/detalleLibros/ReservaCard"
 import { InfoLibro } from "../components/detalleLibros/InfoLibro"
 import { Card } from "../components/ui"
 
@@ -19,9 +19,7 @@ export const DetalleLibro = () => {
       if (id) {
         const usuarioId = authService.obtenerIdUsuarioActual() || 1
         const data = await libroService.getLibroById(Number(id), usuarioId)
-        console.log(data)
         setLibro(data)
-        console.log(usuarioId)
       }
     } catch (error) {
       console.error("Error fetching libro", error)
@@ -51,13 +49,13 @@ export const DetalleLibro = () => {
         <div className="w-full lg:w-1/3 flex flex-col gap-6">
           <Card className="p-4 flex justify-center">
             <img 
-              src={libro.imagenUrl || "https://m.media-amazon.com/images/I/81af+MCATTL.jpg"} 
+              src={libro.imagenUrl} 
               alt={libro.titulo} 
               className="w-full max-w-[280px] rounded-md shadow-md object-cover"
             />
           </Card>
 
-          <TarjetaReserva />
+          <ReservaCard/>
         </div>
 
         <div className="w-full lg:w-2/3 flex flex-col gap-8">
