@@ -19,6 +19,7 @@ export interface LibroDTO {
   fechaPublicacion: string
   propietarioId: number
   imagenUrl: string
+  estoyReservado: boolean 
   alquiladoPorId?: number
   fechaDevolucion?: string // ISO string
   bibliokarma?: number
