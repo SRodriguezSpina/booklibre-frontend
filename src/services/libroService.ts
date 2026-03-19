@@ -57,12 +57,8 @@ export const libroService = {
     return res.data
   },
 
-  async getLibroById(id: number, usuarioId: number): Promise<Libro> {
-    const res = await axios.get<LibroDTO>(`${API_BASE_URL}/libros/${id}`, {
-      params: {
-        usuarioId, // Esto arma la URL como /libros/{id}?usuarioId={usuarioId}
-      },
-    })
+  async getLibroById(id: number): Promise<Libro> {
+    const res = await axios.get<LibroDTO>(`${API_BASE_URL}/libros/${id}`)
     return Libro.fromJson(res.data)
   },
 

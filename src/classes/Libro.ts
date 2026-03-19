@@ -8,7 +8,6 @@ import type {
 } from "../models/libroModel"
 
 export class Libro {
-  // ... propiedades anteriores ...
   id: number
   prestamoId?: number // Para el caso de PrestamoDTO, donde el ID del libro viene como "id" pero queremos mapearlo a "libroId"
   titulo: string
@@ -19,6 +18,7 @@ export class Libro {
   alquiladoPorId?: number
   bibliokarma?: number
   rating: number
+  estoyReservado: boolean 
   fechaDesde?: string
   fechaDevolucion?: string // Mapea a fechaHasta del DTO
   tipo?: TipoLibro
@@ -40,6 +40,7 @@ export class Libro {
     this.propietarioId = data.propietarioId || 0
     this.imagenUrl = data.imagenUrl || ""
     this.rating = data.rating || 0
+    this.estoyReservado = data.estoyReservado ?? false
   }
 
   // Mapeador para el DTO de Libro completo (el que ya tenías)
