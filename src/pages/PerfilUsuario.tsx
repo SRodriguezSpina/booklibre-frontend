@@ -1,4 +1,4 @@
-import { useOutletContext } from 'react-router-dom'
+import { useNavigate, useOutletContext } from 'react-router-dom'
 import { useOnInit } from '../utils/hooks'
 import { libroService } from '../services/libroService'
 import type { LibroUsuarioItemDTO } from '../models/libroModel'
@@ -15,6 +15,7 @@ import { toast } from 'react-toastify'
 
 export const PerfilUsuario = () => {
   const { usuario, setUsuario } = useOutletContext<ContextoPerfilUsuario>()
+  const navigate = useNavigate()
   const [libros, setLibros] = useState<LibroUsuarioItemDTO[]>([])
   const [modalEditarAbierto, setModalEditarAbierto] = useState(false)
 
@@ -43,7 +44,7 @@ export const PerfilUsuario = () => {
   }
 
   const manejarAgregarLibro = () => {
-    toast.info('Funcionalidad para agregar libro próximamente.')
+    navigate('/Libros/nuevo/editar')
   }
 
   const cantidadPrestados = libros.filter((l) => !l.disponible).length

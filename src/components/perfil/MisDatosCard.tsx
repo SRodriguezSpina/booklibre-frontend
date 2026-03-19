@@ -16,7 +16,7 @@ export const MisDatosCard = ({ usuario }: PropsMisDatosCard) => {
         <div className="h-9 w-9 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
           <User className="h-4.5 w-4.5" />
         </div>
-        <h3 className="text-xl font-extrabold text-secondary">Mis Datos</h3>
+        <h3 className="text-xl font-bold text-secondary">Mis Datos</h3>
       </div>
 
       <div className="px-5 pb-5 pt-3 divide-y divide-secondary/10">
