@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Boton } from '../ui'
 import { Usuario } from '../../classes/usuario'
 import type { TipoUsuario } from '../../models/usuarioModel'
+import { toast } from 'react-toastify'
+import { obtenerMensajeError } from '../../utils/errorHandler'
 
 export type PropsModalEditarPerfil = {
   onClose: () => void
@@ -35,6 +37,9 @@ export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEdi
     try {
       await onGuardar(validado)
       onClose()
+    } catch (e: unknown) {
+      const err = obtenerMensajeError(e)
+      toast.error(err.mensaje || 'No se pudieron guardar los cambios.')
     } finally {
       setEnviando(false)
     }
