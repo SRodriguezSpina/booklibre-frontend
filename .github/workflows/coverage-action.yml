@@ -29,6 +29,7 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+      - run: npm i coverage-badges-cli -g
 
       - name: Run Vitest with coverage
         run: npx vitest --coverage.enabled true
@@ -49,8 +50,6 @@ jobs:
           json-final-path: coverage/coverage-final.json
           threshold-icons: "{0: '🔴', 80: '🟠', 90: '🟢'}"
           file-coverage-mode: all
-
-      - run: npm i coverage-badges-cli -g
 
       - name: Create Coverage Badges
         uses: jaywcjlove/coverage-badges-cli@main
