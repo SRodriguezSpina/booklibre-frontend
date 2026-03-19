@@ -61,35 +61,34 @@ export class LibroForm {
   ] as const;
 
   static estadoOptions = [
-  { value: "EXCELENTE",  label: "Excelente" },
-  { value: "MUY_BUENO",  label: "Muy bueno" },
-  { value: "BUENO",      label: "Bueno" },
-  { value: "REGULAR",    label: "Regular" },
-  { value: "MALO",       label: "Malo" },
-  ]
+    { value: "EXCELENTE", label: "Excelente" },
+    { value: "MUY_BUENO", label: "Muy bueno" },
+    { value: "BUENO", label: "Bueno" },
+    { value: "REGULAR", label: "Regular" },
+    { value: "MALO", label: "Malo" },
+  ];
 
   static generoOptions = [
-    { value: "DRAMA",             label: "Drama" },
-    { value: "CIENCIA_FICCION",   label: "Ciencia Ficción" },
-    { value: "ROMANCE",           label: "Romance" },
-    { value: "AUTOAYUDA",         label: "Autoayuda" },
-    { value: "DISENO",            label: "Diseño" },
-    { value: "LITERATURA_CLASICA",label: "Literatura Clásica" },
-  ]
+    { value: "DRAMA", label: "Drama" },
+    { value: "CIENCIA_FICCION", label: "Ciencia Ficción" },
+    { value: "ROMANCE", label: "Romance" },
+    { value: "AUTOAYUDA", label: "Autoayuda" },
+    { value: "DISENO", label: "Diseño" },
+    { value: "LITERATURA_CLASICA", label: "Literatura Clásica" },
+  ];
 
   static idiomaOptions = [
-    { value: "ESPANOL",   label: "Español" },
-    { value: "INGLES",    label: "Inglés" },
+    { value: "ESPANOL", label: "Español" },
+    { value: "INGLES", label: "Inglés" },
     { value: "PORTUGUES", label: "Portugués" },
-    { value: "FRANCES",   label: "Francés" },
-  ]
+    { value: "FRANCES", label: "Francés" },
+  ];
 
   static tipoOptions = [
-    { value: "Comun",          label: "Común" },
+    { value: "Comun", label: "Común" },
     { value: "ConDedicatoria", label: "Con dedicatoria" },
-    { value: "Coleccionable",  label: "Coleccionable" },
-  ]
-  
+    { value: "Coleccionable", label: "Coleccionable" },
+  ];
 
   static fromLibro(libro: Libro): LibroForm {
     const form = new LibroForm();
@@ -106,7 +105,7 @@ export class LibroForm {
     form.propietarioId = libro.propietarioId;
     return form;
   }
-  
+
   validate(): Record<string, string | undefined> {
     return {
       titulo: !this.titulo.trim() ? "El título es obligatorio" : undefined,
@@ -120,7 +119,7 @@ export class LibroForm {
         this.paginas === "" || Number(this.paginas) <= 0
           ? "Ingresá una cantidad de páginas válida"
           : undefined,
-      isbn:!this.isbn.trim() ? "Ingresá un ISBN válido" : undefined,
+      isbn: !this.isbn.trim() ? "Ingresá un ISBN válido" : undefined,
       idioma: !this.idioma ? "El idioma es obligatorio" : undefined,
       estado: !this.estado ? "El estado es obligatorio" : undefined,
       fechaPublicacion: !this.fechaPublicacion
@@ -150,6 +149,7 @@ export class LibroForm {
       estoyReservado: this.estoyReservado,
       imagenUrl: "",
       editorial: "",
+      autorImg: "",
     };
   }
 }
