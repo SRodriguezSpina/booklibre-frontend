@@ -37,7 +37,7 @@ const toValues = (form: LibroForm): Values => ({
   tipo: form.tipo,
   genero: form.genero,
   paginas: String(form.paginas),
-  isbn: String(form.isbn),
+  isbn: form.isbn,
   idioma: form.idioma,
   estado: form.estado,
   fechaPublicacion: form.fechaPublicacion,
@@ -59,12 +59,12 @@ export const EditarLibro = () => {
 
   useOnInit(async () => {
     if (esNuevo) {
-      const propietarioId = authService.obtenerIdUsuarioActual() ?? 0
+      const propietarioId = authService.obtenerIdUsuarioActual()
       setValues((prev) => ({ ...prev, propietarioId: String(propietarioId) }))
       return
     }
     try {
-      const usuarioId = authService.obtenerIdUsuarioActual() || 1
+      const usuarioId = authService.obtenerIdUsuarioActual() ?? 1
       const libro = await libroService.getLibroById(Number(id), usuarioId)
       setValues(toValues(LibroForm.fromLibro(libro)))
     } catch {
@@ -91,7 +91,7 @@ export const EditarLibro = () => {
     setIsSubmitting(true)
     try {
       if (esNuevo) {
-        await libroService.crearLibro(instance.toDTO(0))
+        await libroService.crearLibro(instance.toDTO(0), Number(values.propietarioId))
       } else {
         await libroService.actualizarLibro(instance.toDTO(Number(id)))
       }

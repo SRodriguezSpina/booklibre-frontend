@@ -5,6 +5,7 @@ import { Usuario } from '../classes/usuario'
 import { useAlIniciar } from "../utils/hooks"
 import { obtenerMensajeError } from "../utils/errorHandler"
 import { usuarioService } from "../services/usuarioService"
+import { authService } from "../services/AuthService"
 
 export type ContextoPerfilUsuario = {
   usuario: Usuario
@@ -17,14 +18,12 @@ export const PerfilUsuarioLayout = () => {
   const [error, setError] = useState<ErrorPersonalizado | null>(null)
 
   const cargarUsuario = async () => {
-    // const id = authService.obtenerIdUsuarioActual()
-    // if (id == null) {
-    //   setError({ mensaje: 'Debés iniciar sesión para ver tu perfil.' })
-    //   setCargando(false)
-    //   return
-    // }
-    const id = 3
-    //POR AHORA ESTA HARDCODEADO PARA QUE FUNCIONE EL TESTING
+    const id = authService.obtenerIdUsuarioActual()
+    if (id == null) {
+      setError({ mensaje: 'Debés iniciar sesión para ver tu perfil.' })
+      setCargando(false)
+      return
+    }
 
     try {
       const data = await usuarioService.obtenerUsuario(id)
