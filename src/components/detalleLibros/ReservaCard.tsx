@@ -1,7 +1,27 @@
-import { Card, CardHeader } from "../ui/Card";
+import { useState, useMemo } from "react"
+import { Card, CardHeader } from "../ui/Card"
 import { Boton } from "../ui/Boton"
+import { calcularDiferenciaDias, obtenerFechaHoy, formatearFechaVisual } from "../../utils/dateHandlerReserva"
 
-export const TarjetaReserva = () => {
+export const ReservaCard = () => {
+  const [fechaDesde, setFechaDesde] = useState<string>("")
+  const [fechaHasta, setFechaHasta] = useState<string>("")
+
+  const duracionDias = useMemo(
+    () => calcularDiferenciaDias(fechaDesde, fechaHasta), 
+    [fechaDesde, fechaHasta]
+  )
+
+  const hoy = obtenerFechaHoy()
+  const esReservaValida = fechaDesde !== "" && fechaHasta !== "" && duracionDias > 0
+
+  const handleConfirmar = () => {
+    if (!esReservaValida) return
+    
+    console.log("Enviando al backend reserva desde:", fechaDesde, "hasta:", fechaHasta)
+    // await reservaService.crearReserva({ libroId, fechaDesde, fechaHasta })
+  }
+
   return (
     <Card className="p-6">
       <CardHeader 
@@ -14,42 +34,59 @@ export const TarjetaReserva = () => {
         }
       />
 
-      <div className="mb-4">
-        <label className="text-xs font-bold text-secondary uppercase opacity-70 mb-2 block">
-          Fechas Seleccionadas:
-        </label>
-        <div className="bg-background rounded-md p-3 text-sm border border-accent flex items-center">
-          <span>24 Oct - 07 Nov, 2023</span>
+      <div className="flex flex-col gap-4 mb-6 mt-2">
+        <div>
+          <label className="text-xs font-bold text-secondary uppercase opacity-70 mb-1.5 block">
+            Recogida
+          </label>
+          <input 
+            type="date" 
+            value={fechaDesde}
+            min={hoy} 
+            onChange={(e) => setFechaDesde(e.target.value)}
+            className="w-full bg-background rounded-lg p-2.5 text-sm border border-accent outline-none focus:border-primary text-secondary-dark transition-colors"
+          />
+        </div>
+        <div>
+          <label className="text-xs font-bold text-secondary uppercase opacity-70 mb-1.5 block">
+            Devolución
+          </label>
+          <input 
+            type="date" 
+            value={fechaHasta}
+            min={fechaDesde || hoy} 
+            onChange={(e) => setFechaHasta(e.target.value)}
+            disabled={!fechaDesde} 
+            className="w-full bg-background rounded-lg p-2.5 text-sm border border-accent outline-none focus:border-primary text-secondary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          />
         </div>
       </div>
 
       <div className="flex justify-between items-center text-sm mb-3">
         <span className="text-secondary opacity-80">Recogida</span>
-        <span className="font-bold">24 Oct, 2023</span>
+        <span className="font-bold capitalize">{formatearFechaVisual(fechaDesde)}</span>
       </div>
       <div className="flex justify-between items-center text-sm mb-4">
         <span className="text-secondary opacity-80">Devolución</span>
-        <span className="font-bold">07 Nov, 2023</span>
+        <span className="font-bold capitalize">{formatearFechaVisual(fechaHasta)}</span>
       </div>
 
       <div className="flex justify-between items-center text-sm mb-6 bg-blue-50 p-3 rounded-lg text-blue-600 font-medium">
         <span>Duración</span>
-        <span>14 Días</span>
+        <span>{duracionDias} {duracionDias === 1 ? 'Día' : 'Días'}</span>
       </div>
 
       <Boton 
         tipo="primario" 
         className="w-full py-3 rounded-xl shadow-sm"
-        deshabilitado={true}
-        onClick={() => console.log("Iniciando reserva...")}
+        deshabilitado={!esReservaValida}
+        onClick={handleConfirmar}
       >
         Confirmar Reserva
       </Boton>
-
       <p className="text-xs text-center text-secondary opacity-60 mt-3 px-4">
         Con la reserva no se encontrará disponible en el rango de fechas
       </p>
-
     </Card>
   )
 }
