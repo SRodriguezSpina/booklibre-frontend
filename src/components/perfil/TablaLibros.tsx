@@ -114,9 +114,18 @@ export const TablaLibros = ({
               >
                 <td className="py-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-14 rounded-md bg-secondary/5 flex items-center justify-center text-[10px] text-secondary/30 border border-secondary/10 shrink-0">
-                      📖
-                    </div>
+                    {libro.imagenUrl ? (
+                      <img
+                        src={libro.imagenUrl}
+                        alt={`Portada de ${libro.titulo}`}
+                        className="w-10 h-14 rounded-md object-cover border border-secondary/10 shrink-0"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-10 h-14 rounded-md bg-secondary/5 flex items-center justify-center text-[10px] text-secondary/30 border border-secondary/10 shrink-0">
+                        📖
+                      </div>
+                    )}
                     <div>
                       <div className="font-bold text-secondary text-base">
                         {libro.titulo}
