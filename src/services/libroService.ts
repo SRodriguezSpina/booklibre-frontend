@@ -79,6 +79,12 @@ export const libroService = {
     return Libro.fromJson(res.data)
   },
 
+  async eliminarLibro(libroId: number, usuarioId: number): Promise<void> {
+    await axios.delete(`${API_BASE_URL}/libros/${libroId}`, {
+      params: { usuarioId },
+    })
+  },
+
   async obtenerPrestamosFiltrados(
     usuarioId: number,
     query: string = "",

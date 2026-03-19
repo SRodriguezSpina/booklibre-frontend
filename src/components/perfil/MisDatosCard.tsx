@@ -1,4 +1,5 @@
-import { Card, CardHeader } from '../ui'
+import { User } from 'lucide-react'
+import { Card } from '../ui'
 import type { Usuario } from '../../classes/usuario'
 
 export type PropsMisDatosCard = {
@@ -10,24 +11,35 @@ const etiquetaTipo = (t: Usuario['tipoUsuario']) =>
 
 export const MisDatosCard = ({ usuario }: PropsMisDatosCard) => {
   return (
-    <Card className="bg-surface">
-      <CardHeader titulo="Mis Datos" />
-      <div className="space-y-4">
-        <div>
-          <div className="text-xs font-semibold text-secondary/60">EMAIL</div>
-          <div className="text-sm text-secondary">{usuario.email}</div>
+    <Card className="bg-surface/60 border border-white/60 shadow-[0_18px_40px_rgba(15,23,42,0.08)] rounded-3xl">
+      <div className="flex items-center gap-3 px-5 pt-5">
+        <div className="h-9 w-9 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+          <User className="h-4.5 w-4.5" />
         </div>
-        <div>
-          <div className="text-xs font-semibold text-secondary/60">CELULAR</div>
-          <div className="text-sm text-secondary">{usuario.celular}</div>
+        <h3 className="text-xl font-bold text-secondary">Mis Datos</h3>
+      </div>
+
+      <div className="px-5 pb-5 pt-3 divide-y divide-secondary/10">
+        <div className="py-3">
+          <div className="text-xs font-bold tracking-widest text-secondary/40">EMAIL</div>
+          <div className="mt-1 text-sm font-semibold text-secondary">{usuario.email}</div>
         </div>
-        <div>
-          <div className="text-xs font-semibold text-secondary/60">CIUDAD</div>
-          <div className="text-sm text-secondary">{usuario.ciudad}</div>
+
+        <div className="py-3">
+          <div className="text-xs font-bold tracking-widest text-secondary/40">TELÉFONO</div>
+          <div className="mt-1 text-sm font-semibold text-secondary">{usuario.celular}</div>
         </div>
-        <div>
-          <div className="text-xs font-semibold text-secondary/60">TIPO DE USUARIO</div>
-          <div className="text-sm text-secondary">{etiquetaTipo(usuario.tipoUsuario)}</div>
+
+        <div className="py-3">
+          <div className="text-xs font-bold tracking-widest text-secondary/40">CIUDAD</div>
+          <div className="mt-1 text-sm font-semibold text-secondary">{usuario.ciudad}</div>
+        </div>
+
+        <div className="py-3">
+          <div className="text-xs font-bold tracking-widest text-secondary/40">TIPO DE PERFIL</div>
+          <div className="mt-1 text-sm font-semibold text-secondary">
+            {etiquetaTipo(usuario.tipoUsuario)}
+          </div>
         </div>
       </div>
     </Card>
