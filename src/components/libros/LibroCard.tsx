@@ -5,6 +5,9 @@ import { ModalCalificacion } from "./ModalCalificacion"
 import { libroService } from "../../services/libroService"
 import { authService } from "../../services/AuthService"
 import { useNavigate } from "react-router-dom"
+import { toast } from "react-toastify"
+import { obtenerMensajeError } from "../../utils/errorHandler"
+
 interface LibroCardProps {
   libro: Libro
   tipoVista: TipoPrestamo
@@ -19,18 +22,23 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
   const proximoAVencer = libro.estaProximoAVencer()
   const estaDisponible = libro.estoyDisponible()
   const usuarioActualId = authService.obtenerIdUsuarioActual() || 1
+  // Reemplazá el alert:
   const handleCalificar = async (valor: number, comentario: string) => {
-    await libroService.calificarLibro(
-      libro.id,
-      usuarioActualId,
-      valor,
-      comentario,
-    )
-    setRatingLocal(valor)
-    setYaCalificado(true)
-    console.log("Enviando:", { valor, comentario })
-    setIsModalOpen(false)
-    alert("¡Gracias por calificar!")
+    try {
+      await libroService.calificarLibro(
+        libro.id,
+        usuarioActualId,
+        valor,
+        comentario,
+      )
+      setRatingLocal(valor)
+      setYaCalificado(true)
+      setIsModalOpen(false)
+      toast.success("¡Gracias por calificar! 📚")
+    } catch (e: unknown) {
+      const err = obtenerMensajeError(e)
+      toast.error(err.mensaje || "No se pudo enviar la calificación.")
+    }
   }
   const goToDetail = () => {
     navigate(`/libros/${libro.id}`)

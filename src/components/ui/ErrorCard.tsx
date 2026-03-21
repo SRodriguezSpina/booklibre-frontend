@@ -18,7 +18,7 @@ export function ErrorCard({ error, alReintentar, alVolver }: PropsErrorCard) {
         </div>
         <h2 className="text-lg font-bold text-secondary">
           {error.mensaje}
-          {error.estado != null && error.estado > 0 ? ` (${error.estado})` : ''}
+          {error.estado != null && error.estado > 0 ? ` (${error.estado})` : ""}
         </h2>
         <div className="flex gap-2">
           {alVolver && (
@@ -27,7 +27,7 @@ export function ErrorCard({ error, alReintentar, alVolver }: PropsErrorCard) {
               onClick={alVolver}
               className="px-4 py-2 rounded-lg font-medium bg-secondary/20 text-secondary hover:bg-secondary/30"
             >
-              Volver
+              {error.estado === 401 ? "Iniciar sesión" : "Volver"}
             </button>
           )}
           {alReintentar && (
@@ -44,4 +44,3 @@ export function ErrorCard({ error, alReintentar, alVolver }: PropsErrorCard) {
     </div>
   )
 }
-
