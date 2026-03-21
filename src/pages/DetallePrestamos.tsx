@@ -95,7 +95,7 @@ export const DetallePrestamos = () => {
             Gestiona los intercambios y devoluciones de tu colección.
           </p>
         </div>
-        <div className="w-full md:w-96 flex items-center bg-background border-b border-primary focus-within:border-b-2 transition-all">
+        <div className="w-full md:w-96">
           <SearchBar
             placeholder="Buscar por título o autor..."
             onSearch={handleSearch}
