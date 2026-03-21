@@ -21,6 +21,15 @@ export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEdi
   const [form, setForm] = useState<Usuario>(new Usuario(usuario))
   const [enviando, setEnviando] = useState(false)
 
+  const detectarCampoDuplicado = (mensaje: string): 'email' | 'celular' | null => {
+    const texto = mensaje.toLowerCase()
+    if (texto.includes('email')) return 'email'
+    if (texto.includes('celular') || texto.includes('telefono') || texto.includes('teléfono')) {
+      return 'celular'
+    }
+    return null
+  }
+
   const setCampo =
     (campo: 'nombre' | 'desc' | 'email' | 'celular' | 'ciudad' | 'tipoUsuario') =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -39,6 +48,15 @@ export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEdi
       onClose()
     } catch (e: unknown) {
       const err = obtenerMensajeError(e)
+      if (err.estado === 409) {
+        const campo = detectarCampoDuplicado(err.mensaje)
+        if (campo) {
+          const usuarioConError = new Usuario({ ...validado })
+          usuarioConError.errors = { ...validado.errors, [campo]: err.mensaje }
+          setForm(usuarioConError)
+          return
+        }
+      }
       toast.error(err.mensaje || 'No se pudieron guardar los cambios.')
     } finally {
       setEnviando(false)
@@ -119,8 +137,11 @@ export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEdi
                 type="tel"
                 value={form.celular}
                 onChange={setCampo('celular')}
-                className={claseInput}
+                className={form.errors?.celular ? `${claseInput} ${claseInputError}` : claseInput}
               />
+              {form.errors?.celular && (
+                <p className="mt-1 text-xs text-red-500">{form.errors.celular}</p>
+              )}
             </div>
 
             <div>

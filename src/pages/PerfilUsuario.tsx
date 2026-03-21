@@ -57,8 +57,6 @@ export const PerfilUsuario = () => {
         navigate('/auth/login')
         throw e
       }
-      toast.error(err.mensaje || 'No se pudieron guardar los cambios.')
-      console.error(e)
       throw e
     }
   }
