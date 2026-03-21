@@ -1,19 +1,19 @@
-import { useNavigate, useOutletContext } from 'react-router-dom'
-import { useOnInit } from '../utils/hooks'
-import { libroService } from '../services/libroService'
-import type { LibroUsuarioItemDTO } from '../models/libroModel'
-import { useState } from 'react'
-import type { ContextoPerfilUsuario } from '../layouts/PerfilUsuarioLayout'
-import { Usuario } from '../classes/usuario'
-import { PerfilResumen } from '../components/perfil/PerfilResumen'
-import { MisDatosCard } from '../components/perfil/MisDatosCard'
-import { EstadisticaCard } from '../components/perfil/EstadisticaCard'
-import { GestionMisLibros } from '../components/perfil/GestionMisLibros'
-import { ModalEditarPerfil } from '../components/perfil/ModalEditarPerfil'
-import { usuarioService } from '../services/usuarioService'
-import { toast } from 'react-toastify'
-import { obtenerMensajeError } from '../utils/errorHandler'
-import { authService } from '../services/AuthService'
+import { useNavigate, useOutletContext } from "react-router-dom"
+import { useOnInit } from "../utils/hooks"
+import { libroService } from "../services/libroService"
+import type { LibroUsuarioItemDTO } from "../models/libroModel"
+import { useState } from "react"
+import type { ContextoPerfilUsuario } from "../layouts/PerfilUsuarioLayout"
+import { Usuario } from "../classes/usuario"
+import { PerfilResumen } from "../components/perfil/PerfilResumen"
+import { MisDatosCard } from "../components/perfil/MisDatosCard"
+import { EstadisticaCard } from "../components/perfil/EstadisticaCard"
+import { GestionMisLibros } from "../components/perfil/GestionMisLibros"
+import { ModalEditarPerfil } from "../components/perfil/ModalEditarPerfil"
+import { usuarioService } from "../services/usuarioService"
+import { toast } from "react-toastify"
+import { obtenerMensajeError } from "../utils/errorHandler"
+import { authService } from "../services/AuthService"
 
 export const PerfilUsuario = () => {
   const { usuario, setUsuario } = useOutletContext<ContextoPerfilUsuario>()
@@ -34,10 +34,10 @@ export const PerfilUsuario = () => {
       const err = obtenerMensajeError(e)
       if (err.estado === 401) {
         authService.logout()
-        navigate('/auth/login')
+        navigate("/auth/login")
         return
       }
-      setErrorLibros(err.mensaje || 'No se pudieron cargar tus libros.')
+      setErrorLibros(err.mensaje || "No se pudieron cargar tus libros.")
     } finally {
       setCargandoLibros(false)
     }
@@ -49,37 +49,37 @@ export const PerfilUsuario = () => {
     try {
       const data = await usuarioService.actualizarUsuario(u)
       setUsuario(new Usuario(data))
-      toast.success('¡Perfil actualizado con éxito!')
+      toast.success("¡Perfil actualizado con éxito!")
     } catch (e: unknown) {
       const err = obtenerMensajeError(e)
       if (err.estado === 401) {
         authService.logout()
-        navigate('/auth/login')
+        navigate("/auth/login")
         throw e
       }
-      toast.error(err.mensaje || 'No se pudieron guardar los cambios.')
+      toast.error(err.mensaje || "No se pudieron guardar los cambios.")
       console.error(e)
       throw e
     }
   }
 
   const manejarAgregarLibro = () => {
-    navigate('/Libros/nuevo/editar')
+    navigate("/Libros/nuevo/editar")
   }
 
   const manejarEliminarLibro = async (libroId: number) => {
     try {
       await libroService.eliminarLibro(libroId, usuario.id)
-      toast.success('Libro eliminado.')
+      toast.success("Libro eliminado.")
       await cargarLibros()
     } catch (e: unknown) {
       const err = obtenerMensajeError(e)
       if (err.estado === 401) {
         authService.logout()
-        navigate('/auth/login')
+        navigate("/auth/login")
         return
       }
-      toast.error(err.mensaje || 'No se pudo eliminar el libro.')
+      toast.error(err.mensaje || "No se pudo eliminar el libro.")
       console.error(e)
     }
   }
@@ -87,8 +87,11 @@ export const PerfilUsuario = () => {
   const cantidadPrestados = libros.filter((l) => !l.disponible).length
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      <PerfilResumen usuario={usuario} onEditar={() => setModalEditarAbierto(true)} />
+    <div className="max-w-6xl mx-auto space-y-8 pt-20">
+      <PerfilResumen
+        usuario={usuario}
+        onEditar={() => setModalEditarAbierto(true)}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-4 space-y-6">

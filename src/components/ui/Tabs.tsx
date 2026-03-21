@@ -10,18 +10,23 @@ export type PropsTabs = {
   className?: string
 }
 
-export function Tabs({ pestañas, idActivo, alCambiar, className = '' }: PropsTabs) {
+export function Tabs({
+  pestañas,
+  idActivo,
+  alCambiar,
+  className = "",
+}: PropsTabs) {
   return (
-    <div className={`flex border-b border-secondary/30 ${className}`}>
+    <div className={`flex gap-8 border-b border-accent/20 ${className}`}>
       {pestañas.map((pestaña) => (
         <button
           key={pestaña.id}
           type="button"
           onClick={() => alCambiar(pestaña.id)}
-          className={`flex-1 pb-2 text-center font-medium transition-colors cursor-pointer ${
+          className={`pb-4 px-2 text-sm font-bold tracking-wide transition-colors cursor-pointer ${
             idActivo === pestaña.id
-              ? 'text-primary border-b-2 border-primary'
-              : 'text-secondary hover:text-primary'
+              ? "text-primary-light border-b-2 border-primary-light"
+              : "text-on-surface-variant hover:text-on-surface border-transparent"
           }`}
         >
           {pestaña.etiqueta}
@@ -30,4 +35,3 @@ export function Tabs({ pestañas, idActivo, alCambiar, className = '' }: PropsTa
     </div>
   )
 }
-

@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react"
-import { Tabs } from "../components/ui/Tabs"
 import { LibroCard } from "../components/libros/LibroCard"
 import { Paginacion } from "../components/ui/Paginacion"
 import { libroService } from "../services/libroService"
@@ -8,9 +7,10 @@ import { useOnInit } from "../utils/hooks"
 import { Libro } from "../classes/Libro"
 import type { TipoPrestamo } from "../models/libroModel"
 import { SearchBar } from "../components/ui/SearchBar"
+import { Tabs } from "../components/ui/Tabs"
 
 export const DetallePrestamos = () => {
-  // 1. Cargamos TODOS los libros aquí
+  const [animating, setAnimating] = useState(false)
   const [todosLosLibros, setTodosLosLibros] = useState<Libro[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState<TipoPrestamo>("prestados-a-mi")
@@ -52,13 +52,27 @@ export const DetallePrestamos = () => {
   }, [todosLosLibros, activeTab, searchQuery, usuarioId])
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query)
-    setCurrentPage(1)
+    setAnimating(true)
+    setTimeout(() => {
+      setSearchQuery(query)
+      setCurrentPage(1)
+      setAnimating(false)
+    }, 150)
   }
-
+  const handlePageChange = (page: number) => {
+    setAnimating(true)
+    setTimeout(() => {
+      setCurrentPage(page)
+      setAnimating(false)
+    }, 150)
+  }
   const handleTabChange = (id: string) => {
-    setActiveTab(id as TipoPrestamo)
-    setCurrentPage(1)
+    setAnimating(true)
+    setTimeout(() => {
+      setActiveTab(id as TipoPrestamo)
+      setCurrentPage(1)
+      setAnimating(false)
+    }, 150) // fade out → cambia contenido → fade in
   }
 
   const totalPages = Math.max(
@@ -71,55 +85,58 @@ export const DetallePrestamos = () => {
   )
 
   return (
-    <div className="flex flex-col h-full max-w-6xl mx-auto space-y-8 bg-background px-4">
-      <header>
-        <h1 className="text-3xl font-bold text-primary mb-2 mt-4">
-          Préstamos de libros
-        </h1>
-        <p className="text-secondary-dark opacity-70">
-          Gestiona los intercambios y devoluciones de tu colección.
-        </p>
+    <div className="flex flex-col min-h-screen max-w-7xl mx-auto px-4 md:px-8 pt-24 pb-16">
+      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-2">
+          <h1 className="text-4xl md:text-5xl font-serif text-on-surface">
+            Mis Préstamos
+          </h1>
+          <p className="text-on-surface-variant text-sm max-w-md">
+            Gestiona los intercambios y devoluciones de tu colección.
+          </p>
+        </div>
+        <div className="w-full md:w-96 flex items-center bg-background border-b border-primary focus-within:border-b-2 transition-all">
+          <SearchBar
+            placeholder="Buscar por título o autor..."
+            onSearch={handleSearch}
+          />
+        </div>
       </header>
-
-      <div className="mb-1 max-w-md">
-        <SearchBar
-          placeholder="Buscar por título o autor..."
-          onSearch={handleSearch}
-        />
-      </div>
-
       <Tabs
         pestañas={pestañas}
         idActivo={activeTab}
         alCambiar={handleTabChange}
+        className="mb-10"
       />
 
-      <main className="mt-6 flex flex-col flex-1 gap-6 pb-10">
+      <main className="flex flex-col flex-1 gap-6 pb-10">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
-            <span className="text-secondary font-medium">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-light" />
+            <span className="text-on-surface-variant font-medium">
               Cargando tus libros...
             </span>
           </div>
         ) : librosFiltrados.length === 0 ? (
-          <div className="text-center py-20 bg-surface rounded-3xl border border-accent">
-            <p className="text-secondary opacity-60">
+          <div className="text-center py-20 bg-surface rounded border border-accent/20">
+            <p className="text-on-surface-variant opacity-60">
               No se encontraron libros en esta categoría.
             </p>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+            <div
+              className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 items-stretch transition-all duration-150
+    ${animating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"}`}
+            >
               {librosAMostrar.map((libro) => (
                 <LibroCard key={libro.id} libro={libro} tipoVista={activeTab} />
               ))}
             </div>
-
             <Paginacion
               pagina={currentPage}
               totalPaginas={totalPages}
-              alCambiar={setCurrentPage}
+              alCambiar={handlePageChange}
             />
           </>
         )}
