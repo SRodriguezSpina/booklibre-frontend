@@ -1,5 +1,5 @@
 import { useState } from "react"
-
+import { createPortal } from "react-dom"
 interface ModalCalificacionProps {
   isOpen: boolean
   onClose: () => void
@@ -20,18 +20,15 @@ export const ModalCalificacion = ({
 
   if (!isOpen) return null
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+      <div className="bg-surface rounded border border-accent/20 shadow-[0_24px_48px_rgba(0,0,0,0.5)] w-full max-w-md overflow-hidden">
         <div className="p-6">
-          <h2 className="text-xl font-bold text-secondary-dark mb-1">
+          <h2 className="text-xl font-serif text-on-surface mb-1">
             Calificar Libro
           </h2>
-          <p className="text-sm text-secondary opacity-70 mb-6">
-            {tituloLibro}
-          </p>
+          <p className="text-sm text-on-surface-variant mb-6">{tituloLibro}</p>
 
-          {/* Selector de Estrellas */}
           <div className="flex justify-center gap-2 mb-6">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
@@ -39,8 +36,8 @@ export const ModalCalificacion = ({
                 type="button"
                 className={`text-3xl transition-transform hover:scale-110 ${
                   star <= (hover || rating)
-                    ? "text-yellow-400"
-                    : "text-gray-300"
+                    ? "text-primary-light"
+                    : "text-accent/40"
                 }`}
                 onClick={() => setRating(star)}
                 onMouseEnter={() => setHover(star)}
@@ -51,13 +48,12 @@ export const ModalCalificacion = ({
             ))}
           </div>
 
-          {/* Área de Comentario */}
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase text-secondary-light">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">
               Tu comentario
             </label>
             <textarea
-              className="w-full h-32 p-3 rounded-xl border border-accent bg-gray-50 text-sm focus:ring-2 focus:ring-primary focus:outline-none resize-none"
+              className="w-full h-32 p-3 rounded border border-accent/30 bg-surface-high text-on-surface text-sm focus:ring-1 focus:ring-primary focus:outline-none resize-none placeholder:text-on-surface-variant/40"
               placeholder="Cuéntanos qué te pareció el libro..."
               maxLength={MAX_CARACTERES}
               value={comentario}
@@ -65,7 +61,7 @@ export const ModalCalificacion = ({
             />
             <div className="flex justify-end">
               <span
-                className={`text-[10px] font-bold ${comentario.length >= MAX_CARACTERES ? "text-red-500" : "text-secondary-light"}`}
+                className={`text-[10px] font-bold ${comentario.length >= MAX_CARACTERES ? "text-danger" : "text-on-surface-variant"}`}
               >
                 {comentario.length} / {MAX_CARACTERES}
               </span>
@@ -73,23 +69,23 @@ export const ModalCalificacion = ({
           </div>
         </div>
 
-        {/* Botones de Acción */}
-        <div className="flex border-t border-accent">
+        <div className="flex border-t border-accent/20">
           <button
             onClick={onClose}
-            className="flex-1 py-4 text-sm font-bold text-secondary hover:bg-gray-50 transition-colors"
+            className="flex-1 py-4 text-sm font-bold text-on-surface-variant hover:bg-surface-high transition-colors"
           >
             Cancelar
           </button>
           <button
             onClick={() => onSubmit(rating, comentario)}
             disabled={rating === 0}
-            className="flex-1 py-4 text-sm font-bold bg-primary text-white hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 py-4 text-sm font-bold bg-primary text-background hover:bg-primary-dark disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Enviar Calificación
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
