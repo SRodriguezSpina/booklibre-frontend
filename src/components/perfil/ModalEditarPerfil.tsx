@@ -12,11 +12,8 @@ export type PropsModalEditarPerfil = {
 }
 
 const opcionesTipo: TipoUsuario[] = ['Lector', 'Publicador', 'LectorPublicador']
-
-const claseInput =
-  'mt-1 w-full rounded-lg border border-outline/40 px-3 py-2.5 text-sm text-on-surface bg-surface-high focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors'
+const claseInput ='mt-1 w-full rounded-lg border border-outline/40 px-3 py-2.5 text-sm text-on-surface bg-surface-high focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors'
 const claseInputError = 'border-danger/60 focus:ring-danger/40'
-
 const MAX_FOTO_BYTES = 800_000
 
 async function archivoADataUrl(file: File): Promise<string> {

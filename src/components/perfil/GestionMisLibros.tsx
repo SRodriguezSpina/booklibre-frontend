@@ -1,9 +1,10 @@
 import { Plus } from 'lucide-react'
-import { useMemo, useState } from "react"
-import { Boton, Card, Tabs, type Pestaña } from "../ui"
-import type { LibroUsuarioItemDTO } from "../../models/libroModel"
-import { TablaLibros } from "./TablaLibros"
-import { Paginacion } from "../ui/Paginacion"
+import { Boton, Card, Tabs } from '../ui'
+import type { LibroUsuarioItemDTO } from '../../models/libroModel'
+import { TablaLibros } from './TablaLibros'
+import { Paginacion } from '../ui/Paginacion'
+import { useGestionMisLibros } from '../../utils/misLibros/useGestionMisLibros'
+import { pestañasMisLibros } from '../../utils/misLibros/gestionMisLibros'
 
 export type PropsGestionMisLibros = {
   libros: LibroUsuarioItemDTO[]
@@ -14,79 +15,17 @@ export type PropsGestionMisLibros = {
   onReintentar?: () => void
 }
 
-type Filtro = "todos" | "disponibles" | "prestados"
-type CampoOrden = "titulo" | "estado" | "fecha"
+export const GestionMisLibros = ({libros,onAgregar,onEliminar,cargando = false,error = null,onReintentar}: PropsGestionMisLibros) => {
+  const {alCambiarFiltro,cambiarOrden,campoOrden,filtro,librosFiltrados,librosPagina,paginaAjustada,rangoEtiqueta,sentidoOrden,setPagina,totalPaginas} = useGestionMisLibros(libros)
 
-const pestañas: Pestaña[] = [
-  { id: "todos", etiqueta: "Todos" },
-  { id: "disponibles", etiqueta: "Disponibles" },
-  { id: "prestados", etiqueta: "Prestados" },
-]
-
-const ESTRATEGIAS_FILTRO: Record<Filtro, (l: LibroUsuarioItemDTO) => boolean> =
-  {
-    todos: () => true,
-    disponibles: (l) => l.disponible,
-    prestados: (l) => !l.disponible,
+  const solicitarEliminar = (id: number) => {
+    if (!onEliminar) return
+    const ok = window.confirm(
+      '¿Eliminar este libro? Esta acción no se puede deshacer.',
+    )
+    if (ok) void onEliminar(id)
   }
 
-const COMPARADORES_ORDEN: Record<
-  CampoOrden,
-  (a: LibroUsuarioItemDTO, b: LibroUsuarioItemDTO) => number
-> = {
-  titulo: (a, b) => a.titulo.localeCompare(b.titulo),
-  estado: (a, b) => Number(a.disponible) - Number(b.disponible),
-  fecha: (a, b) => {
-    const fa = a.fechaAgregado ? new Date(a.fechaAgregado).getTime() : 0
-    const fb = b.fechaAgregado ? new Date(b.fechaAgregado).getTime() : 0
-    return fa - fb
-  },
-}
-
-export const GestionMisLibros = ({
-  libros,
-  onAgregar,
-  onEliminar,
-  cargando = false,
-  error = null,
-  onReintentar,
-}: PropsGestionMisLibros) => {
-  const [filtro, setFiltro] = useState<Filtro>("todos")
-  const [pagina, setPagina] = useState(1)
-  const [campoOrden, setCampoOrden] = useState<CampoOrden>("titulo")
-  const [sentidoOrden, setSentidoOrden] = useState<
-    "ascendente" | "descendente"
-  >("ascendente")
-  const porPagina = 3
-
-  const librosFiltrados = useMemo(
-    () => libros.filter(ESTRATEGIAS_FILTRO[filtro]), //Filtramos los libros según el filtro seleccionado
-    [libros, filtro],
-  )
-
-  const librosOrdenados = useMemo(() => { 
-    const comparador = COMPARADORES_ORDEN[campoOrden] 
-    return [...librosFiltrados].sort((a, b) => {
-      const resultado = comparador(a, b)
-      return sentidoOrden === "ascendente" ? resultado : -resultado
-    })
-  }, [librosFiltrados, campoOrden, sentidoOrden])
-
-  const totalPaginas = Math.max(1,Math.ceil(librosOrdenados.length / porPagina)) // Math.max(1,Math.ceil(librosOrdenados.length / porPagina)) es el número de páginas que se necesitan para mostrar todos los libros
-  const paginaAjustada = Math.min(pagina, totalPaginas)
-  const inicio = (paginaAjustada - 1) * porPagina
-  const fin = inicio + porPagina
-  const librosPagina = librosOrdenados.slice(inicio, fin)
-
-  const cambiarOrden = (campo: CampoOrden) => {
-    if (campoOrden === campo) {
-      setSentidoOrden(sentidoOrden === "ascendente" ? "descendente" : "ascendente") //Si el campo orden es el mismo, invertimos el sentido de orden
-    } else {
-      setCampoOrden(campo)
-      setSentidoOrden("ascendente")
-    }
-    setPagina(1)
-  }
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -106,12 +45,9 @@ export const GestionMisLibros = ({
       <Card className="p-0 overflow-hidden rounded-3xl">
         <div className="px-6 pt-6">
           <Tabs
-            pestañas={pestañas}
+            pestañas={pestañasMisLibros}
             idActivo={filtro}
-            alCambiar={(id) => {
-              setFiltro(id as Filtro)
-              setPagina(1)
-            }}
+            alCambiar={alCambiarFiltro}
           />
         </div>
 
@@ -165,7 +101,7 @@ export const GestionMisLibros = ({
               </p>
               <Boton
                 tipo="secundario"
-                onClick={() => setFiltro("todos")}
+                onClick={() => alCambiarFiltro('todos')}
                 className="mt-4 px-4 py-2 text-xs"
               >
                 Ver todos los libros
@@ -178,16 +114,12 @@ export const GestionMisLibros = ({
                 campoOrden={campoOrden}
                 sentidoOrden={sentidoOrden}
                 alCambiarOrden={cambiarOrden}
-                alEliminar={(id) => {
-                  if (!onEliminar) return
-                  const ok = window.confirm('¿Eliminar este libro? Esta acción no se puede deshacer.')
-                  if (ok) void onEliminar(id)
-                }}
+                alEliminar={solicitarEliminar}
               />
 
               <div className="text-xs text-secondary/40 font-medium mt-4">
-                Mostrando {inicio + 1}–{Math.min(fin, librosOrdenados.length)} de{" "}
-                {librosOrdenados.length} libros
+                Mostrando {rangoEtiqueta.desde}–{rangoEtiqueta.hasta} de{' '}
+                {rangoEtiqueta.total} libros
               </div>
 
               <Paginacion
