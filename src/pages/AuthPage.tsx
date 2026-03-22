@@ -91,8 +91,8 @@ export const AuthPage = ({ mode }: AuthPageProps) => {
       <div className="w-full max-w-md bg-surface rounded-2xl shadow-md border border-accent p-8">
 
         <div className="flex flex-col items-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-sm">
-            <img src={navBarLogo} alt="BookLibre" className="w-7 h-7" />
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm">
+            <img src={navBarLogo} alt="BookLibre" className="w-11 h-11" />
           </div>
           <h1 className="text-2xl font-bold text-secondary-dark">{title}</h1>
           <p className="text-sm text-secondary opacity-70 text-center">{subtitle}</p>
