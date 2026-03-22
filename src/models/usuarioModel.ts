@@ -19,4 +19,5 @@ export type UsuarioUpdateRequest = {
   celular: string
   ciudad: string
   tipoUsuario: string
+  imagenUrl?: string | null
 }

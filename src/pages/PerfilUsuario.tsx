@@ -48,7 +48,12 @@ export const PerfilUsuario = () => {
   const guardarDesdeModal = async (u: Usuario) => {
     try {
       const data = await usuarioService.actualizarUsuario(u)
-      setUsuario(new Usuario(data))
+      const imagenUrl =
+        data.imagenUrl !== undefined ? data.imagenUrl : u.imagenUrl
+      const { errors: _, ...uSinErrores } = u
+      const nuevo = new Usuario({ ...uSinErrores, ...data, imagenUrl })
+      nuevo.errors = {}
+      setUsuario(nuevo)
       toast.success("¡Perfil actualizado con éxito!")
     } catch (e: unknown) {
       const err = obtenerMensajeError(e)

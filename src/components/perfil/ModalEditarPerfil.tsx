@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Boton } from '../ui'
+import { useEffect, useRef, useState } from 'react'
+import { Boton, Avatar } from '../ui'
 import { Usuario } from '../../classes/usuario'
 import type { TipoUsuario } from '../../models/usuarioModel'
 import { toast } from 'react-toastify'
@@ -17,9 +17,32 @@ const claseInput =
   'mt-1 w-full rounded-lg border border-outline/40 px-3 py-2.5 text-sm text-on-surface bg-surface-high focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors'
 const claseInputError = 'border-danger/60 focus:ring-danger/40'
 
+const MAX_FOTO_BYTES = 800_000
+
+async function archivoADataUrl(file: File): Promise<string> {
+  if (file.size > MAX_FOTO_BYTES) {
+    throw new Error('La imagen es demasiado grande (máx. ~800 KB).')
+  }
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = () => reject(new Error('No se pudo leer la imagen.'))
+    reader.readAsDataURL(file)
+  })
+}
+
 export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEditarPerfil) => {
   const [form, setForm] = useState<Usuario>(new Usuario(usuario))
   const [enviando, setEnviando] = useState(false)
+  const [archivoLocal, setArchivoLocal] = useState<File | null>(null)
+  const [previewLocal, setPreviewLocal] = useState<string | null>(null)
+  const inputArchivoRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    return () => {
+      if (previewLocal) URL.revokeObjectURL(previewLocal)
+    }
+  }, [previewLocal])
 
   const detectarCampoDuplicado = (mensaje: string): 'email' | 'celular' | null => {
     const texto = mensaje.toLowerCase()
@@ -33,9 +56,31 @@ export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEdi
   const setCampo =
     (campo: 'nombre' | 'desc' | 'email' | 'celular' | 'ciudad' | 'tipoUsuario') =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-      const valor = campo === 'tipoUsuario' ? (e.target.value as TipoUsuario) : e.target.value
-      setForm(form.setCampo(campo, valor))
+      if (campo === 'tipoUsuario') {
+        setForm(form.setCampo('tipoUsuario', e.target.value as TipoUsuario))
+        return
+      }
+      setForm(form.setCampo(campo, e.target.value))
     }
+
+  const alElegirArchivo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || !file.type.startsWith('image/')) {
+      if (file) toast.error('Elegí un archivo de imagen.')
+      return
+    }
+    if (previewLocal) URL.revokeObjectURL(previewLocal)
+    setArchivoLocal(file)
+    setPreviewLocal(URL.createObjectURL(file))
+  }
+
+  const quitarFoto = () => {
+    if (previewLocal) URL.revokeObjectURL(previewLocal)
+    setPreviewLocal(null)
+    setArchivoLocal(null)
+    setForm(form.setCampo('imagenUrl', null))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,9 +89,19 @@ export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEdi
     if (Object.keys(validado.errors).length > 0) return
     setEnviando(true)
     try {
-      await onGuardar(validado)
+      let aGuardar = validado
+      if (archivoLocal) {
+        const dataUrl = await archivoADataUrl(archivoLocal)
+        aGuardar = new Usuario({ ...validado, imagenUrl: dataUrl })
+      }
+      await onGuardar(aGuardar)
       onClose()
     } catch (e: unknown) {
+      if (e instanceof Error && e.message.includes('demasiado grande')) {
+        toast.error(e.message)
+        setEnviando(false)
+        return
+      }
       const err = obtenerMensajeError(e)
       if (err.estado === 409) {
         const campo = detectarCampoDuplicado(err.mensaje)
@@ -63,6 +118,8 @@ export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEdi
     }
   }
 
+  const srcVistaPrevia = previewLocal || form.imagenUrl || null
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
@@ -72,7 +129,7 @@ export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEdi
       onClick={onClose}
     >
       <div
-        className="bg-surface border border-outline/25 rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.6)] w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200"
+        className="bg-surface border border-outline/25 rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.6)] w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <form onSubmit={handleSubmit}>
@@ -81,6 +138,40 @@ export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEdi
               <h2 id="modal-editar-perfil-titulo" className="text-lg font-bold text-on-surface">
                 Editar perfil
               </h2>
+            </div>
+
+            <div className="flex flex-col items-center gap-3 py-2">
+              <Avatar tamaño="grande" src={srcVistaPrevia} alt={form.nombre} />
+              <input
+                ref={inputArchivoRef}
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={alElegirArchivo}
+              />
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <Boton
+                  type="button"
+                  tipo="secundario"
+                  className="text-xs py-2 px-3"
+                  onClick={() => inputArchivoRef.current?.click()}
+                  deshabilitado={enviando}
+                >
+                  Elegir imagen
+                </Boton>
+                {(srcVistaPrevia || form.imagenUrl) && (
+                  <button
+                    type="button"
+                    onClick={quitarFoto}
+                    className="text-xs font-semibold text-on-surface-variant hover:text-danger underline-offset-2 hover:underline"
+                  >
+                    Quitar foto
+                  </button>
+                )}
+              </div>
+              <p className="text-[11px] text-on-surface-variant/80 text-center max-w-sm">
+                Solo desde tu dispositivo. Tamaño máximo ~800 KB.
+              </p>
             </div>
 
             <div>

@@ -62,6 +62,7 @@ describe('usuarioService — actualizarUsuario', () => {
         celular: '123',
         ciudad: 'Rosario',
         tipoUsuario: 'Lector',
+        imagenUrl: null,
       }),
     )
 
