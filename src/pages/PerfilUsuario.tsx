@@ -99,12 +99,10 @@ export const PerfilUsuario = () => {
             <EstadisticaCard
               valor={cantidadPrestados}
               etiqueta="Libros Prestados"
-              claseFondo="bg-[#fdf2f2]"
             />
             <EstadisticaCard
               valor={libros.length}
               etiqueta="Libros Leídos"
-              claseFondo="bg-[#f5f3ff]"
             />
           </div>
         </div>

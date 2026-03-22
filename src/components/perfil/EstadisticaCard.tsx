@@ -1,29 +1,23 @@
-import { Card } from '../ui'
-
 export type PropsEstadisticaCard = {
   valor: number
   etiqueta: string
-  claseFondo?: string
+  icono?: string
 }
 
 export const EstadisticaCard = ({
   valor,
   etiqueta,
-  claseFondo = 'bg-accent/10',
+  icono,
 }: PropsEstadisticaCard) => {
   return (
-    <Card
-      className={`flex flex-col items-center justify-center text-center border border-white/70 rounded-3xl shadow-sm ${claseFondo}`}
-    >
-      <div className="bg-white/80 w-full rounded-2xl px-5 py-5">
-        <div className="text-4xl font-extrabold text-secondary leading-none">
-          {valor}
-        </div>
-        <div className="mt-1.5 text-sm font-semibold text-secondary/60 leading-snug">
-          {etiqueta}
-        </div>
-      </div>
-    </Card>
+    <div className="flex flex-col items-center justify-center text-center bg-surface-high rounded-2xl p-5 border border-outline/20 shadow-sm gap-1">
+      {icono && <span className="text-2xl mb-1">{icono}</span>}
+      <span className="text-4xl font-black text-primary-light leading-none tabular-nums">
+        {valor}
+      </span>
+      <span className="text-[11px] font-semibold text-on-surface-variant tracking-widest uppercase leading-snug mt-1">
+        {etiqueta}
+      </span>
+    </div>
   )
 }
-

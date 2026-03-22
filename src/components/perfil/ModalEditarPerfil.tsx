@@ -14,8 +14,8 @@ export type PropsModalEditarPerfil = {
 const opcionesTipo: TipoUsuario[] = ['Lector', 'Publicador', 'LectorPublicador']
 
 const claseInput =
-  'mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-secondary bg-white focus:outline-none focus:ring-2 focus:ring-primary/60'
-const claseInputError = 'border-red-500 focus:ring-red-500/60'
+  'mt-1 w-full rounded-lg border border-outline/40 px-3 py-2.5 text-sm text-on-surface bg-surface-high focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors'
+const claseInputError = 'border-danger/60 focus:ring-danger/40'
 
 export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEditarPerfil) => {
   const [form, setForm] = useState<Usuario>(new Usuario(usuario))
@@ -72,18 +72,20 @@ export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEdi
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200"
+        className="bg-surface border border-outline/25 rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.6)] w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         <form onSubmit={handleSubmit}>
           <div className="p-6 space-y-4">
-            <h2 id="modal-editar-perfil-titulo" className="text-xl font-bold text-secondary">
-              Editar perfil
-            </h2>
+            <div className="flex items-center gap-2 pb-1 border-b border-outline/20">
+              <h2 id="modal-editar-perfil-titulo" className="text-lg font-bold text-on-surface">
+                Editar perfil
+              </h2>
+            </div>
 
             <div>
-              <label htmlFor="editar-perfil-nombre" className="text-xs font-semibold text-secondary/60">
-                NOMBRE
+              <label htmlFor="editar-perfil-nombre" className="text-[11px] font-semibold text-on-surface-variant tracking-widest uppercase">
+                Nombre
               </label>
               <input
                 id="editar-perfil-nombre"
@@ -99,8 +101,8 @@ export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEdi
             </div>
 
             <div>
-              <label htmlFor="editar-perfil-desc" className="text-xs font-semibold text-secondary/60">
-                DESCRIPCIÓN
+              <label htmlFor="editar-perfil-desc" className="text-[11px] font-semibold text-on-surface-variant tracking-widest uppercase">
+                Descripción
               </label>
               <textarea
                 id="editar-perfil-desc"
@@ -112,8 +114,8 @@ export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEdi
             </div>
 
             <div>
-              <label htmlFor="editar-perfil-email" className="text-xs font-semibold text-secondary/60">
-                EMAIL
+              <label htmlFor="editar-perfil-email" className="text-[11px] font-semibold text-on-surface-variant tracking-widest uppercase">
+                Email
               </label>
               <input
                 id="editar-perfil-email"
@@ -129,8 +131,8 @@ export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEdi
             </div>
 
             <div>
-              <label htmlFor="editar-perfil-celular" className="text-xs font-semibold text-secondary/60">
-                CELULAR
+              <label htmlFor="editar-perfil-celular" className="text-[11px] font-semibold text-on-surface-variant tracking-widest uppercase">
+                Celular
               </label>
               <input
                 id="editar-perfil-celular"
@@ -145,8 +147,8 @@ export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEdi
             </div>
 
             <div>
-              <label htmlFor="editar-perfil-ciudad" className="text-xs font-semibold text-secondary/60">
-                CIUDAD / UBICACIÓN
+              <label htmlFor="editar-perfil-ciudad" className="text-[11px] font-semibold text-on-surface-variant tracking-widest uppercase">
+                Ciudad / Ubicación
               </label>
               <input
                 id="editar-perfil-ciudad"
@@ -158,8 +160,8 @@ export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEdi
             </div>
 
             <div>
-              <label htmlFor="editar-perfil-tipo" className="text-xs font-semibold text-secondary/60">
-                TIPO DE LECTOR
+              <label htmlFor="editar-perfil-tipo" className="text-[11px] font-semibold text-on-surface-variant tracking-widest uppercase">
+                Tipo de lector
               </label>
               <select
                 id="editar-perfil-tipo"
@@ -176,7 +178,7 @@ export const ModalEditarPerfil = ({ onClose, usuario, onGuardar }: PropsModalEdi
             </div>
           </div>
 
-          <div className="flex border-t border-gray-200">
+          <div className="flex border-t border-outline/20">
             <Boton
               type="button"
               tipo="gris"
