@@ -48,7 +48,12 @@ export const PerfilUsuario = () => {
   const guardarDesdeModal = async (u: Usuario) => {
     try {
       const data = await usuarioService.actualizarUsuario(u)
-      setUsuario(new Usuario(data))
+      const imagenUrl =
+        data.imagenUrl !== undefined ? data.imagenUrl : u.imagenUrl
+      const { errors: _, ...uSinErrores } = u
+      const nuevo = new Usuario({ ...uSinErrores, ...data, imagenUrl })
+      nuevo.errors = {}
+      setUsuario(nuevo)
       toast.success("¡Perfil actualizado con éxito!")
     } catch (e: unknown) {
       const err = obtenerMensajeError(e)
@@ -57,8 +62,6 @@ export const PerfilUsuario = () => {
         navigate("/auth/login")
         throw e
       }
-      toast.error(err.mensaje || "No se pudieron guardar los cambios.")
-      console.error(e)
       throw e
     }
   }
@@ -101,12 +104,10 @@ export const PerfilUsuario = () => {
             <EstadisticaCard
               valor={cantidadPrestados}
               etiqueta="Libros Prestados"
-              claseFondo="bg-[#fdf2f2]"
             />
             <EstadisticaCard
               valor={libros.length}
               etiqueta="Libros Leídos"
-              claseFondo="bg-[#f5f3ff]"
             />
           </div>
         </div>

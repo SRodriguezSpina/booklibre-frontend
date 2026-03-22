@@ -17,6 +17,7 @@ class UsuarioService {
       celular: usuario.celular,
       ciudad: usuario.ciudad,
       tipoUsuario: usuario.tipoUsuario,
+      imagenUrl: usuario.imagenUrl ?? null,
     }
     const res = await axios.put<UsuarioData>(
       `${API_BASE_URL}/usuarios/${usuario.id}`,
