@@ -6,6 +6,7 @@ import { authService } from "../../services/AuthService"
 import type { UsuarioData } from "../../classes/usuario"
 import { useState } from "react"
 import { useOnInit } from "../../utils/hooks"
+import { Avatar } from "./Avatar"
 
 interface NavItemProps {
   text: string
@@ -48,7 +49,6 @@ export const NavbarSuperior = () => {
   })
 
   const nombre = usuario?.nombre ?? "Usuario"
-  const inicial = nombre.charAt(0).toUpperCase()
   const bibliokarmas = usuario?.bibliokarmas ?? 0
   const navigate = useNavigate()
 
@@ -89,9 +89,12 @@ export const NavbarSuperior = () => {
               {bibliokarmas}
             </span>
           </div>
-          <div className="w-9 h-9 rounded border border-primary/30 bg-surface-high flex items-center justify-center text-primary-light text-sm font-bold">
-            {inicial}
-          </div>
+          <Avatar
+            src={usuario?.imagenUrl ?? null}
+            alt={nombre}
+            tamaño="chico"
+            className="!w-9 !h-9 !rounded-lg !text-sm"
+          />
           <button
             onClick={handleLogout}
             className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant hover:text-on-surface border border-accent/30 rounded px-3 py-1.5 hover:bg-surface transition-colors"
@@ -106,9 +109,12 @@ export const NavbarSuperior = () => {
             <TrendingUp size={13} className="text-primary-light" />
             <span className="text-primary-light text-xs font-bold">{bibliokarmas}</span>
           </div>
-          <div className="w-8 h-8 rounded border border-primary/30 bg-surface-high flex items-center justify-center text-primary-light text-sm font-bold">
-            {inicial}
-          </div>
+          <Avatar
+            src={usuario?.imagenUrl ?? null}
+            alt={nombre}
+            tamaño="chico"
+            className="!rounded-lg !text-sm"
+          />
           <button
             onClick={() => setMenuMovilAbierto((v) => !v)}
             className="p-1.5 rounded border border-accent/30 text-on-surface-variant hover:text-on-surface hover:bg-surface transition-colors"

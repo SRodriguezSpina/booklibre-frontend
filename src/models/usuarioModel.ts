@@ -9,6 +9,7 @@ export type UsuarioResponse = {
   ciudad: string
   tipoUsuario: string
   bibliokarmas: number
+  imagenUrl?: string | null
 }
 
 export type UsuarioUpdateRequest = {

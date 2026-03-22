@@ -12,7 +12,7 @@ export const PerfilResumen = ({ usuario, onEditar }: PropsPerfilResumen) => {
     <section className="bg-gradient-to-r from-surface to-accent/10 rounded-3xl border border-white/70 shadow-[0_18px_40px_rgba(15,23,42,0.08)] px-6 md:px-8 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
       <div className="flex items-center gap-4 md:gap-5 min-w-0">
         <div className="shrink-0">
-          <Avatar tamaño="grande" src={null} alt={usuario.nombre} />
+          <Avatar tamaño="grande" src={usuario.imagenUrl ?? null} alt={usuario.nombre} />
         </div>
         <div className="min-w-0">
           <div className="text-xl md:text-2xl font-bold text-secondary truncate">
