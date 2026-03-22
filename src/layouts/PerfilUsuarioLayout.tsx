@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Outlet, useNavigate } from "react-router-dom"
 import { Spinner, ErrorCard, type ErrorPersonalizado } from "../components/ui"
-import { Usuario } from '../classes/usuario'
+import { Usuario } from "../classes/usuario"
 import { useAlIniciar } from "../utils/hooks"
 import { obtenerMensajeError } from "../utils/errorHandler"
 import { usuarioService } from "../services/usuarioService"
@@ -21,7 +21,7 @@ export const PerfilUsuarioLayout = () => {
   const cargarUsuario = async () => {
     const id = authService.obtenerIdUsuarioActual()
     if (id == null) {
-      setError({ mensaje: 'Debés iniciar sesión para ver tu perfil.' })
+      setError({ mensaje: "Debés iniciar sesión para ver tu perfil." })
       setCargando(false)
       return
     }
@@ -40,11 +40,12 @@ export const PerfilUsuarioLayout = () => {
 
   if (cargando) return <Spinner />
   if (error) {
-    const noAutenticado = error.estado === 401 || authService.obtenerIdUsuarioActual() == null
+    const noAutenticado =
+      error.estado === 401 || authService.obtenerIdUsuarioActual() == null
     return (
       <ErrorCard
         error={error}
-        alReintentar={noAutenticado ? () => navigate('/login') : cargarUsuario}
+        alReintentar={noAutenticado ? () => navigate("/login") : cargarUsuario}
       />
     )
   }

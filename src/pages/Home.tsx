@@ -13,7 +13,6 @@ import { useOnInit } from "../utils/hooks.ts"
 
 const ITEMS_POR_PAGINA = 6
 
-
 export const Home = () => {
   const [query, setQuery] = useState("")
   const [filters, setFilters] = useState<FiltersState>(INITIAL_FILTERS)
@@ -63,7 +62,7 @@ export const Home = () => {
   }
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-6">
+    <main className="max-w-6xl mx-auto px-4 py-6 pt-22">
       <section className="mb-6">
         <h1 className="text-2xl font-bold text-secondary-dark mb-1">
           Encuentra tu próxima lectura

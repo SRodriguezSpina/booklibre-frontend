@@ -90,7 +90,10 @@ export const EditarLibro = () => {
     setIsSubmitting(true)
     try {
       if (esNuevo) {
-        await libroService.crearLibro(instance.toDTO(0), Number(values.propietarioId))
+        await libroService.crearLibro(
+          instance.toDTO(0),
+          Number(values.propietarioId),
+        )
       } else {
         await libroService.actualizarLibro(instance.toDTO(Number(id)))
       }
@@ -111,7 +114,7 @@ export const EditarLibro = () => {
   }
 
   return (
-    <div className="flex flex-col bg-background p-6 max-w-xl mx-auto mt-10">
+    <div className="flex flex-col bg-background p-6 max-w-xl mx-auto mt-10 pt-24">
       <h1 className="text-2xl font-bold text-secondary-dark mb-1">{titulo}</h1>
       <p className="text-sm text-secondary opacity-70 mb-6">
         {esNuevo
