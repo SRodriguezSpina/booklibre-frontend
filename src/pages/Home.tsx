@@ -63,22 +63,15 @@ export const Home = () => {
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-6 pt-22">
-      <section className="mb-6">
-        <h1 className="text-2xl font-bold text-secondary-dark mb-1">
-          Encuentra tu próxima lectura
-        </h1>
-        <p className="text-sm text-secondary-light mb-4">
-          {" "}
-          Explorá miles de libros disponibles para préstamo en nuestra
-          comunidad.
-        </p>
-        <SearchBar
-          onSearch={(query) => handleSearch(query)}
-          placeholder="Buscar por título..."
-        />
-      </section>
+      <h1 className="text-2xl font-bold text-secondary-dark mb-1">
+        Encuentra tu próxima lectura
+      </h1>
+      <p className="text-sm text-secondary-light mb-6">
+        Explorá miles de libros disponibles para préstamo en nuestra
+        comunidad.
+      </p>
 
-      <div className="flex gap-6">
+      <div className="flex gap-10">
         <aside className="w-56 shrink-0">
           <Filters
             onApplyFilters={(filters: FiltersState) =>
@@ -87,17 +80,20 @@ export const Home = () => {
           />
         </aside>
 
-        <section className="flex-1 flex flex-col gap-6">
+        <div className="flex-1 flex flex-col gap-6">
+          <SearchBar
+            onSearch={(query) => handleSearch(query)}
+            placeholder="Buscar por título..."
+          />
+
           {loading ? (
             <Spinner />
           ) : books.length === 0 ? (
-            <>
-              <div className="text-center py-20 bg-surface rounded border border-accent/20">
-                <p className="text-on-surface-variant opacity-60">
-                  No se encontraron libros en esta categoría.
-                </p>
-              </div>
-            </>
+            <div className="text-center py-20 bg-surface rounded border border-accent/20">
+              <p className="text-on-surface-variant opacity-60">
+                No se encontraron libros.
+              </p>
+            </div>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -112,7 +108,7 @@ export const Home = () => {
               />
             </>
           )}
-        </section>
+        </div>
       </div>
     </main>
   )
