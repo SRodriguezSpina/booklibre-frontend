@@ -4,12 +4,13 @@ import { Card, CardHeader } from "../ui/Card"
 
 interface InfoLibroProps {
   libro: Libro
+  karmaCalculado: number // NUEVO: Recibe el cálculo del padre
 }
 
-export const InfoLibro = ({ libro }: InfoLibroProps) => {
+export const InfoLibro = ({ libro, karmaCalculado }: InfoLibroProps) => {
   return (
     <section className="flex flex-col gap-8">
-      
+
       {/*HEADER DEL LIBRO Y SINOPSIS*/}
       <div>
         <div className="flex items-center gap-3 mb-3">
@@ -42,22 +43,23 @@ export const InfoLibro = ({ libro }: InfoLibroProps) => {
 
       {/*DETALLES DEL LIBRO*/}
       <Card className="p-6 md:p-8">
-        <CardHeader 
-          titulo="Detalles del Libro" 
-          className="text-xl text-secondary-dark mb-6" 
+        <CardHeader
+          titulo="Detalles del Libro"
+          className="text-xl text-secondary-dark mb-6"
         />
 
         <div className="flex flex-col gap-8">
-          
+
           <DetalleFila>
             <DetalleItem label="Tipo" colSpan="col-span-2 md:col-span-3">
               <span className="bg-orange-50 text-orange-700 text-xs font-bold px-3 py-1.5 rounded-full flex w-fit items-center gap-1.5 border border-orange-100">
                 {libro.tipo}
               </span>
             </DetalleItem>
+
             <DetalleItem label="Bibliokarmas" colSpan="col-span-2 md:col-span-1">
-              <span className="bg-green-50 text-green-600 font-bold px-4 py-1.5 rounded-lg flex w-fit border border-green-100">
-                +{libro.bibliokarma}
+              <span className="bg-green-50 text-green-600 font-bold px-4 py-1.5 rounded-lg flex w-fit border border-green-100 transition-all">
+                +{karmaCalculado}
               </span>
             </DetalleItem>
           </DetalleFila>
@@ -80,7 +82,6 @@ export const InfoLibro = ({ libro }: InfoLibroProps) => {
 
         </div>
       </Card>
-
     </section>
   )
 }

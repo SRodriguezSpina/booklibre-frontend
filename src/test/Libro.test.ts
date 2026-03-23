@@ -44,7 +44,7 @@ describe("Libro - fromPrestamoJson", () => {
     expect(libro.alquiladoPorId).toBe(1)
     expect(libro.rating).toBe(0)
     expect(libro.bibliokarma).toBe(1550)
-    expect(libro.fechaDevolucion).toBe(formatDate(en5Dias)) // fechaHasta -> fechaDevolucion
+    expect(libro.fechaHasta).toBe(formatDate(en5Dias)) // fechaHasta -> fechaDevolucion
   })
 })
 
