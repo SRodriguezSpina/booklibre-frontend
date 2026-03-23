@@ -1,61 +1,21 @@
-import { Badge } from "../ui"
-import {
-  Pencil,
-  Trash2,
-  ChevronUp,
-  ChevronDown,
-  ChevronsUpDown,
-} from "lucide-react"
-import type { LibroUsuarioItemDTO } from "../../models/libroModel"
-import { useNavigate } from "react-router-dom"
+import { Badge } from '../ui'
+import { Pencil, Trash2 } from 'lucide-react'
+import type { LibroUsuarioItemDTO } from '../../models/libroModel'
+import { useNavigate } from 'react-router-dom'
+import { TablaLibrosIconoOrden } from './TablaLibrosIconoOrden'
+import {badgeDisponibilidad,formatearFechaAgregadoLibro,rutaEditarLibro} from '../../utils/misLibros/tablaLibros'
+import type {CampoOrdenMisLibros,SentidoOrden} from '../../utils/misLibros/gestionMisLibros'
 
 export type PropsTablaLibros = {
   libros: LibroUsuarioItemDTO[]
-  campoOrden: "titulo" | "estado" | "fecha"
-  sentidoOrden: "ascendente" | "descendente"
-  alCambiarOrden: (campo: "titulo" | "estado" | "fecha") => void
+  campoOrden: CampoOrdenMisLibros
+  sentidoOrden: SentidoOrden
+  alCambiarOrden: (campo: CampoOrdenMisLibros) => void
   alEliminar: (libroId: number) => void
 }
 
-const getBadge = (disponible: boolean) =>
-  disponible
-    ? { variante: "exito" as const, texto: "Disponible" }
-    : { variante: "advertencia" as const, texto: "Prestado" }
-
-const IconoOrden = ({
-  activo,
-  sentido,
-}: {
-  activo: boolean
-  sentido: "ascendente" | "descendente"
-}) => {
-  if (!activo) return <ChevronsUpDown className="ml-1 w-3 h-3 text-gray-300" />
-  return sentido === "ascendente" ? (
-    <ChevronUp className="ml-1 w-3 h-3 text-secondary" />
-  ) : (
-    <ChevronDown className="ml-1 w-3 h-3 text-secondary" />
-  )
-}
-
-const formatearFecha = (fechaStr: string | null) => {
-  if (!fechaStr) return "—"
-  return new Date(fechaStr)
-    .toLocaleDateString("es-AR", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    })
-    .replace(".", "")
-}
-
-export const TablaLibros = ({
-  libros,
-  campoOrden,
-  sentidoOrden,
-  alCambiarOrden,
-  alEliminar,
-}: PropsTablaLibros) => {
-  const navigate = useNavigate() // Inicialización
+export const TablaLibros = ({libros,campoOrden,sentidoOrden,alCambiarOrden,alEliminar}: PropsTablaLibros) => {
+  const navigate = useNavigate()
 
   return (
     <div className="overflow-x-auto">
@@ -66,11 +26,11 @@ export const TablaLibros = ({
               <button
                 type="button"
                 className="inline-flex items-center hover:text-secondary transition-colors"
-                onClick={() => alCambiarOrden("titulo")}
+                onClick={() => alCambiarOrden('titulo')}
               >
                 Título y Autor
-                <IconoOrden
-                  activo={campoOrden === "titulo"}
+                <TablaLibrosIconoOrden
+                  activo={campoOrden === 'titulo'}
                   sentido={sentidoOrden}
                 />
               </button>
@@ -79,11 +39,11 @@ export const TablaLibros = ({
               <button
                 type="button"
                 className="inline-flex items-center hover:text-secondary transition-colors"
-                onClick={() => alCambiarOrden("estado")}
+                onClick={() => alCambiarOrden('estado')}
               >
                 Disponible
-                <IconoOrden
-                  activo={campoOrden === "estado"}
+                <TablaLibrosIconoOrden
+                  activo={campoOrden === 'estado'}
                   sentido={sentidoOrden}
                 />
               </button>
@@ -92,11 +52,11 @@ export const TablaLibros = ({
               <button
                 type="button"
                 className="inline-flex items-center hover:text-secondary transition-colors"
-                onClick={() => alCambiarOrden("fecha")}
+                onClick={() => alCambiarOrden('fecha')}
               >
                 Agregado
-                <IconoOrden
-                  activo={campoOrden === "fecha"}
+                <TablaLibrosIconoOrden
+                  activo={campoOrden === 'fecha'}
                   sentido={sentidoOrden}
                 />
               </button>
@@ -106,7 +66,7 @@ export const TablaLibros = ({
         </thead>
         <tbody className="divide-y divide-gray-50">
           {libros.map((libro) => {
-            const { variante, texto } = getBadge(libro.disponible)
+            const { variante, texto } = badgeDisponibilidad(libro.disponible)
             return (
               <tr
                 key={libro.id}
@@ -143,17 +103,16 @@ export const TablaLibros = ({
                   <Badge variante={variante}>{texto}</Badge>
                 </td>
                 <td className="py-4 text-secondary/60 font-medium">
-                  {formatearFecha(libro.fechaAgregado)}
+                  {formatearFechaAgregadoLibro(libro.fechaAgregado)}
                 </td>
                 <td className="py-4">
                   <div className="flex justify-end gap-2 pr-4 text-secondary/40">
                     <button
-                      onClick={() => navigate(`/Libros/${libro.id}/editar`)} // Uso de Template Literals
+                      onClick={() => navigate(rutaEditarLibro(libro.id))}
                       type="button"
                       className="p-2 hover:bg-white hover:text-secondary hover:shadow-md rounded-full transition-all"
                       aria-label="Editar"
                     >
-                      {" "}
                       <Pencil className="w-4 h-4" />
                     </button>
                     <button
