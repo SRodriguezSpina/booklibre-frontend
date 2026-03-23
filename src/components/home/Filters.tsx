@@ -28,6 +28,7 @@ export const INITIAL_FILTERS: FiltersState = {
     romance: false,
     disenio: false,
     literaturaClasica: false
+    // agregar fechas de hoy
 }
 
 export const Filters = ({ onApplyFilters }: Props) => {
@@ -51,6 +52,8 @@ export const Filters = ({ onApplyFilters }: Props) => {
         setErrors(nuevosErrores)
         return Object.keys(nuevosErrores).length === 0
     }
+    // esto lo podría pasar a otro doc
+
     const handleApply = () => {
         if (validar()) onApplyFilters(filters)
     }
