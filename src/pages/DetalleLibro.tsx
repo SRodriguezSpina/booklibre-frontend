@@ -13,7 +13,7 @@ export const DetalleLibro = () => {
   const { id } = useParams()
   const [libro, setLibro] = useState<Libro>()
   const [loading, setLoading] = useState(true)
-  
+
   // NUEVO: Estados de las fechas subidos al padre
   const [fechaDesde, setFechaDesde] = useState<string>("")
   const [fechaHasta, setFechaHasta] = useState<string>("")
@@ -47,7 +47,7 @@ export const DetalleLibro = () => {
   return (
     <main className="min-h-screen bg-background p-6 md:p-10 text-secondary-dark">
       <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto pt-20">
-        
+
         <div className="w-full lg:w-1/3 flex flex-col gap-6">
           <Card className="p-4 flex justify-center">
             <img src={libro.imagenUrl} alt={libro.titulo} className="w-full max-w-[280px] rounded-md shadow-md object-cover" />
@@ -57,7 +57,6 @@ export const DetalleLibro = () => {
             libro={libro}
             usuarioId={usuarioId}
             onReservaExitosa={fetchLibro}
-            estaOcupadoHoy={libro.estoyReservado}
             fechaDesde={fechaDesde}
             setFechaDesde={setFechaDesde}
             fechaHasta={fechaHasta}

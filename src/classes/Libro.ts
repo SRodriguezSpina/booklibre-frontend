@@ -5,12 +5,13 @@ import type {
   Genero,
   Idioma,
   PrestamoDTO,
+  RangoReservaDTO,
 } from "../models/libroModel";
 import { calcularDiferenciaDias } from "../utils/dateHandlerReserva";
 
 export class Libro {
   id: number;
-  prestamoId?: number; // Para el caso de PrestamoDTO, donde el ID del libro viene como "id" pero queremos mapearlo a "libroId"
+  prestamoId?: number;
   titulo: string;
   autor: string;
   autorImg?: string;
@@ -22,7 +23,7 @@ export class Libro {
   rating: number;
   estoyReservado: boolean;
   fechaDesde?: string;
-  fechaHasta?: string; // Mapea a fechaHasta del DTO
+  fechaHasta?: string;
   tipo?: TipoLibro;
   descripcion?: string;
   genero?: Genero;
@@ -32,10 +33,10 @@ export class Libro {
   editorial?: string;
   fechaPublicacion?: string;
   cantidadReservas?: number;
+  reservas: RangoReservaDTO[]; 
 
   constructor(data: Partial<Libro>) {
     Object.assign(this, data);
-    // Aseguramos valores por defecto para los obligatorios si fuera necesario
     this.id = data.id || 0;
     this.titulo = data.titulo || "";
     this.autor = data.autor || "";
@@ -44,17 +45,15 @@ export class Libro {
     this.imagenUrl = data.imagenUrl || "";
     this.rating = data.rating || 0;
     this.estoyReservado = data.estoyReservado ?? false;
+    this.reservas = data.reservas ?? [];  
   }
 
-  // Mapeador para el DTO de Libro completo (el que ya tenías)
   static fromJson(json: LibroDTO): Libro {
     return new Libro({
       ...json,
-      // Adaptamos nombres si varían
     });
   }
 
-  // NUEVO: Mapeador para el DTO de Préstamo
   static fromPrestamoJson(json: PrestamoDTO): Libro {
     return new Libro({
       id: json.id,
@@ -65,10 +64,10 @@ export class Libro {
       imagenUrl: json.imagenUrl,
       alquiladoPorId: json.alquiladoPorId ?? undefined,
       fechaDesde: json.fechaDesde ?? undefined,
-      fechaHasta: json.fechaHasta ?? undefined, 
+      fechaHasta: json.fechaHasta ?? undefined,
       rating: json.rating,
       bibliokarma: json.bibliokarma ?? undefined,
-      // Los campos faltantes quedan como undefined
+      reservas: [], 
     });
   }
 
@@ -76,14 +75,12 @@ export class Libro {
     if (!this.fechaHasta) return false;
     const hoy = new Date();
     const fechaFin = new Date(this.fechaHasta);
-    // Seteamos ambos a medianoche para comparar solo el día
     hoy.setHours(0, 0, 0, 0);
     fechaFin.setHours(0, 0, 0, 0);
     return fechaFin < hoy;
   }
 
   estoyDisponible(): boolean {
-    // Está disponible si no tiene fecha de devolución o si ya se devolvió
     return !this.fechaHasta || this.estaDevuelto();
   }
 
@@ -91,10 +88,8 @@ export class Libro {
     if (!this.fechaHasta || this.estaDevuelto()) return false;
     const hoy = new Date();
     const fechaFin = new Date(this.fechaHasta);
-    // Calculamos la diferencia en días
     const diffTiempo = fechaFin.getTime() - hoy.getTime();
     const diffDias = Math.ceil(diffTiempo / (1000 * 60 * 60 * 24));
-    // Por ejemplo, avisar si faltan 3 días o menos
     return diffDias >= 0 && diffDias <= 3;
   }
 
@@ -108,11 +103,8 @@ export class Libro {
     bibliokarmasUsuario: number,
   ): number {
     if (!fechaDesde || !fechaHasta) return 0;
-
-  
     const diasReserva = calcularDiferenciaDias(fechaDesde, fechaHasta);
     if (diasReserva <= 0) return 0;
-
     const base = 5 * diasReserva;
     const plus = this.calcularPlusBibliokarma(bibliokarmasUsuario);
     return base + plus;

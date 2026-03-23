@@ -4,6 +4,11 @@ export type Idioma = "ESPANOL" | "INGLES" | "FRANCES" | "PORTUGUES"
 export type TipoLibro = "Comun" | "ConDedicatoria" | "Coleccionable"
 export type TipoPrestamo = "prestados-a-mi" | "prestados-por-mi"
 
+export type RangoReservaDTO = {
+  fechaDesde: string
+  fechaHasta: string
+}
+
 export interface LibroDTO {
   id: number
   titulo: string
@@ -20,17 +25,17 @@ export interface LibroDTO {
   fechaPublicacion: string
   propietarioId: number
   imagenUrl: string
-  estoyReservado: boolean 
+  estoyReservado: boolean
   alquiladoPorId?: number
-  fechaDevolucion?: string // ISO string
   bibliokarma?: number
+  reservas: RangoReservaDTO[]
 }
 
 export interface PrestamoDTO {
   id: number
   titulo: string
   autor: string
-  estado: EstadoLibro // Usamos tu enum/tipo existente
+  estado: EstadoLibro
   propietarioId: number
   imagenUrl: string
   alquiladoPorId: number | null
@@ -46,7 +51,7 @@ export interface LibroHome {
   genero: Genero
   titulo: string
   autor: string
-  calificacion: number  /*o float?*/ 
+  calificacion: number
   isbn: string
   idioma: Idioma
   tipo: TipoLibro

@@ -25,10 +25,10 @@ const libroDTOMock: LibroDTO = {
   propietarioId: 3,
   imagenUrl: 'https://example.com/cover.jpg',
   alquiladoPorId: undefined,
-  fechaDevolucion: undefined,
   bibliokarma: undefined,
   autorImg: "",
-  estoyReservado: false
+  estoyReservado: false,
+  reservas: [], 
 }
 
 const prestamoDTOMock: PrestamoDTO = {

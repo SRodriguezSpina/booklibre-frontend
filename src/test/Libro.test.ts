@@ -44,7 +44,7 @@ describe("Libro - fromPrestamoJson", () => {
     expect(libro.alquiladoPorId).toBe(1)
     expect(libro.rating).toBe(0)
     expect(libro.bibliokarma).toBe(1550)
-    expect(libro.fechaHasta).toBe(formatDate(en5Dias)) // fechaHasta -> fechaDevolucion
+    expect(libro.fechaHasta).toBe(formatDate(en5Dias))
   })
 })
 
@@ -67,7 +67,8 @@ describe("Libro - fromJson", () => {
       fechaPublicacion: "2008-08-01",
       bibliokarma: 1000,
       autorImg: "",
-      estoyReservado: false
+      estoyReservado: false,
+      reservas: [],
     }
     const libro = Libro.fromJson(dto)
     expect(libro.id).toBe(2)
