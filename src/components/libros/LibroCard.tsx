@@ -109,7 +109,7 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
             <span>📅</span>
             <span className="font-bold shrink-0">Rango:</span>
             <span className="text-on-surface font-semibold">
-              {libro.fechaDesde} / {libro.fechaDevolucion || "Sin fecha"}
+              {libro.fechaDesde} / {libro.fechaHasta || "Sin fecha"}
             </span>
           </div>
           <div className="flex items-center gap-2 text-[10px] text-primary-light uppercase tracking-wider font-bold">

@@ -25,10 +25,10 @@ const libroDTOMock: LibroDTO = {
   propietarioId: 3,
   imagenUrl: 'https://example.com/cover.jpg',
   alquiladoPorId: undefined,
-  fechaDevolucion: undefined,
   bibliokarma: undefined,
   autorImg: "",
-  estoyReservado: false
+  estoyReservado: false,
+  reservas: [], 
 }
 
 const prestamoDTOMock: PrestamoDTO = {
@@ -100,7 +100,7 @@ describe('libroService - obtenerTodosLosPrestamos', () => {
 
     const result = await libroService.obtenerTodosLosPrestamos(1)
 
-    expect(result[0].fechaDevolucion).toBe('2026-03-20')
+    expect(result[0].fechaHasta).toBe('2026-03-20')
   })
 
   it('mapea alquiladoPorId correctamente', async () => {

@@ -1,123 +1,243 @@
-import { useState, useMemo } from "react"
+import { useState } from "react"
+import { type DateRange } from "react-day-picker"
 import { Card, CardHeader } from "../ui/Card"
 import { Boton } from "../ui/Boton"
-import { calcularDiferenciaDias, obtenerFechaHoy, formatearFechaVisual } from "../../utils/dateHandlerReserva"
+import { formatearFechaVisual, calcularDiferenciaDias } from "../../utils/dateHandlerReserva"
 import { reservaService } from "../../services/reservaService"
+import { Libro } from "../../classes/Libro"
+import { CalendarDays, ChevronDown, ChevronUp, Package, RotateCcw, Clock } from "lucide-react"
 import axios from "axios"
 
+// Importamos el nuevo componente
+import { Calendario} from "../ui/Calendario"
+
 interface ReservaCardProps {
-  libroId: number
+  libro: Libro
   usuarioId: number
   onReservaExitosa: () => void
-  estaOcupadoHoy: boolean
+  fechaDesde: string
+  setFechaDesde: (fecha: string) => void
+  fechaHasta: string
+  setFechaHasta: (fecha: string) => void
 }
 
-export const ReservaCard = ({ libroId, usuarioId, onReservaExitosa, estaOcupadoHoy}: ReservaCardProps) => {
-  const [fechaDesde, setFechaDesde] = useState<string>("")
-  const [fechaHasta, setFechaHasta] = useState<string>("")
+const strToDate = (str: string) => new Date(str + "T12:00:00")
+const dateToStr = (d: Date) => d.toISOString().split("T")[0]
 
-  const duracionDias = useMemo(
-    () => calcularDiferenciaDias(fechaDesde, fechaHasta),
-    [fechaDesde, fechaHasta]
-  )
+export const ReservaCard = ({
+  libro, usuarioId, onReservaExitosa,
+  fechaDesde, setFechaDesde, fechaHasta, setFechaHasta
+}: ReservaCardProps) => {
+  const [loading, setLoading] = useState(false)
+  const [calendarAbierto, setCalendarAbierto] = useState(true)
 
-  const hoy = obtenerFechaHoy()
-  const esReservaValida = fechaDesde !== "" && fechaHasta !== "" && duracionDias > 0
+  const hoy = new Date()
+  hoy.setHours(0, 0, 0, 0)
 
-  const handleConfirmar = async () => {
-    if (!esReservaValida) return
+  const diasDeshabilitados = [
+    { before: hoy },
+    ...libro.reservas.map(r => ({
+      from: strToDate(r.fechaDesde),
+      to: strToDate(r.fechaHasta),
+    })),
+  ]
 
-    try {
-      await reservaService.crearReserva({
-        libroId,
-        usuarioId,
-        fechaDesde,
-        fechaHasta
-      })
+  const rangeSeleccionado: DateRange | undefined = fechaDesde
+    ? { from: strToDate(fechaDesde), to: fechaHasta ? strToDate(fechaHasta) : undefined }
+    : undefined
 
-      alert("¡Reserva confirmada con éxito!")
+  const handleSelect = (range: DateRange | undefined) => {
+    if (!range) {
       setFechaDesde("")
       setFechaHasta("")
-      onReservaExitosa()
+      return
+    }
 
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const mensajeDeSpring = error.response?.data?.message
+    const nuevoDesde = range.from ? dateToStr(range.from) : ""
+    const nuevoHasta = range.to ? dateToStr(range.to) : ""
 
-        if (mensajeDeSpring) {
-          alert(mensajeDeSpring)
-          return
-        }
+    const esPrimerClic = nuevoDesde && nuevoHasta && nuevoDesde === nuevoHasta && !fechaDesde
+
+    setFechaDesde(nuevoDesde)
+
+    if (esPrimerClic) {
+      setFechaHasta("")
+    } else {
+      setFechaHasta(nuevoHasta)
+      if (nuevoHasta) {
+        setCalendarAbierto(false)
       }
-      alert("No se pudo confirmar la reserva. Intentá de nuevo.")
     }
   }
 
+  const errorValidacion: string | null = (() => {
+    if (!fechaDesde || !fechaHasta) return null
+    const inicio = strToDate(fechaDesde)
+    const fin = strToDate(fechaHasta)
+    const conflicto = libro.reservas.find(r => {
+      const rDesde = strToDate(r.fechaDesde)
+      const rHasta = strToDate(r.fechaHasta)
+      return inicio <= rHasta && fin >= rDesde
+    })
+    if (conflicto) {
+      return `El libro ya está reservado del ${formatearFechaVisual(conflicto.fechaDesde)} al ${formatearFechaVisual(conflicto.fechaHasta)}.`
+    }
+    return null
+  })()
+
+  const duracionDias = fechaDesde && fechaHasta
+    ? calcularDiferenciaDias(fechaDesde, fechaHasta)
+    : 0
+
+  const handleReservar = async () => {
+    if (!fechaDesde || !fechaHasta || errorValidacion) return
+    setLoading(true)
+    try {
+      await reservaService.crearReserva({ libroId: libro.id, usuarioId, fechaDesde, fechaHasta })
+      setFechaDesde("")
+      setFechaHasta("")
+      setCalendarAbierto(true)
+      onReservaExitosa()
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        alert(error.response.data.message)
+      } else {
+        alert("No se pudo confirmar la reserva. Intentá de nuevo.")
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const limpiarFechas = () => {
+    setFechaDesde("")
+    setFechaHasta("")
+    setCalendarAbierto(true)
+  }
+
+  const hayFechasSeleccionadas = fechaDesde && fechaHasta && !errorValidacion
+
   return (
-    <Card className="p-6">
-      <CardHeader
-        titulo="Tu Reserva"
-        className="text-lg text-secondary-dark"
-        icono={
-          <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        }
-      />
+    <Card className="flex flex-col gap-0 overflow-hidden p-0">
 
-      <div className="flex flex-col gap-4 mb-6 mt-2">
-        <div>
-          <label className="text-xs font-bold text-secondary uppercase opacity-70 mb-1.5 block">
-            Recogida
-          </label>
-          <input
-            type="date"
-            value={fechaDesde}
-            min={hoy}
-            onChange={(e) => setFechaDesde(e.target.value)}
-            className="w-full bg-background rounded-lg p-2.5 text-sm border border-accent outline-none focus:border-primary text-secondary-dark transition-colors"
-          />
+      {/* Header */}
+      <div className="px-5 pt-5 pb-4 border-b border-gray-100/10">
+        <CardHeader
+          titulo="Tu Reserva"
+          icono={<CalendarDays size={18} className="text-primary" />}
+          className="text-lg mb-0"
+        />
+      </div>
+
+      {/* Resumen de fechas seleccionadas */}
+      {hayFechasSeleccionadas && !calendarAbierto && (
+        <div className="px-5 py-4 border-b border-gray-100/10">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-secondary/50 mb-3">
+            Fechas Seleccionadas:
+          </p>
+          <div className="flex items-center gap-3 mb-3 bg-primary/10 rounded-lg px-3 py-2.5">
+            <CalendarDays size={14} className="text-primary shrink-0" />
+            <span className="text-sm font-semibold text-secondary-dark">
+              {formatearFechaVisual(fechaDesde)} → {formatearFechaVisual(fechaHasta)}
+            </span>
+          </div>
+          <div className="flex flex-col gap-0">
+            <div className="flex items-center justify-between py-2.5 border-b border-gray-100/10">
+              <div className="flex items-center gap-2 text-secondary/60">
+                <Package size={13} />
+                <span className="text-xs font-semibold">Recogido</span>
+              </div>
+              <span className="text-xs font-bold text-secondary-dark">
+                {formatearFechaVisual(fechaDesde)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between py-2.5 border-b border-gray-100/10">
+              <div className="flex items-center gap-2 text-secondary/60">
+                <RotateCcw size={13} />
+                <span className="text-xs font-semibold">Devolución</span>
+              </div>
+              <span className="text-xs font-bold text-secondary-dark">
+                {formatearFechaVisual(fechaHasta)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between py-2.5">
+              <div className="flex items-center gap-2 text-secondary/60">
+                <Clock size={13} />
+                <span className="text-xs font-semibold">Duración</span>
+              </div>
+              <span className="text-xs font-bold text-primary">
+                {duracionDias} {duracionDias === 1 ? "día" : "días"}
+              </span>
+            </div>
+          </div>
         </div>
-        <div>
-          <label className="text-xs font-bold text-secondary uppercase opacity-70 mb-1.5 block">
-            Devolución
-          </label>
-          <input
-            type="date"
-            value={fechaHasta}
-            min={fechaDesde || hoy}
-            onChange={(e) => setFechaHasta(e.target.value)}
-            disabled={!fechaDesde}
-            className="w-full bg-background rounded-lg p-2.5 text-sm border border-accent outline-none focus:border-primary text-secondary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          />
-        </div>
-      </div>
+      )}
 
-      <div className="flex justify-between items-center text-sm mb-3">
-        <span className="text-secondary opacity-80">Recogida</span>
-        <span className="font-bold capitalize">{formatearFechaVisual(fechaDesde)}</span>
-      </div>
-      <div className="flex justify-between items-center text-sm mb-4">
-        <span className="text-secondary opacity-80">Devolución</span>
-        <span className="font-bold capitalize">{formatearFechaVisual(fechaHasta)}</span>
-      </div>
-
-      <div className="flex justify-between items-center text-sm mb-6 bg-blue-50 p-3 rounded-lg text-blue-600 font-medium">
-        <span>Duración</span>
-        <span>{duracionDias} {duracionDias === 1 ? 'Día' : 'Días'}</span>
-      </div>
-
-      <Boton
-        className="w-full"
-        tipo="primario"
-        onClick={handleConfirmar}
-        deshabilitado={!esReservaValida || estaOcupadoHoy} 
+      {/* Toggle del calendario */}
+      <button
+        type="button"
+        onClick={() => setCalendarAbierto(v => !v)}
+        className="flex items-center justify-between px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-secondary/50 hover:text-secondary/80 transition-colors border-b border-gray-100/10"
       >
-        {estaOcupadoHoy ? "Libro no disponible" : "Confirmar Reserva"}
-      </Boton>
-      <p className="text-xs text-center text-secondary opacity-60 mt-3 px-4">
-        Con la reserva no se encontrará disponible en el rango de fechas
-      </p>
+        <span>{calendarAbierto ? "Cerrar Calendario" : "Cambiar Fechas"}</span>
+        {calendarAbierto ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+      </button>
+
+      {/* Calendario desplegable */}
+      {calendarAbierto && (
+        <div className="border-b border-gray-100/10">
+          
+          {/* Aquí inyectamos el nuevo componente */}
+          <Calendario
+            rangeSeleccionado={rangeSeleccionado}
+            onSelect={handleSelect}
+            diasDeshabilitados={diasDeshabilitados}
+          />
+
+          {/* Fechas no disponibles */}
+          {libro.reservas.length > 0 && (
+            <div className="px-5 pb-4 flex flex-col gap-1.5">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-secondary/40 mb-0.5">
+                No disponible:
+              </p>
+              {libro.reservas.map((r, i) => (
+                <div key={i} className="flex items-center gap-2 text-[10px] text-secondary/50">
+                  <span className="w-1.5 h-1.5 rounded-full bg-danger/60 shrink-0" />
+                  {formatearFechaVisual(r.fechaDesde)} → {formatearFechaVisual(r.fechaHasta)}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Error de validación */}
+      {errorValidacion && (
+        <div className="px-5 py-3 border-b border-gray-100/10">
+          <p className="text-xs text-danger">{errorValidacion}</p>
+        </div>
+      )}
+
+      {/* Botones */}
+      <div className="px-5 py-4 flex flex-col gap-2">
+        <Boton
+          tipo="primario"
+          className="w-full"
+          onClick={handleReservar}
+          deshabilitado={loading || !fechaDesde || !fechaHasta || !!errorValidacion}
+        >
+          {loading ? "Procesando..." : "Confirmar Reserva ✓"}
+        </Boton>
+
+        {hayFechasSeleccionadas && !errorValidacion && (
+          <p
+            onClick={limpiarFechas}
+            className="text-[10px] text-secondary/40 hover:text-secondary/60 transition-colors text-center cursor-pointer"
+          >
+            Con la reserva no se encontrará disponible en el rango de fechas
+          </p>
+        )}
+      </div>
     </Card>
   )
 }
