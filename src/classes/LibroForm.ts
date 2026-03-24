@@ -115,7 +115,8 @@ export class LibroForm {
       imagenUrl: "",
       editorial: "",
       autorImg: "",
-      reservas: [],  // ← NUEVO: al crear/editar no se mandan reservas
+      reservas: [],
+      ultimasCalificaciones: [],
     };
   }
 }
