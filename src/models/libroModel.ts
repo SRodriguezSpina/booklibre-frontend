@@ -55,7 +55,7 @@ export interface LibroHome {
   isbn: string
   idioma: Idioma
   tipo: TipoLibro
-  biblokarma: number
+  bibliokarma: number
   estado: EstadoLibro
   duenio: string
 }
