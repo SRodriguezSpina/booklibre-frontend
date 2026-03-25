@@ -20,6 +20,9 @@ export class LibroForm {
   estoyReservado: boolean = false;
   fechaPublicacion: string = "";
   propietarioId: number = 0;
+  imagenUrl: string = "";
+  editorial: string = "";
+  autorImg: string = "";
 
   static fields = [
     { name: "titulo", label: "Título", type: "text", placeholder: "Ingresá el título del libro..." },
@@ -73,6 +76,9 @@ export class LibroForm {
     form.estado = libro.estado;
     form.fechaPublicacion = libro.fechaPublicacion || "";
     form.propietarioId = libro.propietarioId;
+    form.imagenUrl = libro.imagenUrl || "";
+    form.editorial = libro.editorial || "";
+    form.autorImg = libro.autorImg || "";
     return form;
   }
 
@@ -112,9 +118,9 @@ export class LibroForm {
       fechaPublicacion: this.fechaPublicacion,
       propietarioId: this.propietarioId,
       estoyReservado: this.estoyReservado,
-      imagenUrl: "",
-      editorial: "",
-      autorImg: "",
+      imagenUrl: this.imagenUrl,
+      editorial: this.editorial,
+      autorImg: this.autorImg,
       reservas: [],
       ultimasCalificaciones: [],
     };

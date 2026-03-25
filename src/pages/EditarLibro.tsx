@@ -19,6 +19,10 @@ const emptyValues = (): Values => ({
   estado: "",
   fechaPublicacion: "",
   propietarioId: "",
+  imagenUrl: "",
+  editorial: "",
+  autorImg: ""
+
 })
 
 const fromValues = (values: Values): LibroForm => {
@@ -42,6 +46,9 @@ const toValues = (form: LibroForm): Values => ({
   estado: form.estado,
   fechaPublicacion: form.fechaPublicacion,
   propietarioId: String(form.propietarioId),
+  imagenUrl: form.imagenUrl,
+  editorial: form.editorial,
+  autorImg: form.autorImg
 })
 
 export const EditarLibro = () => {

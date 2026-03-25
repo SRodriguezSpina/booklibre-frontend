@@ -67,7 +67,7 @@ export const PerfilUsuario = () => {
   }
 
   const manejarAgregarLibro = () => {
-    navigate("/Libros/nuevo/editar")
+    navigate("/libros/nuevo/editar")
   }
 
   const manejarEliminarLibro = async (libroId: number) => {
