@@ -53,16 +53,37 @@ export const GestionMisLibros = ({libros,onAgregar,onEliminar,cargando = false,e
 
         <div className="px-6 pb-6 pt-2">
           {cargando ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="text-secondary font-bold text-lg">
-                Cargando tus libros…
+            <div className="py-10 px-2 space-y-5" aria-label="Cargando libros">
+              <div className="flex items-center justify-between gap-4">
+                <div className="h-6 w-44 bg-secondary/10 rounded animate-pulse" />
+                <div className="h-10 w-44 bg-secondary/10 rounded animate-pulse" />
               </div>
-              <p className="text-secondary/50 text-sm mt-1">
-                Esto puede tardar unos segundos.
-              </p>
+
+              <div className="h-11 bg-secondary/10 rounded animate-pulse" />
+
+              <div className="space-y-3">
+                {Array.from({ length: 5 }).map((_, idx) => (
+                  <div key={idx} className="flex items-center gap-4">
+                    <div className="h-14 w-10 rounded bg-secondary/10 animate-pulse" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 w-3/4 rounded bg-secondary/10 animate-pulse" />
+                      <div className="h-3 w-1/2 rounded bg-secondary/10 animate-pulse" />
+                      <div className="h-3 w-2/3 rounded bg-secondary/10 animate-pulse" />
+                    </div>
+                    <div className="h-7 w-20 rounded bg-secondary/10 animate-pulse" />
+                    <div className="ml-auto flex items-center gap-2">
+                      <div className="h-9 w-9 rounded-full bg-secondary/10 animate-pulse" />
+                      <div className="h-9 w-9 rounded-full bg-secondary/10 animate-pulse" />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : error ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div
+              className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in duration-300"
+              style={{ animationDelay: "40ms" }}
+            >
               <div className="text-secondary font-bold text-lg">
                 No se pudieron cargar tus libros
               </div>
@@ -80,7 +101,10 @@ export const GestionMisLibros = ({libros,onAgregar,onEliminar,cargando = false,e
               )}
             </div>
           ) : libros.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div
+              className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in duration-300"
+              style={{ animationDelay: "40ms" }}
+            >
               <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                 📚
               </div>
@@ -92,7 +116,10 @@ export const GestionMisLibros = ({libros,onAgregar,onEliminar,cargando = false,e
               </p>
             </div>
           ) : librosFiltrados.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div
+              className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in duration-300"
+              style={{ animationDelay: "40ms" }}
+            >
               <div className="text-secondary font-bold text-lg">
                 No se encontraron resultados
               </div>
@@ -108,7 +135,7 @@ export const GestionMisLibros = ({libros,onAgregar,onEliminar,cargando = false,e
               </Boton>
             </div>
           ) : (
-            <>
+            <div className="animate-in fade-in duration-300" style={{ animationDelay: "60ms" }}>
               <TablaLibros
                 libros={librosPagina}
                 campoOrden={campoOrden}
@@ -127,7 +154,7 @@ export const GestionMisLibros = ({libros,onAgregar,onEliminar,cargando = false,e
                 totalPaginas={totalPaginas}
                 alCambiar={(nueva) => setPagina(nueva)}
               />
-            </>
+            </div>
           )}
         </div>
       </Card>

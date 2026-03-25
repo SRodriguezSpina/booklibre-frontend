@@ -13,7 +13,7 @@ import { ModalEditarPerfil } from "../components/perfil/ModalEditarPerfil"
 import { usuarioService } from "../services/usuarioService"
 import { toast } from "react-toastify"
 import { obtenerMensajeError } from "../utils/errorHandler"
-import { authService } from "../services/AuthService"
+
 
 export const PerfilUsuario = () => {
   const { usuario, setUsuario } = useOutletContext<ContextoPerfilUsuario>()
@@ -32,11 +32,6 @@ export const PerfilUsuario = () => {
     } catch (e: unknown) {
       setLibros([])
       const err = obtenerMensajeError(e)
-      if (err.estado === 401) {
-        authService.logout()
-        navigate("/auth/login")
-        return
-      }
       setErrorLibros(err.mensaje || "No se pudieron cargar tus libros.")
     } finally {
       setCargandoLibros(false)
@@ -48,8 +43,7 @@ export const PerfilUsuario = () => {
   const guardarDesdeModal = async (u: Usuario) => {
     try {
       const data = await usuarioService.actualizarUsuario(u)
-      const imagenUrl =
-        data.imagenUrl !== undefined ? data.imagenUrl : u.imagenUrl
+      const imagenUrl = data.imagenUrl !== undefined ? data.imagenUrl : u.imagenUrl
       const { errors: _, ...uSinErrores } = u
       const nuevo = new Usuario({ ...uSinErrores, ...data, imagenUrl })
       nuevo.errors = {}
@@ -57,12 +51,8 @@ export const PerfilUsuario = () => {
       toast.success("¡Perfil actualizado con éxito!")
     } catch (e: unknown) {
       const err = obtenerMensajeError(e)
-      if (err.estado === 401) {
-        authService.logout()
-        navigate("/auth/login")
-        throw e
-      }
       throw e
+      toast.error(err.mensaje || "No se pudo actualizar el perfil.")
     }
   }
 
@@ -77,27 +67,20 @@ export const PerfilUsuario = () => {
       await cargarLibros()
     } catch (e: unknown) {
       const err = obtenerMensajeError(e)
-      if (err.estado === 401) {
-        authService.logout()
-        navigate("/auth/login")
-        return
-      }
       toast.error(err.mensaje || "No se pudo eliminar el libro.")
-      console.error(e)
     }
   }
 
   const cantidadPrestados = libros.filter((l) => !l.disponible).length
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 pt-20">
-      <PerfilResumen
-        usuario={usuario}
-        onEditar={() => setModalEditarAbierto(true)}
-      />
+    <div className="max-w-6xl mx-auto space-y-8 pt-20 animate-in fade-in duration-300">
+      <div className="animate-in fade-in duration-300" style={{ animationDelay: "60ms" }}>
+        <PerfilResumen usuario={usuario} onEditar={() => setModalEditarAbierto(true)} />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-4 space-y-6">
+        <div className="lg:col-span-4 space-y-6 animate-in fade-in duration-300" style={{ animationDelay: "120ms" }}>
           <MisDatosCard usuario={usuario} />
 
           <div className="grid grid-cols-2 gap-4">
@@ -112,7 +95,7 @@ export const PerfilUsuario = () => {
           </div>
         </div>
 
-        <div className="lg:col-span-8">
+        <div className="lg:col-span-8 animate-in fade-in duration-300" style={{ animationDelay: "160ms" }}>
           <GestionMisLibros
             libros={libros}
             onAgregar={manejarAgregarLibro}

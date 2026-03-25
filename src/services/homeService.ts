@@ -25,7 +25,7 @@ class HomeService {
         filters: FiltersState = INITIAL_FILTERS,
         page: number = 0,
         size: number = 6,
-        usuarioId: number,
+        usuarioId: number | null,
         sortBy: string = 'titulo'
     ): Promise<SearchResponse> {
         const generos = Object.entries(filters)
@@ -35,7 +35,8 @@ class HomeService {
 
         const response = await axios.get<SearchResponse>(`${API_BASE_URL}/libros/home`, {
             params: {
-                query, generos, page, size, usuarioId,
+                query, generos, page, size, 
+                ...(usuarioId !== null && {usuarioId}),
                 paginasMin: filters.paginasMin || undefined,
                 paginasMax: filters.paginasMax || undefined,
                 fechaDesde: filters.fechaDesde || undefined,
