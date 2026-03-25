@@ -9,10 +9,15 @@ export type PropsPerfilResumen = {
 
 export const PerfilResumen = ({ usuario, onEditar }: PropsPerfilResumen) => {
   return (
-    <section className="bg-gradient-to-r from-surface to-accent/10 rounded-3xl border border-white/70 shadow-[0_18px_40px_rgba(15,23,42,0.08)] px-6 md:px-8 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+    <section className="group bg-gradient-to-r from-surface to-accent/10 rounded-3xl border border-white/70 shadow-[0_18px_40px_rgba(15,23,42,0.08)] px-6 md:px-8 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 transition-transform duration-300 hover:-translate-y-0.5 hover:shadow-[0_28px_70px_rgba(15,23,42,0.14)]">
       <div className="flex items-center gap-4 md:gap-5 min-w-0">
-        <div className="shrink-0">
-          <Avatar tamaño="grande" src={usuario.imagenUrl ?? null} alt={usuario.nombre} />
+        <div className="shrink-0 transition-transform duration-300 group-hover:scale-[1.03]">
+          <Avatar
+            tamaño="grande"
+            src={usuario.imagenUrl ?? null}
+            alt={usuario.nombre}
+            className="transition-transform duration-300 group-hover:scale-[1.03]"
+          />
         </div>
         <div className="min-w-0">
           <div className="text-xl md:text-2xl font-bold text-secondary truncate">

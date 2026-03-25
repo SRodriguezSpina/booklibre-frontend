@@ -10,7 +10,7 @@ export const EstadisticaCard = ({
   icono,
 }: PropsEstadisticaCard) => {
   return (
-    <div className="flex flex-col items-center justify-center text-center bg-surface-high rounded-2xl p-5 border border-outline/20 shadow-sm gap-1">
+    <div className="flex flex-col items-center justify-center text-center bg-surface-high rounded-2xl p-5 border border-outline/20 shadow-sm gap-1 transition-transform duration-300 hover:-translate-y-1 hover:bg-surface-high/80">
       {icono && <span className="text-2xl mb-1">{icono}</span>}
       <span className="text-4xl font-black text-primary-light leading-none tabular-nums">
         {valor}

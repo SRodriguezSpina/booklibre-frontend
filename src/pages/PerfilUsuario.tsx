@@ -74,14 +74,13 @@ export const PerfilUsuario = () => {
   const cantidadPrestados = libros.filter((l) => !l.disponible).length
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 pt-20">
-      <PerfilResumen
-        usuario={usuario}
-        onEditar={() => setModalEditarAbierto(true)}
-      />
+    <div className="max-w-6xl mx-auto space-y-8 pt-20 animate-in fade-in duration-300">
+      <div className="animate-in fade-in duration-300" style={{ animationDelay: "60ms" }}>
+        <PerfilResumen usuario={usuario} onEditar={() => setModalEditarAbierto(true)} />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-4 space-y-6">
+        <div className="lg:col-span-4 space-y-6 animate-in fade-in duration-300" style={{ animationDelay: "120ms" }}>
           <MisDatosCard usuario={usuario} />
 
           <div className="grid grid-cols-2 gap-4">
@@ -96,7 +95,7 @@ export const PerfilUsuario = () => {
           </div>
         </div>
 
-        <div className="lg:col-span-8">
+        <div className="lg:col-span-8 animate-in fade-in duration-300" style={{ animationDelay: "160ms" }}>
           <GestionMisLibros
             libros={libros}
             onAgregar={manejarAgregarLibro}
