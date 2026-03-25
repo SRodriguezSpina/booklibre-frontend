@@ -88,34 +88,54 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
               ★{ratingLocal}
             </span>
           </div>
-          <p className="text-on-surface-variant text-sm italic mb-2">
+          <p className="text-on-surface-variant text-sm italic">
             {libro.autor}
           </p>
         </div>
 
-        <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent my-3" />
+        <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent mb-2 mt-1" />
 
-        <div className="space-y-2 mb-4">
-          <div className="flex items-center gap-2 text-[10px] text-on-surface-variant uppercase tracking-wider">
-            <span>👤</span>
-            <span className="font-bold shrink-0">
-              {esPrestamoRecibido ? "Prestado por:" : "Prestado a:"}
+        <div className="space-y-3 mb-4">
+          {/* Prestado por/a */}
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[9px] uppercase tracking-widest text-on-surface-variant/50 font-medium">
+              {esPrestamoRecibido ? "Prestado por" : "Prestado a"}
             </span>
-            <span className="text-on-surface font-semibold truncate">
-              Usuario{" "}
-              {esPrestamoRecibido ? libro.propietarioId : libro.alquiladoPorId}
-            </span>
+            <div className="flex items-center gap-1.5">
+              <div className="w-5 h-5 rounded-full bg-surface-highest flex items-center justify-center text-[9px] font-bold text-primary-light shrink-0">
+                {esPrestamoRecibido
+                  ? (libro.propietarioId ?? "?").toString().charAt(0)
+                  : (libro.alquiladoPorId ?? "?").toString().charAt(0)}
+              </div>
+              <span className="text-xs text-on-surface font-medium">
+                Usuario{" "}
+                {esPrestamoRecibido
+                  ? libro.propietarioId
+                  : libro.alquiladoPorId}
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-[10px] text-on-surface-variant uppercase tracking-wider">
-            <span>📅</span>
-            <span className="font-bold shrink-0">Rango:</span>
-            <span className="text-on-surface font-semibold">
-              {libro.fechaDesde} / {libro.fechaHasta || "Sin fecha"}
+
+          {/* Rango de fechas */}
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[9px] uppercase tracking-widest text-on-surface-variant/50 font-medium">
+              Período
             </span>
+            <div className="flex items-center gap-2 text-xs text-on-surface font-medium">
+              <span>{libro.fechaDesde}</span>
+              <span className="text-primary/40">→</span>
+              <span>{libro.fechaHasta || "Sin fecha"}</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-[10px] text-primary-light uppercase tracking-wider font-bold">
-            <span>💎</span>
-            <span>Bibliokarma: {libro.bibliokarma}</span>
+
+          {/* Bibliokarma */}
+          <div className="flex items-center justify-between pt-1 border-t border-accent/10">
+            <span className="text-[9px] uppercase tracking-widest text-on-surface-variant/50 font-medium">
+              Bibliokarma
+            </span>
+            <span className="text-sm font-bold text-primary-light">
+              +{libro.bibliokarma}
+            </span>
           </div>
         </div>
 
