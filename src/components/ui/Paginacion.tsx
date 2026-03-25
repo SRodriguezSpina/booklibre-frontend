@@ -24,7 +24,7 @@ export const Paginacion = ({
         type="button"
         disabled={pagina === 1}
         onClick={() => alCambiar(pagina - 1)}
-        className="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-primary-light disabled:opacity-30 transition-colors"
+        className="cursor-pointer w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-primary-light disabled:opacity-30 transition-colors"
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
@@ -34,7 +34,7 @@ export const Paginacion = ({
           key={page}
           type="button"
           onClick={() => alCambiar(page)}
-          className={`w-8 h-8 flex items-center justify-center text-xs font-bold rounded transition-all ${
+          className={`cursor-pointer w-8 h-8 flex items-center justify-center text-xs font-bold rounded transition-all ${
             pagina === page
               ? "bg-primary text-background shadow-[0_0_8px_rgba(247,189,72,0.3)]"
               : "text-on-surface-variant hover:text-on-surface"
@@ -48,7 +48,7 @@ export const Paginacion = ({
         type="button"
         disabled={pagina === totalPaginas}
         onClick={() => alCambiar(pagina + 1)}
-        className="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-primary-light disabled:opacity-30 transition-colors"
+        className="cursor-pointer w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-primary-light disabled:opacity-30 transition-colors"
       >
         <ChevronRight className="w-5 h-5" />
       </button>
