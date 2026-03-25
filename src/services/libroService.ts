@@ -48,9 +48,7 @@ export const libroService = {
   },
 
   // ⇩⇩⇩ NUEVO MÉTODO SOLO PARA PERFIL USUARIO
-  async obtenerLibrosUsuarioPerfil(
-    usuarioId: number,
-  ): Promise<LibroUsuarioItemDTO[]> {
+  async obtenerLibrosUsuarioPerfil(usuarioId: number): Promise<LibroUsuarioItemDTO[]> {
     const res = await axios.get<LibroUsuarioItemDTO[]>(
       `${API_BASE_URL}/usuarios/${usuarioId}/libros`,
     )
