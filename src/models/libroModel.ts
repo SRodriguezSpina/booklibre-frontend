@@ -9,6 +9,12 @@ export type RangoReservaDTO = {
   fechaHasta: string
 }
 
+export type CalificacionDTO = {
+  usuarioId: number
+  valor: number
+  comentario: string
+}
+
 export interface LibroDTO {
   id: number
   titulo: string
@@ -29,6 +35,7 @@ export interface LibroDTO {
   alquiladoPorId?: number
   bibliokarma?: number
   reservas: RangoReservaDTO[]
+  ultimasCalificaciones: CalificacionDTO[]
 }
 
 export interface PrestamoDTO {
