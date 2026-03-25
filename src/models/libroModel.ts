@@ -29,6 +29,7 @@ export interface LibroDTO {
   editorial: string
   estado: EstadoLibro
   fechaPublicacion: string
+  fechaAgregado: string
   propietarioId: number
   imagenUrl: string
   estoyReservado: boolean

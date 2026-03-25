@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { LibroForm } from "../classes/LibroForm"
 import { libroService } from "../services/libroService"
@@ -22,7 +22,6 @@ const emptyValues = (): Values => ({
   imagenUrl: "",
   editorial: "",
   autorImg: ""
-
 })
 
 const fromValues = (values: Values): LibroForm => {
@@ -51,6 +50,20 @@ const toValues = (form: LibroForm): Values => ({
   autorImg: form.autorImg
 })
 
+const MAX_FOTO_BYTES = 800_000
+
+async function archivoADataUrl(file: File): Promise<string> {
+  if (file.size > MAX_FOTO_BYTES) {
+    throw new Error("La imagen es demasiado grande (máx. ~800 KB).")
+  }
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = () => reject(new Error("No se pudo leer la imagen."))
+    reader.readAsDataURL(file)
+  })
+}
+
 export const EditarLibro = () => {
   const navigate = useNavigate()
   const { id } = useParams()
@@ -61,6 +74,17 @@ export const EditarLibro = () => {
   const [serverError, setServerError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loading, setLoading] = useState(!esNuevo)
+  const [previewPortada, setPreviewPortada] = useState<string | null>(null)
+  const [previewAutor, setPreviewAutor] = useState<string | null>(null)
+  const inputPortadaRef = useRef<HTMLInputElement>(null)
+  const inputAutorRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    return () => {
+      if (previewPortada) URL.revokeObjectURL(previewPortada)
+      if (previewAutor) URL.revokeObjectURL(previewAutor)
+    }
+  }, [previewPortada, previewAutor])
 
   const titulo = esNuevo ? "Nuevo libro" : "Editar libro"
 
@@ -84,6 +108,38 @@ export const EditarLibro = () => {
     setValues((prev) => ({ ...prev, [name]: value }))
     setErrors((prev) => ({ ...prev, [name]: undefined }))
     setServerError(null)
+  }
+
+  const handleElegirImagen = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    fieldName: "imagenUrl" | "autorImg",
+    setPreview: (url: string | null) => void,
+    currentPreview: string | null,
+  ) => {
+    const file = e.target.files?.[0]
+    e.target.value = ""
+    if (!file || !file.type.startsWith("image/")) return
+
+    if (currentPreview) URL.revokeObjectURL(currentPreview)
+    setPreview(URL.createObjectURL(file))
+
+    try {
+      const dataUrl = await archivoADataUrl(file)
+      handleChange(fieldName, dataUrl)
+    } catch (err) {
+      setPreview(null)
+      setServerError(err instanceof Error ? err.message : "No se pudo leer la imagen.")
+    }
+  }
+
+  const handleQuitarImagen = (
+    fieldName: "imagenUrl" | "autorImg",
+    setPreview: (url: string | null) => void,
+    currentPreview: string | null,
+  ) => {
+    if (currentPreview) URL.revokeObjectURL(currentPreview)
+    setPreview(null)
+    handleChange(fieldName, "")
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -120,6 +176,10 @@ export const EditarLibro = () => {
     )
   }
 
+  // Imagenes existentes o nuevas
+  const srcPortada = previewPortada || values.imagenUrl || null
+  const srcAutor = previewAutor || values.autorImg || null
+
   return (
     <div className="flex flex-col bg-background p-6 max-w-xl mx-auto mt-10 pt-24">
       <h1 className="text-2xl font-bold text-secondary-dark mb-1">{titulo}</h1>
@@ -134,7 +194,33 @@ export const EditarLibro = () => {
         className="bg-surface border border-accent rounded-2xl p-6 flex flex-col gap-5"
         noValidate
       >
-        {/* Text / number / date fields */}
+        <ImagePicker
+          label="Foto del autor"
+          src={srcAutor}
+          shape="circle"
+          inputRef={inputAutorRef as React.RefObject<HTMLInputElement>}
+          onElegir={(e) =>
+            handleElegirImagen(e, "autorImg", setPreviewAutor, previewAutor)
+          }
+          onQuitar={() =>
+            handleQuitarImagen("autorImg", setPreviewAutor, previewAutor)
+          }
+          deshabilitado={isSubmitting}
+        />
+
+        <ImagePicker
+          label="Portada del libro"
+          src={srcPortada}
+          shape="rect"
+          inputRef={inputPortadaRef as React.RefObject<HTMLInputElement>}
+          onElegir={(e) =>
+            handleElegirImagen(e, "imagenUrl", setPreviewPortada, previewPortada)
+          }
+          onQuitar={() =>
+            handleQuitarImagen("imagenUrl", setPreviewPortada, previewPortada)
+          }
+          deshabilitado={isSubmitting}
+        />
         {LibroForm.fields.map((field) => (
           <Field
             key={field.name}
@@ -147,7 +233,7 @@ export const EditarLibro = () => {
           />
         ))}
 
-        {/* Select fields */}
+
         <SelectField
           label="Tipo"
           value={values.tipo}
@@ -199,25 +285,23 @@ export const EditarLibro = () => {
         )}
 
         <div className="flex gap-3 pt-2">
-          {
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary-dark transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {isSubmitting
-                ? "Guardando..."
-                : esNuevo
-                  ? "Crear libro"
-                  : "Guardar cambios"}
-            </button>
-          }
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="flex-1 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary-dark transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isSubmitting
+              ? "Guardando..."
+              : esNuevo
+                ? "Crear libro"
+                : "Guardar cambios"}
+          </button>
           <button
             type="button"
             onClick={() => navigate(-1)}
             className="flex-1 py-2.5 bg-surface border border-accent text-secondary-dark rounded-lg text-sm font-bold hover:bg-accent transition-all"
           >
-            {"Descartar cambios"}
+            Descartar cambios
           </button>
         </div>
       </form>
@@ -226,6 +310,83 @@ export const EditarLibro = () => {
 }
 
 /* ---------- Sub-components ---------- */
+
+interface ImagePickerProps {
+  label: string
+  src: string | null
+  shape: "circle" | "rect"
+  inputRef: React.RefObject<HTMLInputElement>
+  onElegir: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onQuitar: () => void
+  deshabilitado: boolean
+}
+
+const ImagePicker = ({
+  label,
+  src,
+  shape,
+  inputRef,
+  onElegir,
+  onQuitar,
+  deshabilitado,
+}: ImagePickerProps) => {
+  const previewClass =
+    shape === "circle"
+      ? "w-20 h-20 rounded-full object-cover border border-accent bg-surface-high"
+      : "w-20 h-28 rounded-lg object-cover border border-accent bg-surface-high"
+
+  const placeholderClass =
+    shape === "circle"
+      ? "w-20 h-20 rounded-full bg-surface-high border border-accent flex items-center justify-center text-secondary/30 text-2xl shrink-0"
+      : "w-20 h-28 rounded-lg bg-surface-high border border-accent flex items-center justify-center text-secondary/30 text-2xl shrink-0"
+
+  return (
+    <div className="flex flex-col gap-1">
+      <label className="text-xs font-bold text-secondary-light uppercase tracking-wider">
+        {label}
+      </label>
+      <div className="flex items-center gap-4">
+        {src ? (
+          <img src={src} alt={label} className={`${previewClass} shrink-0`} />
+        ) : (
+          <div className={placeholderClass}>
+            {shape === "circle" ? "👤" : "📖"}
+          </div>
+        )}
+        <div className="flex flex-col gap-2">
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            onChange={onElegir}
+          />
+          <button
+            type="button"
+            disabled={deshabilitado}
+            onClick={() => inputRef.current?.click()}
+            className="px-3 py-1.5 rounded-lg border border-accent bg-surface text-secondary-dark text-xs font-semibold hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Elegir imagen
+          </button>
+          {src && (
+            <button
+              type="button"
+              onClick={onQuitar}
+              className="text-xs font-semibold text-secondary/50 hover:text-danger transition-colors text-left"
+            >
+              Quitar
+            </button>
+          )}
+          <p className="text-[10px] text-secondary/40">
+            Solo desde tu dispositivo. Máx. ~800 KB.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+// @@END-IMAGE-FIELDS
 
 interface FieldProps {
   label: string

@@ -116,6 +116,7 @@ export class LibroForm {
       idioma: this.idioma as Idioma,
       estado: this.estado as EstadoLibro,
       fechaPublicacion: this.fechaPublicacion,
+      fechaAgregado: new Date().toISOString(),
       propietarioId: this.propietarioId,
       estoyReservado: this.estoyReservado,
       imagenUrl: this.imagenUrl,
