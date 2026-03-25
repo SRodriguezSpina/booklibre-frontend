@@ -25,13 +25,13 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
   // Reemplazá el alert:
   const handleCalificar = async (valor: number, comentario: string) => {
     try {
-      await libroService.calificarLibro(
+      const res = await libroService.calificarLibro(
         libro.id,
         usuarioActualId,
         valor,
         comentario,
       )
-      setRatingLocal(valor)
+      setRatingLocal(res.data.rating)
       setYaCalificado(true)
       setIsModalOpen(false)
       toast.success("¡Gracias por calificar! 📚")
@@ -64,7 +64,8 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
     <div className="bg-surface rounded border border-accent/10 shadow-[0_8px_24px_rgba(0,0,0,0.3)] flex flex-col h-full group hover:-translate-y-1 transition-transform duration-300">
       <div
         onClick={goToDetail}
-        className="relative h-64 overflow-hidden cursor-pointer rounded-t"
+        className="relative overflow-hidden cursor-pointer rounded-t"
+        style={{ aspectRatio: "2/3" }}
       >
         <div
           className={`absolute top-3 right-3 px-2 py-1 rounded text-[10px] font-bold z-10 uppercase tracking-tighter ${getBadgeStyles()}`}
@@ -74,7 +75,7 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
         <img
           src={libro.imagenUrl}
           alt={libro.titulo}
-          className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-500"
+          className="w-full h-full object-contain bg-black/20 grayscale-[0.2] group-hover:grayscale-0 transition-all duration-500"
         />
       </div>
       <div className="p-5 flex flex-col flex-1">

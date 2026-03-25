@@ -6,46 +6,49 @@ import type {
   Idioma,
   PrestamoDTO,
   RangoReservaDTO,
-} from "../models/libroModel";
-import { calcularDiferenciaDias } from "../utils/dateHandlerReserva";
+  CalificacionDTO
+} from "../models/libroModel"
+import { calcularDiferenciaDias } from "../utils/dateHandlerReserva"
 
 export class Libro {
-  id: number;
-  prestamoId?: number;
-  titulo: string;
-  autor: string;
-  autorImg?: string;
-  estado: EstadoLibro;
-  propietarioId: number;
-  imagenUrl: string;
-  alquiladoPorId?: number;
-  bibliokarma?: number;
-  rating: number;
-  estoyReservado: boolean;
-  fechaDesde?: string;
-  fechaHasta?: string;
-  tipo?: TipoLibro;
-  descripcion?: string;
-  genero?: Genero;
-  paginas?: number;
-  isbn?: string;
-  idioma?: Idioma;
-  editorial?: string;
-  fechaPublicacion?: string;
-  cantidadReservas?: number;
-  reservas: RangoReservaDTO[]; 
+  id: number
+  prestamoId?: number
+  titulo: string
+  autor: string
+  autorImg?: string
+  estado: EstadoLibro
+  propietarioId: number
+  imagenUrl: string
+  alquiladoPorId?: number
+  bibliokarma?: number
+  rating: number
+  estoyReservado: boolean
+  fechaDesde?: string
+  fechaHasta?: string
+  tipo?: TipoLibro
+  descripcion?: string
+  genero?: Genero
+  paginas?: number
+  isbn?: string
+  idioma?: Idioma
+  editorial?: string
+  fechaPublicacion?: string
+  cantidadReservas?: number
+  reservas: RangoReservaDTO[]
+  ultimasCalificaciones: CalificacionDTO[]
 
   constructor(data: Partial<Libro>) {
-    Object.assign(this, data);
-    this.id = data.id || 0;
-    this.titulo = data.titulo || "";
-    this.autor = data.autor || "";
-    this.estado = data.estado || ("DISPONIBLE" as EstadoLibro);
-    this.propietarioId = data.propietarioId || 0;
-    this.imagenUrl = data.imagenUrl || "";
-    this.rating = data.rating || 0;
-    this.estoyReservado = data.estoyReservado ?? false;
-    this.reservas = data.reservas ?? [];  
+    Object.assign(this, data)
+    this.id = data.id || 0
+    this.titulo = data.titulo || ""
+    this.autor = data.autor || ""
+    this.estado = data.estado || ("DISPONIBLE" as EstadoLibro)
+    this.propietarioId = data.propietarioId || 0
+    this.imagenUrl = data.imagenUrl || ""
+    this.rating = data.rating || 0
+    this.estoyReservado = data.estoyReservado ?? false
+    this.reservas = data.reservas ?? []
+    this.ultimasCalificaciones = data.ultimasCalificaciones ?? []
   }
 
   static fromJson(json: LibroDTO): Libro {

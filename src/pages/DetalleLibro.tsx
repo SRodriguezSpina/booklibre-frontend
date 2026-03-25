@@ -4,7 +4,7 @@ import { useOnInit } from "../utils/hooks"
 import { libroService } from "../services/libroService"
 import { authService } from "../services/AuthService"
 import { Libro } from "../classes/Libro"
-
+import { ReseniasLibro } from "../components/detalleLibros/ReseniasLibro"
 import { ReservaCard } from "../components/detalleLibros/ReservaCard"
 import { InfoLibro } from "../components/detalleLibros/InfoLibro"
 import { Card } from "../components/ui/Card"
@@ -66,6 +66,11 @@ export const DetalleLibro = () => {
 
         <div className="w-full lg:w-2/3 flex flex-col gap-8">
           <InfoLibro libro={libro} karmaCalculado={karmaCalculado} />
+
+          {/* NUEVO */}
+          <ReseniasLibro
+            calificaciones={libro.ultimasCalificaciones}
+          />
         </div>
 
       </div>

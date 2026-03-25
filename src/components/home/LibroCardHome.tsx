@@ -14,13 +14,13 @@ type LibroCardProps = {
     isbn: string
     idioma: string
     tipo: string
-    biblokarma: number
+    bibliokarma: number
     estado: string
     // --
     duenio: string
 }
 
-export const LibroCardHome = ({ id, imagenUrl, genero, titulo, autor, calificacion, isbn, idioma, tipo, biblokarma, estado, duenio }: LibroCardProps) => {
+export const LibroCardHome = ({ id, imagenUrl, genero, titulo, autor, calificacion, isbn, idioma, tipo, bibliokarma, estado, duenio }: LibroCardProps) => {
     return (
         <Link to={`/libros/${id}`} className='flex flex-col bg-surface rounded-2xl overflow-hidden shadow-sm border border-accent hover:shadow-md transition-shadow'>
             <div className='w-full h-52 overflow-hidden'>
@@ -54,7 +54,7 @@ export const LibroCardHome = ({ id, imagenUrl, genero, titulo, autor, calificaci
                 </div>
                 <div>
                     <p className='text-secondary-light uppercase tracking-wide text-[10px]'>Biblokarma</p>
-                    <p className='font-medium text-primary'>+{biblokarma}</p>
+                    <p className='font-medium text-primary'>+{bibliokarma}</p>
                 </div>
             </div>
 

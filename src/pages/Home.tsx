@@ -11,6 +11,8 @@ import { LibroCardHome } from "../components/home/LibroCardHome"
 
 import { useOnInit } from "../utils/hooks.ts"
 import { SortBy } from "../components/home/SortBy.tsx"
+import { obtenerMensajeError, type ErrorPersonalizado } from "../utils/errorHandler.ts"
+import { ErrorCard } from "../components/ui/ErrorCard"
 
 const ITEMS_POR_PAGINA = 6
 
@@ -22,11 +24,13 @@ export const Home = () => {
   const [totalPaginas, setTotalPaginas] = useState(1)
   const [sortBy, setSortBy] = useState("titulo")
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<ErrorPersonalizado | null>(null)
 
-  const userId = authService.obtenerIdUsuarioActual() ?? 1
+  const userId = authService.obtenerIdUsuarioActual()
 
   const search = async (q: string, f: FiltersState, page: number = 0, sort: string = sortBy) => {
     setLoading(true)
+    setError(null)
     try {
       const data = await homeService.search(
         q,
@@ -38,8 +42,9 @@ export const Home = () => {
       )
       setBooks(data.content)
       setTotalPaginas(data.totalPages)
-    } catch (error: unknown) {
-      console.error(error)
+    } catch (e: unknown) {
+      const err = obtenerMensajeError(e)
+      setError(err)
     } finally {
       setLoading(false)
     }
@@ -70,6 +75,17 @@ export const Home = () => {
     search(query, filters, 0, sort)
   }
 
+  if (error) {
+    return (
+      <div className="flex flex-col min-h-screen max-w-6xl mx-auto px-4 pt-22 pb-16">
+        <ErrorCard
+          error={error}
+          alReintentar={() => search(query, filters, currentPage - 1, sortBy)}
+        />
+      </div>
+    )
+  }
+
   return (
     <main className="max-w-6xl mx-auto px-4 py-6 pt-22">
       <h1 className="text-2xl font-bold text-secondary-dark mb-1">
@@ -94,7 +110,7 @@ export const Home = () => {
             onSearch={(query) => handleSearch(query)}
             placeholder="Buscar por título..."
           />
-          
+
           <div className="felx justify-end">
             <SortBy value={sortBy} onChange={handleSortChange} />
           </div>
