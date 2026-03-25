@@ -25,10 +25,12 @@ export const Home = () => {
   const [sortBy, setSortBy] = useState("titulo")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<ErrorPersonalizado | null>(null)
+  const [animating, setAnimating] = useState(false)
 
   const userId = authService.obtenerIdUsuarioActual()
 
   const search = async (q: string, f: FiltersState, page: number = 0, sort: string = sortBy) => {
+    setAnimating(true)
     setLoading(true)
     setError(null)
     try {
@@ -47,6 +49,7 @@ export const Home = () => {
       setError(err)
     } finally {
       setLoading(false)
+      setTimeout(() => setAnimating(false), 150)
     }
   }
 
@@ -116,7 +119,7 @@ export const Home = () => {
           </div>
 
           {loading ? (
-              <Spinner />
+            <Spinner />
           ) : books.length === 0 ? (
             <div data-testid="empty-state" className="text-center py-20 bg-surface rounded border border-accent/20">
               <p className="text-on-surface-variant opacity-60">
@@ -125,7 +128,8 @@ export const Home = () => {
             </div>
           ) : (
             <>
-              <div data-testid="libros-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div data-testid="libros-grid"
+                className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 transition-all duration-150 ${animating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"}`}>
                 {books.map((book) => (
                   <LibroCardHome key={book.id} {...book} />
                 ))}
