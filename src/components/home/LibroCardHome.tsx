@@ -14,20 +14,20 @@ type LibroCardProps = {
     isbn: string
     idioma: string
     tipo: string
-    biblokarma: number
+    bibliokarma: number
     estado: string
     // --
     duenio: string
 }
 
-export const LibroCardHome = ({ id, imagenUrl, genero, titulo, autor, calificacion, isbn, idioma, tipo, biblokarma, estado, duenio }: LibroCardProps) => {
+export const LibroCardHome = ({ id, imagenUrl, genero, titulo, autor, calificacion, isbn, idioma, tipo, bibliokarma, estado, duenio }: LibroCardProps) => {
     return (
-        <Link to={`/libros/${id}`} className='flex flex-col bg-surface rounded-2xl overflow-hidden shadow-sm border border-accent hover:shadow-md transition-shadow w-56'>
+        <Link to={`/libros/${id}`} className='flex flex-col bg-surface rounded-2xl overflow-hidden shadow-sm border border-accent hover:shadow-md transition-shadow'>
             <div className='w-full h-52 overflow-hidden'>
                 <img src={imagenUrl} className='w-full h-full object-cover' />
             </div>
 
-            <div className='flex flex-col gap-1 px-4 pt-3'>
+            <div className='flex flex-col gap-1 px-4 pt-3 min-h-[72px]'>
                 <div className='flex justify-between items-center'>
                     <span className='text-xs font-semibold text-primary'>{GENERO_LABEL[genero] ?? genero}</span>
                     <div className='flex items-center gap-1 text-xs text-secondary-light'>
@@ -54,20 +54,23 @@ export const LibroCardHome = ({ id, imagenUrl, genero, titulo, autor, calificaci
                 </div>
                 <div>
                     <p className='text-secondary-light uppercase tracking-wide text-[10px]'>Biblokarma</p>
-                    <p className='font-medium text-primary'>+{biblokarma}</p>
+                    <p className='font-medium text-primary'>+{bibliokarma}</p>
                 </div>
-            </div>
-            <div className='px-4 pt-2'>
-                <span className='inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-accent text-primary-dark'>
-                    {ESTADO_LABEL[estado] ?? estado}
-                </span>
             </div>
 
-            <div className='flex items-center gap-2 px-4 py-3 mt-auto border-t border-accent'>
-                <div className='w-6 h-6 rounded-full bg-primary-light flex items-center justify-center text-white text-[10px] font-bold'>
-                    {duenio.charAt(0).toUpperCase()}
+            <div className='mt-auto'>
+                <div className='px-4 pt-2 pb-2'>
+                    <p className='text-secondary-light uppercase tracking-wide text-[10px]'>Estado</p>
+                    <span className='inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-accent text-primary-dark'>
+                        {ESTADO_LABEL[estado] ?? estado}
+                    </span>
                 </div>
-                <span className='text-xs text-secondary-light'>@{duenio}</span>
+                <div className='flex items-center gap-2 px-4 py-3 border-t border-accent'>
+                    <div className='w-6 h-6 rounded-full bg-primary-light flex items-center justify-center text-white text-[10px] font-bold'>
+                        {duenio.charAt(0).toUpperCase()}
+                    </div>
+                    <span className='text-xs text-secondary-light'>@{duenio}</span>
+                </div>
             </div>
         </Link>
     )

@@ -25,7 +25,8 @@ class HomeService {
         filters: FiltersState = INITIAL_FILTERS,
         page: number = 0,
         size: number = 6,
-        usuarioId: number
+        usuarioId: number,
+        sortBy: string = 'titulo'
     ): Promise<SearchResponse> {
         const generos = Object.entries(filters)
             .filter(([key, value]) => value === true && Object.keys(GENERO_MAP).includes(key))
@@ -40,7 +41,8 @@ class HomeService {
                 fechaDesde: filters.fechaDesde || undefined,
                 fechaHasta: filters.fechaHasta || undefined,
                 isbn: filters.isbn || undefined,
-                prestadoPor: filters.prestadoPor || undefined
+                prestadoPor: filters.prestadoPor || undefined,
+                sortBy
             }
         })
         return response.data

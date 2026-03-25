@@ -10,6 +10,7 @@ import type { LibroHome } from "../models/libroModel"
 import { LibroCardHome } from "../components/home/LibroCardHome"
 
 import { useOnInit } from "../utils/hooks.ts"
+import { SortBy } from "../components/home/SortBy.tsx"
 
 const ITEMS_POR_PAGINA = 6
 
@@ -19,11 +20,12 @@ export const Home = () => {
   const [books, setBooks] = useState<LibroHome[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPaginas, setTotalPaginas] = useState(1)
+  const [sortBy, setSortBy] = useState("titulo")
   const [loading, setLoading] = useState(false)
 
   const userId = authService.obtenerIdUsuarioActual() ?? 1
 
-  const search = async (q: string, f: FiltersState, page: number = 0) => {
+  const search = async (q: string, f: FiltersState, page: number = 0, sort: string = sortBy) => {
     setLoading(true)
     try {
       const data = await homeService.search(
@@ -32,6 +34,7 @@ export const Home = () => {
         page,
         ITEMS_POR_PAGINA,
         userId,
+        sort
       )
       setBooks(data.content)
       setTotalPaginas(data.totalPages)
@@ -61,24 +64,23 @@ export const Home = () => {
     search(query, filters, page - 1)
   }
 
+  const handleSortChange = (sort: string) => {
+    setSortBy(sort)
+    setCurrentPage(1)
+    search(query, filters, 0, sort)
+  }
+
   return (
     <main className="max-w-6xl mx-auto px-4 py-6 pt-22">
-      <section className="mb-6">
-        <h1 className="text-2xl font-bold text-secondary-dark mb-1">
-          Encuentra tu próxima lectura
-        </h1>
-        <p className="text-sm text-secondary-light mb-4">
-          {" "}
-          Explorá miles de libros disponibles para préstamo en nuestra
-          comunidad.
-        </p>
-        <SearchBar
-          onSearch={(query) => handleSearch(query)}
-          placeholder="Buscar por título..."
-        />
-      </section>
+      <h1 className="text-2xl font-bold text-secondary-dark mb-1">
+        Encuentra tu próxima lectura
+      </h1>
+      <p className="text-sm text-secondary-light mb-6">
+        Explorá miles de libros disponibles para préstamo en nuestra
+        comunidad.
+      </p>
 
-      <div className="flex gap-6">
+      <div className="flex gap-10">
         <aside className="w-56 shrink-0">
           <Filters
             onApplyFilters={(filters: FiltersState) =>
@@ -87,9 +89,24 @@ export const Home = () => {
           />
         </aside>
 
-        <section className="flex-1 flex flex-col gap-6">
+        <div className="flex-1 flex flex-col gap-3">
+          <SearchBar
+            onSearch={(query) => handleSearch(query)}
+            placeholder="Buscar por título..."
+          />
+          
+          <div className="felx justify-end">
+            <SortBy value={sortBy} onChange={handleSortChange} />
+          </div>
+
           {loading ? (
             <Spinner />
+          ) : books.length === 0 ? (
+            <div className="text-center py-20 bg-surface rounded border border-accent/20">
+              <p className="text-on-surface-variant opacity-60">
+                No se encontraron libros.
+              </p>
+            </div>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -104,7 +121,7 @@ export const Home = () => {
               />
             </>
           )}
-        </section>
+        </div>
       </div>
     </main>
   )

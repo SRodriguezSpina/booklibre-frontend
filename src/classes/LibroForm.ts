@@ -22,42 +22,12 @@ export class LibroForm {
   propietarioId: number = 0;
 
   static fields = [
-    {
-      name: "titulo",
-      label: "Título",
-      type: "text",
-      placeholder: "Ingresá el título del libro...",
-    },
-    {
-      name: "autor",
-      label: "Autor",
-      type: "text",
-      placeholder: "Ingresá el autor...",
-    },
-    {
-      name: "descripcion",
-      label: "Descripción",
-      type: "text",
-      placeholder: "Breve descripción del libro...",
-    },
-    {
-      name: "paginas",
-      label: "Páginas",
-      type: "number",
-      placeholder: "Cantidad de páginas...",
-    },
-    {
-      name: "isbn",
-      label: "ISBN",
-      type: "text",
-      placeholder: "Código ISBN...",
-    },
-    {
-      name: "fechaPublicacion",
-      label: "Fecha de publicación",
-      type: "date",
-      placeholder: "",
-    },
+    { name: "titulo", label: "Título", type: "text", placeholder: "Ingresá el título del libro..." },
+    { name: "autor", label: "Autor", type: "text", placeholder: "Ingresá el autor..." },
+    { name: "descripcion", label: "Descripción", type: "text", placeholder: "Breve descripción del libro..." },
+    { name: "paginas", label: "Páginas", type: "number", placeholder: "Cantidad de páginas..." },
+    { name: "isbn", label: "ISBN", type: "text", placeholder: "Código ISBN..." },
+    { name: "fechaPublicacion", label: "Fecha de publicación", type: "date", placeholder: "" },
   ] as const;
 
   static estadoOptions = [
@@ -110,21 +80,16 @@ export class LibroForm {
     return {
       titulo: !this.titulo.trim() ? "El título es obligatorio" : undefined,
       autor: !this.autor.trim() ? "El autor es obligatorio" : undefined,
-      descripcion: !this.descripcion.trim()
-        ? "La descripción es obligatoria"
-        : undefined,
+      descripcion: !this.descripcion.trim() ? "La descripción es obligatoria" : undefined,
       tipo: !this.tipo ? "El tipo es obligatorio" : undefined,
       genero: !this.genero ? "El género es obligatorio" : undefined,
-      paginas:
-        this.paginas === "" || Number(this.paginas) <= 0
-          ? "Ingresá una cantidad de páginas válida"
-          : undefined,
+      paginas: this.paginas === "" || Number(this.paginas) <= 0
+        ? "Ingresá una cantidad de páginas válida" : undefined,
       isbn: !this.isbn.trim() ? "Ingresá un ISBN válido" : undefined,
       idioma: !this.idioma ? "El idioma es obligatorio" : undefined,
       estado: !this.estado ? "El estado es obligatorio" : undefined,
       fechaPublicacion: !this.fechaPublicacion
-        ? "La fecha de publicación es obligatoria"
-        : undefined,
+        ? "La fecha de publicación es obligatoria" : undefined,
     };
   }
 
@@ -150,6 +115,8 @@ export class LibroForm {
       imagenUrl: "",
       editorial: "",
       autorImg: "",
+      reservas: [],
+      ultimasCalificaciones: [],
     };
   }
 }
