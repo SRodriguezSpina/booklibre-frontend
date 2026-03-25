@@ -11,7 +11,7 @@ export type PropsErrorCard = {
 
 export function ErrorCard({ error, alReintentar, alVolver }: PropsErrorCard) {
   return (
-    <div className="flex items-center justify-center w-full min-h-[40vh] px-4">
+    <div data-testid="error-card" className="flex items-center justify-center w-full min-h-[40vh] px-4">
       <div className="p-8 max-w-md text-center flex flex-col items-center gap-4">
         <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-2xl">
           !
