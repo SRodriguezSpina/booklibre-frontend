@@ -26,5 +26,5 @@ export function formatearFechaAgregadoLibro(fechaStr: string | null | undefined)
 
 /** Ruta de edición de un libro en la app. */
 export function rutaEditarLibro(libroId: number): string {
-  return `/Libros/${libroId}/editar`
+  return `/libros/${libroId}/editar`
 }

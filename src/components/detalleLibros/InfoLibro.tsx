@@ -22,11 +22,7 @@ export const InfoLibro = ({ libro, karmaCalculado }: InfoLibroProps) => {
           </div>
         </div>
         <h1 className="text-4xl font-extrabold text-secondary-dark mb-4">{libro.titulo}</h1>
-
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden">
-            <img src={libro.autorImg} alt="ImgAutor" />
-          </div>
+        <div className="inline-flex items-center gap-3 rounded-xl border border-outline/25 bg-surface-high/60 px-3 py-2.5 w-fit">
           <div>
             <p className="text-xs text-secondary font-bold uppercase opacity-70">Autor</p>
             <p className="font-semibold">{libro.autor}</p>

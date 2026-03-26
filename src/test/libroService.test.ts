@@ -30,10 +30,10 @@ const libroDTOMock: LibroDTO = {
   imagenUrl: "https://example.com/cover.jpg",
   alquiladoPorId: undefined,
   bibliokarma: undefined,
-  autorImg: "",
   estoyReservado: false,
   reservas: [],
   ultimasCalificaciones: [],
+  fechaAgregado: ""
 }
 
 const prestamoDTOMock: PrestamoDTO = {
@@ -398,11 +398,12 @@ describe("libroService - actualizarLibro", () => {
   it("llama al endpoint correcto con el id del libro", async () => {
     mockedAxios.put.mockResolvedValueOnce({ data: libroDTOMock })
 
-    await libroService.actualizarLibro(libroDTOMock)
+    await libroService.actualizarLibro(libroDTOMock, 3)
 
     expect(mockedAxios.put).toHaveBeenCalledWith(
       expect.stringContaining("/libros/1"),
       libroDTOMock,
+      { params: { usuarioId: 3 } },
     )
   })
 
@@ -410,29 +411,31 @@ describe("libroService - actualizarLibro", () => {
     const dtoConId5 = { ...libroDTOMock, id: 5 }
     mockedAxios.put.mockResolvedValueOnce({ data: dtoConId5 })
 
-    await libroService.actualizarLibro(dtoConId5)
+    await libroService.actualizarLibro(dtoConId5, 3)
 
     expect(mockedAxios.put).toHaveBeenCalledWith(
       expect.stringContaining("/libros/5"),
       expect.anything(),
+      { params: { usuarioId: 3 } },
     )
   })
 
   it("envía el DTO completo como body", async () => {
     mockedAxios.put.mockResolvedValueOnce({ data: libroDTOMock })
 
-    await libroService.actualizarLibro(libroDTOMock)
+    await libroService.actualizarLibro(libroDTOMock, 3)
 
     expect(mockedAxios.put).toHaveBeenCalledWith(
       expect.any(String),
       libroDTOMock,
+      { params: { usuarioId: 3 } },
     )
   })
 
   it("devuelve una instancia de Libro", async () => {
     mockedAxios.put.mockResolvedValueOnce({ data: libroDTOMock })
 
-    const result = await libroService.actualizarLibro(libroDTOMock)
+    const result = await libroService.actualizarLibro(libroDTOMock, 3)
 
     expect(result).toBeInstanceOf(Libro)
   })
@@ -441,7 +444,7 @@ describe("libroService - actualizarLibro", () => {
     const dtoActualizado = { ...libroDTOMock, titulo: "Clean Code 2nd Ed" }
     mockedAxios.put.mockResolvedValueOnce({ data: dtoActualizado })
 
-    const result = await libroService.actualizarLibro(dtoActualizado)
+    const result = await libroService.actualizarLibro(dtoActualizado, 3)
 
     expect(result.titulo).toBe("Clean Code 2nd Ed")
   })
@@ -449,7 +452,7 @@ describe("libroService - actualizarLibro", () => {
   it("propaga el error si axios falla", async () => {
     mockedAxios.put.mockRejectedValueOnce(new Error("Not Found"))
 
-    await expect(libroService.actualizarLibro(libroDTOMock)).rejects.toThrow(
+    await expect(libroService.actualizarLibro(libroDTOMock, 3)).rejects.toThrow(
       "Not Found",
     )
   })

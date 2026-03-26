@@ -51,13 +51,13 @@ export const PerfilUsuario = () => {
       toast.success("¡Perfil actualizado con éxito!")
     } catch (e: unknown) {
       const err = obtenerMensajeError(e)
-      throw e
       toast.error(err.mensaje || "No se pudo actualizar el perfil.")
+      throw e
     }
   }
 
   const manejarAgregarLibro = () => {
-    navigate("/Libros/nuevo/editar")
+    navigate("/libros/nuevo/editar")
   }
 
   const manejarEliminarLibro = async (libroId: number) => {
