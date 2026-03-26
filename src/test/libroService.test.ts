@@ -403,6 +403,7 @@ describe("libroService - actualizarLibro", () => {
     expect(mockedAxios.put).toHaveBeenCalledWith(
       expect.stringContaining("/libros/1"),
       libroDTOMock,
+      { params: { usuarioId: 3 } },
     )
   })
 
@@ -415,6 +416,7 @@ describe("libroService - actualizarLibro", () => {
     expect(mockedAxios.put).toHaveBeenCalledWith(
       expect.stringContaining("/libros/5"),
       expect.anything(),
+      { params: { usuarioId: 3 } },
     )
   })
 
@@ -426,6 +428,7 @@ describe("libroService - actualizarLibro", () => {
     expect(mockedAxios.put).toHaveBeenCalledWith(
       expect.any(String),
       libroDTOMock,
+      { params: { usuarioId: 3 } },
     )
   })
 

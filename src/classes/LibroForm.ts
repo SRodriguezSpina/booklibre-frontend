@@ -63,6 +63,9 @@ export class LibroForm {
   ];
 
   static fromLibro(libro: Libro): LibroForm {
+    const parsed = libro.fechaPublicacion
+      ? new Date(libro.fechaPublicacion + "T12:00:00Z")
+      : undefined
     const form = new LibroForm();
     form.titulo = libro.titulo;
     form.autor = libro.autor;
@@ -73,9 +76,7 @@ export class LibroForm {
     form.isbn = libro.isbn || "";
     form.idioma = libro.idioma || "";
     form.estado = libro.estado;
-    form.fechaPublicacion = libro.fechaPublicacion
-      ? new Date(libro.fechaPublicacion + "T12:00:00")
-      : undefined;
+    form.fechaPublicacion = parsed && !isNaN(parsed.getTime()) ? parsed : undefined
     form.propietarioId = libro.propietarioId;
     form.imagenUrl = libro.imagenUrl || "";
     form.editorial = libro.editorial || "";
