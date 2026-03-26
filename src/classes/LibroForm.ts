@@ -64,7 +64,7 @@ export class LibroForm {
 
   static fromLibro(libro: Libro): LibroForm {
     const parsed = libro.fechaPublicacion
-      ? new Date(libro.fechaPublicacion + "T12:00:00Z")
+      ? new Date(libro.fechaPublicacion + "T12:00:00Z") // Sumo 12hs para evitar que la zona horaria afecte la fecha al parsear
       : undefined
     const form = new LibroForm();
     form.titulo = libro.titulo;
