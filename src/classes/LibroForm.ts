@@ -6,6 +6,7 @@ import type {
   Idioma,
 } from "../models/libroModel";
 import { Libro } from "./Libro";
+import { parseISO, isValid, isFuture, startOfDay } from "date-fns";
 
 export class LibroForm {
   titulo: string = "";
@@ -63,9 +64,6 @@ export class LibroForm {
   ];
 
   static fromLibro(libro: Libro): LibroForm {
-    const parsed = libro.fechaPublicacion
-      ? new Date(libro.fechaPublicacion + "T12:00:00Z") // Sumo 12hs para evitar que la zona horaria afecte la fecha al parsear
-      : undefined
     const form = new LibroForm();
     form.titulo = libro.titulo;
     form.autor = libro.autor;
@@ -76,10 +74,14 @@ export class LibroForm {
     form.isbn = libro.isbn || "";
     form.idioma = libro.idioma || "";
     form.estado = libro.estado;
-    form.fechaPublicacion = parsed && !isNaN(parsed.getTime()) ? parsed : undefined
     form.propietarioId = libro.propietarioId;
     form.imagenUrl = libro.imagenUrl || "";
     form.editorial = libro.editorial || "";
+    if (libro.fechaPublicacion) {
+      // parseISO maneja "YYYY-MM-DD" sin problemas de zona horaria
+      const parsed = parseISO(libro.fechaPublicacion);
+      form.fechaPublicacion = isValid(parsed) ? parsed : undefined;
+    }
     return form;
   }
 
@@ -105,10 +107,9 @@ export class LibroForm {
     };
 
     if (!errors.fechaPublicacion && this.fechaPublicacion) {
-      const hoy = new Date()
-      hoy.setHours(0, 0, 0, 0)
-      if (this.fechaPublicacion > hoy) {
-        errors.fechaPublicacion = "La fecha de publicación no puede ser futura"
+      // isFuture compara contra ahora; usamos startOfDay para ignorar la hora
+      if (isFuture(startOfDay(this.fechaPublicacion))) {
+        errors.fechaPublicacion = "La fecha de publicación no puede ser futura";
       }
     }
 

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
+import { parseISO, isValid, isFuture, startOfDay, format } from "date-fns"
 import { Calendario } from "../components/ui/Calendario"
 import { LibroForm } from "../classes/LibroForm"
 import { libroService } from "../services/libroService"
@@ -8,6 +9,16 @@ import { useOnInit } from "../utils/hooks"
 import { toast } from "react-toastify"
 
 type Values = Record<string, string>
+
+/** "YYYY-MM-DD" → Date (medianoche local).  Devuelve undefined si inválido. */
+const parseNativeDate = (value: string): Date | undefined => {
+  if (!value) return undefined;
+  const parsed = parseISO(value);           // date-fns: sin problemas de TZ
+  return isValid(parsed) ? parsed : undefined;
+};
+ 
+/** Date → "YYYY-MM-DD" para el value del <input type="date">. */
+const dateToInputValue = (date: Date): string => format(date, "yyyy-MM-dd");
 
 const emptyValues = (): Values => ({
   titulo: "",
@@ -30,47 +41,9 @@ const fromValues = (values: Values): LibroForm => {
   Object.assign(instance, {
     ...values,
     paginas: values.paginas === "" ? "" : Number(values.paginas),
-    fechaPublicacion: values.fechaPublicacion ? parseFechaPublicacion(values.fechaPublicacion) : undefined,
+    fechaPublicacion: parseNativeDate(values.fechaPublicacion),
   })
   return instance
-}
-
-const parseFechaPublicacion = (value: string): Date | null => {
-  const parts = value.split("/")
-  if (parts.length !== 3) return null
-
-  const [dayStr, monthStr, yearStr] = parts
-  const day = Number(dayStr)
-  const month = Number(monthStr)
-  const year = Number(yearStr)
-
-  if ([day, month, year].some((v) => Number.isNaN(v))) return null
-  if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1 || year > 9999) return null
-
-  const date = new Date(year, month - 1, day)
-  if (date.getDate() !== day || date.getMonth() !== month - 1 || date.getFullYear() !== year) return null
-
-  return date
-}
-
-const fechaToString = (date: Date): string =>
-  date.toLocaleDateString('es', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  })
-
-const isFechaPublicacionValid = (value: string): boolean => {
-  if (value.length <= 10) {
-    return true
-  }
-  
-  const parsed = parseFechaPublicacion(value)
-  if (!parsed) return false
-
-  const hoy = new Date()
-  hoy.setHours(0, 0, 0, 0)
-  return parsed <= hoy
 }
 
 const toValues = (form: LibroForm): Values => ({
@@ -83,7 +56,7 @@ const toValues = (form: LibroForm): Values => ({
   isbn: form.isbn,
   idioma: form.idioma,
   estado: form.estado,
-  fechaPublicacion: form.fechaPublicacion ? fechaToString(form.fechaPublicacion) : "",
+  fechaPublicacion: form.fechaPublicacion ? dateToInputValue(form.fechaPublicacion) : "",
   propietarioId: String(form.propietarioId),
   imagenUrl: form.imagenUrl,
   editorial: form.editorial
@@ -114,34 +87,21 @@ export const EditarLibro = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loading, setLoading] = useState(!esNuevo)
   const [previewPortada, setPreviewPortada] = useState<string | null>(null)
-  const [fechaPublicacionDate, setFechaPublicacionDate] = useState<Date | undefined>(undefined)
   const [fechaPickerAbierto, setFechaPickerAbierto] = useState(false)
+  const [mesCalendario, setMesCalendario] = useState<Date | undefined>(undefined)
   const inputPortadaRef = useRef<HTMLInputElement>(null)
 
   const diasNoSeleccionables = useMemo(() => {
-    const hoy = new Date()
-    hoy.setHours(0, 0, 0, 0)
-    return [{ from: hoy, to: new Date(9999, 11, 31) }]
+    const manana = startOfDay(new Date())
+    manana.setDate(manana.getDate() + 1)
+    return [{ from: manana, to: new Date(9999, 11, 31) }]
   }, [])
-
-  const [mesCalendario, setMesCalendario] = useState<Date | undefined>(undefined)
-
 
   useEffect(() => {
     return () => {
       if (previewPortada) URL.revokeObjectURL(previewPortada)
     }
   }, [previewPortada])
-
-  useEffect(() => {
-    if (fechaPickerAbierto) {
-      if (fechaPublicacionDate) {
-        setMesCalendario(new Date(fechaPublicacionDate.getFullYear(), fechaPublicacionDate.getMonth()))
-      } else {
-        setMesCalendario(new Date())
-      }
-    }
-  }, [fechaPickerAbierto, fechaPublicacionDate])
 
   const titulo = esNuevo ? "Nuevo libro" : "Editar libro"
 
@@ -153,13 +113,8 @@ export const EditarLibro = () => {
     }
     try {
       const libro = await libroService.getLibroById(Number(id))
-      const formValues = toValues(LibroForm.fromLibro(libro))
-      setValues(formValues)
-      if (formValues.fechaPublicacion) {
-        const parsed = parseFechaPublicacion(formValues.fechaPublicacion)
-        if (parsed) setFechaPublicacionDate(parsed)
-      }
-    } catch (e) {
+      setValues(toValues(LibroForm.fromLibro(libro)))
+    } catch {
       toast.error("No se pudo cargar el libro.")
       navigate("/home")
     } finally {
@@ -168,24 +123,20 @@ export const EditarLibro = () => {
   })
 
   const handleChange = (name: string, value: string) => {
-    if (name === "fechaPublicacion" && !isFechaPublicacionValid(value)) {
-      return
-    }
-
     setValues((prev) => ({ ...prev, [name]: value }))
     setErrors((prev) => ({ ...prev, [name]: undefined }))
     setServerError(null)
+  }
 
-    if (name === "fechaPublicacion") {
-      if (value.length === 10) {
-        const parsed = parseFechaPublicacion(value)
-        if (parsed) {
-          setFechaPublicacionDate(parsed)
-        }
-      } else {
-        setFechaPublicacionDate(undefined)
-      }
-    }
+  const handleFechaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value   // "YYYY-MM-DD" o ""
+    handleChange("fechaPublicacion", value)
+  }
+
+  const handleFechaFromCalendar = (range: { from?: Date; to?: Date } | undefined) => {
+    if (!range?.from) return
+    handleChange("fechaPublicacion", dateToInputValue(range.from))
+    setFechaPickerAbierto(false)
   }
 
   const handleElegirImagen = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -239,6 +190,15 @@ export const EditarLibro = () => {
     }
   }
 
+  const fechaComoDate = parseNativeDate(values.fechaPublicacion)
+  const fechaEsFutura = fechaComoDate && isFuture(startOfDay(fechaComoDate))
+
+  useEffect(() => {
+    if (fechaComoDate) {
+      setMesCalendario(fechaComoDate)
+    }
+  }, [fechaComoDate])
+
   if (loading) {
     return (
       <div className="flex justify-center py-20 italic text-primary font-medium">
@@ -285,6 +245,7 @@ export const EditarLibro = () => {
               label={field.label}
               type={field.type}
               placeholder={field.placeholder}
+              maxLength={field.name === "isbn" ? 13 : undefined}
               value={values[field.name] ?? ""}
               error={errors[field.name]}
               onChange={(v) => handleChange(field.name, v)}
@@ -296,36 +257,34 @@ export const EditarLibro = () => {
             Fecha de publicación <span className="text-primary">*</span>
           </label>
           <input
-            type="text"
+            type="date"
             value={values.fechaPublicacion}
-            placeholder="dd/mm/yyyy"
-            maxLength={10}
+            max={format(new Date(), "yyyy-MM-dd")}
+            onChange={handleFechaChange}
             onFocus={() => setFechaPickerAbierto(true)}
-            onChange={(e) => handleChange("fechaPublicacion", e.target.value)}
-            className={`w-full px-4 py-2.5 rounded-lg border bg-background text-secondary-dark text-sm placeholder:text-secondary-light outline-none transition-colors focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed ${
-              errors.fechaPublicacion ? "border-red-400" : "border-accent"
-            }`}
+            className={`w-full px-4 py-2.5 rounded-lg border bg-background text-secondary-dark text-sm outline-none transition-colors focus:border-primary
+              ${errors.fechaPublicacion || fechaEsFutura ? "border-red-400" : "border-accent"}`}
           />
           {errors.fechaPublicacion && <p className="text-xs text-red-500">{errors.fechaPublicacion}</p>}
           {fechaPickerAbierto && (
             <div className="mt-2 rounded-lg border border-accent bg-surface-high p-2">
               <Calendario
                 rangeSeleccionado={
-                  fechaPublicacionDate
-                    ? { from: fechaPublicacionDate, to: fechaPublicacionDate }
+                  fechaComoDate
+                    ? { from: fechaComoDate, to: fechaComoDate }
                     : undefined
                 }
-                onSelect={(range) => {
-                  if (!range?.from) return
-                  const iso = fechaToString(range.from)
-                  handleChange("fechaPublicacion", iso)
-                  setFechaPublicacionDate(range.from)
-                  setFechaPickerAbierto(false)
-                }}
+                onSelect={handleFechaFromCalendar}
                 diasDeshabilitados={diasNoSeleccionables}
                 mes={mesCalendario}
-                onMesCambio={setMesCalendario}
               />
+              <button
+                type="button"
+                onClick={() => setFechaPickerAbierto(false)}
+                className="mt-1 w-full text-xs text-secondary/50 hover:text-secondary/80 transition-colors py-1"
+              >
+                Cerrar calendario
+              </button>
             </div>
           )}
         </div>
@@ -479,6 +438,7 @@ interface FieldProps {
   label: string
   type?: string
   placeholder?: string
+  maxLength?: number
   value: string
   error?: string
   disabled?: boolean
@@ -489,6 +449,7 @@ const Field = ({
   label,
   type = "text",
   placeholder,
+  maxLength,
   value,
   error,
   disabled,
@@ -502,6 +463,7 @@ const Field = ({
       type={type}
       value={value}
       placeholder={placeholder}
+      maxLength={maxLength}
       disabled={disabled}
       onChange={(e) => onChange(e.target.value)}
       className={`w-full px-4 py-2.5 rounded-lg border bg-background text-secondary-dark text-sm placeholder:text-secondary-light outline-none transition-colors focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed ${

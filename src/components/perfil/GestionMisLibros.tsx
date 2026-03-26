@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Boton, Card, Tabs } from '../ui'
 import type { LibroUsuarioItemDTO } from '../../models/libroModel'
@@ -15,8 +16,10 @@ export type PropsGestionMisLibros = {
   onReintentar?: () => void
 }
 
+
 export const GestionMisLibros = ({libros,onAgregar,onEliminar,cargando = false,error = null,onReintentar}: PropsGestionMisLibros) => {
   const {alCambiarFiltro,cambiarOrden,campoOrden,filtro,librosFiltrados,librosPagina,paginaAjustada,rangoEtiqueta,sentidoOrden,setPagina,totalPaginas} = useGestionMisLibros(libros)
+  const [animating, setAnimating] = useState(false)
 
   const solicitarEliminar = (id: number) => {
     if (!onEliminar) return
@@ -24,6 +27,23 @@ export const GestionMisLibros = ({libros,onAgregar,onEliminar,cargando = false,e
       '¿Eliminar este libro? Esta acción no se puede deshacer.',
     )
     if (ok) void onEliminar(id)
+  }
+
+// Animación para el cambio de filtro
+  const handleCambiarFiltro = (id: string) => {
+    setAnimating(true)
+    setTimeout(() => {
+      alCambiarFiltro(id)
+      setAnimating(false)
+    }, 150)
+  }
+// Animación para el cambio de página
+  const handleCambiarPagina = (nueva: number) => {
+    setAnimating(true)
+    setTimeout(() => {
+      setPagina(nueva)
+      setAnimating(false)
+    }, 150)
   }
 
   return (
@@ -47,7 +67,7 @@ export const GestionMisLibros = ({libros,onAgregar,onEliminar,cargando = false,e
           <Tabs
             pestañas={pestañasMisLibros}
             idActivo={filtro}
-            alCambiar={alCambiarFiltro}
+            alCambiar={handleCambiarFiltro}
           />
         </div>
 
@@ -100,60 +120,60 @@ export const GestionMisLibros = ({libros,onAgregar,onEliminar,cargando = false,e
                 </Boton>
               )}
             </div>
-          ) : libros.length === 0 ? (
-            <div
-              className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in duration-300"
-              style={{ animationDelay: "40ms" }}
-            >
-              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                📚
-              </div>
-              <div className="text-secondary font-bold text-lg">
-                Aún no tienes libros
-              </div>
-              <p className="text-secondary/50 text-sm max-w-62.5 mt-1">
-                ¡Comienza agregando tu primer libro a la colección!
-              </p>
-            </div>
-          ) : librosFiltrados.length === 0 ? (
-            <div
-              className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in duration-300"
-              style={{ animationDelay: "40ms" }}
-            >
-              <div className="text-secondary font-bold text-lg">
-                No se encontraron resultados
-              </div>
-              <p className="text-secondary/50 text-sm mt-1">
-                Prueba cambiando el filtro de búsqueda.
-              </p>
-              <Boton
-                tipo="secundario"
-                onClick={() => alCambiarFiltro('todos')}
-                className="mt-4 px-4 py-2 text-xs"
-              >
-                Ver todos los libros
-              </Boton>
-            </div>
           ) : (
-            <div className="animate-in fade-in duration-300" style={{ animationDelay: "60ms" }}>
-              <TablaLibros
-                libros={librosPagina}
-                campoOrden={campoOrden}
-                sentidoOrden={sentidoOrden}
-                alCambiarOrden={cambiarOrden}
-                alEliminar={solicitarEliminar}
-              />
+            <div
+              className={`transition-all duration-150 ${animating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"}`}
+            >
+              {libros.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                    📚
+                  </div>
+                  <div className="text-secondary font-bold text-lg">
+                    Aún no tienes libros
+                  </div>
+                  <p className="text-secondary/50 text-sm max-w-62.5 mt-1">
+                    ¡Comienza agregando tu primer libro a la colección!
+                  </p>
+                </div>
+              ) : librosFiltrados.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="text-secondary font-bold text-lg">
+                    No se encontraron resultados
+                  </div>
+                  <p className="text-secondary/50 text-sm mt-1">
+                    Prueba cambiando el filtro de búsqueda.
+                  </p>
+                  <Boton
+                    tipo="secundario"
+                    onClick={() => handleCambiarFiltro('todos')}
+                    className="mt-4 px-4 py-2 text-xs"
+                  >
+                    Ver todos los libros
+                  </Boton>
+                </div>
+              ) : (
+                <>
+                  <TablaLibros
+                    libros={librosPagina}
+                    campoOrden={campoOrden}
+                    sentidoOrden={sentidoOrden}
+                    alCambiarOrden={cambiarOrden}
+                    alEliminar={solicitarEliminar}
+                  />
 
-              <div className="text-xs text-secondary/40 font-medium mt-4">
-                Mostrando {rangoEtiqueta.desde}–{rangoEtiqueta.hasta} de{' '}
-                {rangoEtiqueta.total} libros
-              </div>
+                  <div className="text-xs text-secondary/40 font-medium mt-4">
+                    Mostrando {rangoEtiqueta.desde}–{rangoEtiqueta.hasta} de{' '}
+                    {rangoEtiqueta.total} libros
+                  </div>
 
-              <Paginacion
-                pagina={paginaAjustada}
-                totalPaginas={totalPaginas}
-                alCambiar={(nueva) => setPagina(nueva)}
-              />
+                  <Paginacion
+                    pagina={paginaAjustada}
+                    totalPaginas={totalPaginas}
+                    alCambiar={handleCambiarPagina}
+                  />
+                </>
+              )}
             </div>
           )}
         </div>
