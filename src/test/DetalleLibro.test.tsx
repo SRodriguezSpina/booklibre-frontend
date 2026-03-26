@@ -7,8 +7,12 @@ import { Libro } from '../classes/Libro'
 import { AuthContext } from '../context/AuthContext'
 import type { UsuarioData } from '../classes/usuario'
 
-// Solo mockeamos el servicio, dejamos los hooks en paz
-vi.mock('../services/libroService')
+vi.mock('../services/libroService', () => ({
+  libroService: {
+    getLibroById: vi.fn(),
+    getCalificaciones: vi.fn(),
+  }
+}))
 
 describe('DetalleLibro', () => {
   const mockUsuario: UsuarioData = {
@@ -45,10 +49,10 @@ describe('DetalleLibro', () => {
 
   it('muestra spinner al cargar y luego renderiza el libro', async () => {
     vi.mocked(libroService.getLibroById).mockResolvedValueOnce(
-      new Libro({ 
-        id: 1, 
-        titulo: 'El Aleph', 
-        autor: 'Borges', 
+      new Libro({
+        id: 1,
+        titulo: 'El Aleph',
+        autor: 'Borges',
         descripcion: 'Cuentos',
         reservas: [],
         ultimasCalificaciones: []
@@ -56,13 +60,10 @@ describe('DetalleLibro', () => {
     )
 
     renderConContexto('/libros/1')
-
     expect(screen.getByText('Cargando...')).toBeInTheDocument()
 
-    await waitFor(() => {
-      expect(screen.getByText('El Aleph')).toBeInTheDocument()
-      expect(screen.getByText('Borges')).toBeInTheDocument()
-    })
+    expect(await screen.findByRole('heading', { name: 'El Aleph' })).toBeInTheDocument()
+    expect(await screen.findByText('Borges')).toBeInTheDocument()
   })
 
   it('muestra mensaje de error si el libro no existe en la base de datos', async () => {
