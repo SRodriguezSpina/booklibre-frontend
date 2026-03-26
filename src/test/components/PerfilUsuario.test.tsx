@@ -9,6 +9,7 @@ const mockNavigate = vi.fn()
 const mockUseOutletContext = vi.fn()
 const mockObtenerLibrosUsuarioPerfil = vi.fn()
 const mockActualizarUsuario = vi.fn()
+const mockSetUsuarioContext = vi.fn()
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
@@ -38,6 +39,16 @@ vi.mock('react-toastify', () => ({
     error: vi.fn(),
   },
 }))
+
+vi.mock('../../utils/hooks', async () => {
+  const actual = await vi.importActual<typeof import('../../utils/hooks')>('../../utils/hooks')
+  return {
+    ...actual,
+    useAuthContext: () => ({
+      setUsuarioContext: mockSetUsuarioContext,
+    }),
+  }
+})
 
 vi.mock('../../components/perfil/PerfilResumen', () => ({
   PerfilResumen: ({ onEditar }: { onEditar: () => void }) => (
@@ -125,9 +136,12 @@ describe('PerfilUsuario', () => {
 
     await waitFor(() => {
       expect(mockSetUsuario).toHaveBeenCalledTimes(1)
+      expect(mockSetUsuarioContext).toHaveBeenCalledTimes(1)
       const usuarioSeteado = mockSetUsuario.mock.calls[0][0] as Usuario
       expect(usuarioSeteado.nombre).toBe('Ana 2')
       expect(usuarioSeteado.imagenUrl).toBe('img-local')
+      const usuarioContexto = mockSetUsuarioContext.mock.calls[0][0] as Usuario
+      expect(usuarioContexto.imagenUrl).toBe('img-local')
       expect(toast.success).toHaveBeenCalledWith('¡Perfil actualizado con éxito!')
     })
   })
