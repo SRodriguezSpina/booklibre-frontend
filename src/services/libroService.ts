@@ -69,9 +69,9 @@ export const libroService = {
     return Libro.fromJson(res.data)
   },
 
-  async actualizarLibro(dto: LibroDTO): Promise<Libro> {
+  async actualizarLibro(dto: LibroDTO, usuarioId: number): Promise<Libro> {
     const res = await axios.put<LibroDTO>(
-      `${API_BASE_URL}/libros/${dto.id}`,
+      `${API_BASE_URL}/libros/${dto.id}?usuarioId=${usuarioId}`,
       dto,
     )
     return Libro.fromJson(res.data)

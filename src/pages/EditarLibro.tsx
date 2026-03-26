@@ -189,19 +189,19 @@ export const EditarLibro = () => {
   }
 
   const handleElegirImagen = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0]
-  e.target.value = ""
-  if (!file || !file.type.startsWith("image/")) return
-  if (previewPortada) URL.revokeObjectURL(previewPortada)
-  setPreviewPortada(URL.createObjectURL(file))
-  try {
-    const dataUrl = await archivoADataUrl(file)
-    handleChange("imagenUrl", dataUrl)
-  } catch (err) {
-    setPreviewPortada(null)
-    setServerError(err instanceof Error ? err.message : "No se pudo leer la imagen.")
+    const file = e.target.files?.[0]
+    e.target.value = ""
+    if (!file || !file.type.startsWith("image/")) return
+    if (previewPortada) URL.revokeObjectURL(previewPortada)
+    setPreviewPortada(URL.createObjectURL(file))
+    try {
+      const dataUrl = await archivoADataUrl(file)
+      handleChange("imagenUrl", dataUrl)
+    } catch (err) {
+      setPreviewPortada(null)
+      setServerError(err instanceof Error ? err.message : "No se pudo leer la imagen.")
+    }
   }
-}
 
   const handleQuitarImagen = (
     fieldName: "imagenUrl",
@@ -229,7 +229,7 @@ export const EditarLibro = () => {
           Number(values.propietarioId),
         )
       } else {
-        await libroService.actualizarLibro(instance.toDTO(Number(id)))
+        await libroService.actualizarLibro(instance.toDTO(Number(id)), Number(values.propietarioId))
       }
       navigate("/home")
     } catch {
