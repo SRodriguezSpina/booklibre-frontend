@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { useOnInit } from "../utils/hooks"
 import { libroService } from "../services/libroService"
 import { Libro } from "../classes/Libro"
@@ -8,9 +8,11 @@ import { ReservaCard } from "../components/detalleLibros/ReservaCard"
 import { InfoLibro } from "../components/detalleLibros/InfoLibro"
 import { Card } from "../components/ui/Card"
 import { useAuthContext } from "../utils/hooks"
+import { ChevronRight } from "lucide-react"
 
 export const DetalleLibro = () => {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [libro, setLibro] = useState<Libro>()
   const [loading, setLoading] = useState(true)
 
@@ -55,6 +57,15 @@ export const DetalleLibro = () => {
       <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto pt-20">
 
         <div className="w-full lg:w-1/3 flex flex-col gap-6">
+          
+          <button
+            type="button"
+            onClick={() => navigate("/home")}
+            className="flex items-center gap-1.5 text-xs font-semibold text-secondary/50 hover:text-secondary transition-colors w-fit"
+          >
+            Explorar <ChevronRight size={14} /> <span className="text-secondary-dark">{libro.titulo}</span>
+          </button>
+
           <Card className="p-4 flex justify-center">
             <img src={libro.imagenUrl} alt={libro.titulo} className="w-full max-w-[280px] rounded-md shadow-md object-cover" />
           </Card>

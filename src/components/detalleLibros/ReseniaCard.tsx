@@ -7,7 +7,7 @@ interface ReseniaCardProps {
 
 export const ReseniaCard = ({ calificacion, truncate = false }: ReseniaCardProps) => {
   return (
-    <div className="bg-surface border border-accent/20 rounded-2xl p-5 flex flex-col gap-3 hover:border-accent/40 transition-colors h-full">
+    <section className="bg-surface border border-accent/20 rounded-2xl p-5 flex flex-col gap-3 hover:border-accent/40 transition-colors h-full">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary-light text-sm font-bold shrink-0">
           {calificacion.nombreUsuario.charAt(0).toUpperCase()}
@@ -32,6 +32,6 @@ export const ReseniaCard = ({ calificacion, truncate = false }: ReseniaCardProps
           {calificacion.comentario}
         </p>
       )}
-    </div>
+    </section>
   )
 }
