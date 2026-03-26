@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest' // <-- Agregamos afterEach
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { Home } from '../../pages/Home'
@@ -17,15 +17,13 @@ vi.mock('../../services/AuthService', () => ({
     }
 }))
 
-
-
 const mockedHomeService = vi.mocked(homeService)
 const mockedAuthService = vi.mocked(authService)
 
 const librosMock = [
     {
         id: 1,
-        imagenUrl: '',
+        imagenUrl: '', 
         genero: 'DRAMA' as const,
         titulo: 'Clean Code',
         autor: 'Robert C. Martin',
@@ -53,14 +51,20 @@ const renderHome = () =>
     )
 
 describe('Home', () => {
-
     beforeEach(() => {
         vi.clearAllMocks()
         mockedAuthService.obtenerIdUsuarioActual.mockReturnValue(null)
+    
+        vi.useFakeTimers({ shouldAdvanceTime: true })
+    })
+
+    afterEach(() => {
+        vi.runOnlyPendingTimers() 
+        vi.useRealTimers() 
     })
 
     it('muestra el spinner mientras carga', async () => {
-        mockedHomeService.search.mockReturnValue(new Promise(() => {})) // nunca resuelve
+        mockedHomeService.search.mockReturnValue(new Promise(() => {}))
 
         renderHome()
 
@@ -71,6 +75,8 @@ describe('Home', () => {
         mockedHomeService.search.mockResolvedValueOnce(responseMock())
 
         renderHome()
+
+        vi.advanceTimersByTime(200)
 
         await waitFor(() => {
             expect(screen.getByTestId('libros-grid')).toBeInTheDocument()
@@ -83,6 +89,8 @@ describe('Home', () => {
 
         renderHome()
 
+        vi.advanceTimersByTime(200)
+
         await waitFor(() => {
             expect(screen.getByTestId('empty-state')).toBeInTheDocument()
         })
@@ -92,6 +100,8 @@ describe('Home', () => {
         mockedHomeService.search.mockRejectedValueOnce(new Error('Network Error'))
 
         renderHome()
+
+        vi.advanceTimersByTime(200)
 
         await waitFor(() => {
             expect(screen.getByTestId('error-card')).toBeInTheDocument()
@@ -103,6 +113,8 @@ describe('Home', () => {
 
         renderHome()
 
+        vi.advanceTimersByTime(200)
+
         await waitFor(() => {
             expect(mockedHomeService.search).toHaveBeenCalledTimes(1)
         })
@@ -110,16 +122,22 @@ describe('Home', () => {
 
     it('llama al service con el nuevo sort al cambiar el SortBy', async () => {
         mockedHomeService.search
-            .mockResolvedValueOnce(responseMock())  // llamada inicial
-            .mockResolvedValueOnce(responseMock())  // llamada por cambio de sort
+            .mockResolvedValueOnce(responseMock())  
+            .mockResolvedValueOnce(responseMock())  
 
         renderHome()
-
-        await waitFor(() => screen.getByTestId('sort-select'))
+        
+        vi.advanceTimersByTime(200)
+        
+        await waitFor(() => {
+            expect(screen.getByTestId('sort-select')).toBeInTheDocument()
+        })
 
         fireEvent.change(screen.getByTestId('sort-select'), {
             target: { value: 'autor' }
         })
+
+        vi.advanceTimersByTime(200)
 
         await waitFor(() => {
             expect(mockedHomeService.search).toHaveBeenCalledTimes(2)

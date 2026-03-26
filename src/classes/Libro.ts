@@ -34,6 +34,7 @@ export class Libro {
   editorial?: string
   fechaPublicacion?: string
   cantidadReservas?: number
+  cantidadCalificaciones?: number
   reservas: RangoReservaDTO[]
   ultimasCalificaciones: CalificacionDTO[]
 
