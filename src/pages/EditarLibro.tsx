@@ -420,22 +420,13 @@ interface ImagePickerProps {
 const ImagePicker = ({
   label,
   src,
-  shape,
   inputRef,
   onElegir,
   onQuitar,
   deshabilitado,
 }: ImagePickerProps) => {
-  const previewClass =
-    shape === "circle"
-      ? "w-20 h-20 rounded-full object-cover border border-accent bg-surface-high"
-      : "w-20 h-28 rounded-lg object-cover border border-accent bg-surface-high"
 
-  const placeholderClass =
-    shape === "circle"
-      ? "w-20 h-20 rounded-full bg-surface-high border border-accent flex items-center justify-center text-secondary/30 text-2xl shrink-0"
-      : "w-20 h-28 rounded-lg bg-surface-high border border-accent flex items-center justify-center text-secondary/30 text-2xl shrink-0"
-
+  const placeholderClass = "w-20 h-28 rounded-lg bg-surface-high border border-accent flex items-center justify-center text-secondary/30 text-2xl shrink-0"
   return (
     <div className="flex flex-col gap-1">
       <label className="text-xs font-bold text-secondary-light uppercase tracking-wider">
@@ -443,7 +434,7 @@ const ImagePicker = ({
       </label>
       <div className="flex items-center gap-4">
         {src ? (
-          <img src={src} alt={label} className={`${previewClass} shrink-0`} />
+          <img src={src} alt={label} className={`${placeholderClass} shrink-0`} />
         ) : (
           <div className={placeholderClass}>
             📖
