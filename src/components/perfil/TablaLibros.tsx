@@ -70,7 +70,7 @@ export const TablaLibros = ({libros,campoOrden,sentidoOrden,alCambiarOrden,alEli
             return (
               <tr
                 key={libro.id}
-                className="group hover:bg-gray-50/50 transition-colors"
+                className="group hover:bg-accent/5 transition-all duration-150 cursor-default"
               >
                 <td className="py-4">
                   <div className="flex items-center gap-4">
@@ -78,7 +78,7 @@ export const TablaLibros = ({libros,campoOrden,sentidoOrden,alCambiarOrden,alEli
                       <img
                         src={libro.imagenUrl}
                         alt={`Portada de ${libro.titulo}`}
-                        className="w-10 h-14 rounded-md object-cover border border-secondary/10 shrink-0"
+                        className="w-10 h-14 rounded-md object-cover border border-secondary/10 shrink-0 transition-transform duration-150 group-hover:scale-105"
                         loading="lazy"
                       />
                     ) : (
