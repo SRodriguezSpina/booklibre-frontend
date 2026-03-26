@@ -1,4 +1,5 @@
-import { useEffect } from "react"
+import { useEffect, useContext } from "react"
+import { AuthContext } from "../context/AuthContext"
 
 export const useOnInit = (initialCallBack: () => void) => {
   useEffect(() => {
@@ -8,3 +9,7 @@ export const useOnInit = (initialCallBack: () => void) => {
 }
 
 export const useAlIniciar = useOnInit
+
+export const useAuthContext = () => {
+  return useContext(AuthContext)
+}
