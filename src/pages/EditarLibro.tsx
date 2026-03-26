@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { Calendario } from "../components/ui/Calendario"
 import { LibroForm } from "../classes/LibroForm"
 import { libroService } from "../services/libroService"
 import { authService } from "../services/AuthService"
 import { useOnInit } from "../utils/hooks"
+import { toast } from "react-toastify"
 
 type Values = Record<string, string>
 
@@ -117,9 +118,11 @@ export const EditarLibro = () => {
   const [fechaPickerAbierto, setFechaPickerAbierto] = useState(false)
   const inputPortadaRef = useRef<HTMLInputElement>(null)
 
-  const hoy = new Date()
-  hoy.setHours(0, 0, 0, 0)
-  const diasNoSeleccionables = [{ from: hoy, to: new Date(9999, 11, 31) }]
+  const diasNoSeleccionables = useMemo(() => {
+    const hoy = new Date()
+    hoy.setHours(0, 0, 0, 0)
+    return [{ from: hoy, to: new Date(9999, 11, 31) }]
+  }, [])
 
   const [mesCalendario, setMesCalendario] = useState<Date | undefined>(undefined)
 
@@ -153,12 +156,11 @@ export const EditarLibro = () => {
       const formValues = toValues(LibroForm.fromLibro(libro))
       setValues(formValues)
       if (formValues.fechaPublicacion) {
-        const parsed = new Date(`${formValues.fechaPublicacion}T12:00:00`)
-        if (!Number.isNaN(parsed.getTime())) {
-          setFechaPublicacionDate(parsed)
-        }
+        const parsed = parseFechaPublicacion(formValues.fechaPublicacion)
+        if (parsed) setFechaPublicacionDate(parsed)
       }
-    } catch {
+    } catch (e) {
+      toast.error("No se pudo cargar el libro.")
       navigate("/home")
     } finally {
       setLoading(false)
@@ -186,27 +188,20 @@ export const EditarLibro = () => {
     }
   }
 
-  const handleElegirImagen = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    fieldName: "imagenUrl",
-    setPreview: (url: string | null) => void,
-    currentPreview: string | null,
-  ) => {
-    const file = e.target.files?.[0]
-    e.target.value = ""
-    if (!file || !file.type.startsWith("image/")) return
-
-    if (currentPreview) URL.revokeObjectURL(currentPreview)
-    setPreview(URL.createObjectURL(file))
-
-    try {
-      const dataUrl = await archivoADataUrl(file)
-      handleChange(fieldName, dataUrl)
-    } catch (err) {
-      setPreview(null)
-      setServerError(err instanceof Error ? err.message : "No se pudo leer la imagen.")
-    }
+  const handleElegirImagen = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0]
+  e.target.value = ""
+  if (!file || !file.type.startsWith("image/")) return
+  if (previewPortada) URL.revokeObjectURL(previewPortada)
+  setPreviewPortada(URL.createObjectURL(file))
+  try {
+    const dataUrl = await archivoADataUrl(file)
+    handleChange("imagenUrl", dataUrl)
+  } catch (err) {
+    setPreviewPortada(null)
+    setServerError(err instanceof Error ? err.message : "No se pudo leer la imagen.")
   }
+}
 
   const handleQuitarImagen = (
     fieldName: "imagenUrl",
@@ -275,7 +270,7 @@ export const EditarLibro = () => {
           shape="rect"
           inputRef={inputPortadaRef as React.RefObject<HTMLInputElement>}
           onElegir={(e) =>
-            handleElegirImagen(e, "imagenUrl", setPreviewPortada, previewPortada)
+            handleElegirImagen(e)
           }
           onQuitar={() =>
             handleQuitarImagen("imagenUrl", setPreviewPortada, previewPortada)
@@ -451,7 +446,7 @@ const ImagePicker = ({
           <img src={src} alt={label} className={`${previewClass} shrink-0`} />
         ) : (
           <div className={placeholderClass}>
-            {shape === "circle" ? "👤" : "📖"}
+            📖
           </div>
         )}
         <div className="flex flex-col gap-2">
