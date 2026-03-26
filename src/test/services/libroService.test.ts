@@ -5,13 +5,13 @@ vi.mock("axios")
 const mockedAxios = vi.mocked(axios, true)
 
 // Importamos DESPUÉS del mock para que el módulo use la versión mockeada
-import { libroService } from "../services/libroService"
-import { Libro } from "../classes/Libro"
+import { libroService } from "../../services/libroService"
+import { Libro } from "../../classes/Libro"
 import type {
   LibroDTO,
   PrestamoDTO,
   LibroUsuarioItemDTO,
-} from "../models/libroModel"
+} from "../../models/libroModel"
 
 const libroDTOMock: LibroDTO = {
   id: 1,

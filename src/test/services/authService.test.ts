@@ -5,7 +5,7 @@ vi.mock('axios')
 const mockedAxios = vi.mocked(axios, true)
 
 // Importamos DESPUÉS del mock para que el módulo use la versión mockeada
-import { authService } from '../services/AuthService'
+import { authService } from '../../services/AuthService'
 
 const usuarioMock = {
   id: 1,

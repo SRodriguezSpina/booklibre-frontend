@@ -1,13 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import axios from 'axios'
+import type { UsuarioData } from '../../classes/usuario'
 
 vi.mock('axios')
 const mockedAxios = vi.mocked(axios, true)
 
 // Importar después del mock
-import { usuarioService } from '../services/usuarioService'
+import { usuarioService } from '../../services/usuarioService'
 
-const usuarioDataMock = {
+const usuarioDataMock: UsuarioData = {
   id: 1,
   nombre: 'Juan Pérez',
   desc: 'desc',
@@ -24,12 +25,12 @@ describe('usuarioService — obtenerUsuario', () => {
   })
 
   it('llama al endpoint correcto y devuelve el data', async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: usuarioDataMock } as any)
+    mockedAxios.get.mockResolvedValueOnce({ data: usuarioDataMock })
 
     const result = await usuarioService.obtenerUsuario(1)
 
     expect(mockedAxios.get).toHaveBeenCalledWith(
-      expect.stringContaining('/usuarios/1'),
+      expect.stringContaining('/usuarios/1')
     )
     expect(result).toEqual(usuarioDataMock)
   })
@@ -47,11 +48,11 @@ describe('usuarioService — actualizarUsuario', () => {
   })
 
   it('envía el payload correcto (UsuarioUpdateRequest)', async () => {
-    const usuarioActualizado = { ...usuarioDataMock, nombre: 'Juan 2' }
+    const usuarioActualizado: UsuarioData = { ...usuarioDataMock, nombre: 'Juan 2' }
 
-    mockedAxios.put.mockResolvedValueOnce({ data: usuarioActualizado } as any)
+    mockedAxios.put.mockResolvedValueOnce({ data: usuarioActualizado })
 
-    const result = await usuarioService.actualizarUsuario(usuarioActualizado as any)
+    const result = await usuarioService.actualizarUsuario(usuarioActualizado)
 
     expect(mockedAxios.put).toHaveBeenCalledWith(
       expect.stringContaining('/usuarios/1'),
@@ -63,7 +64,7 @@ describe('usuarioService — actualizarUsuario', () => {
         ciudad: 'Rosario',
         tipoUsuario: 'Lector',
         imagenUrl: null,
-      }),
+      })
     )
 
     expect(result).toEqual(usuarioActualizado)
@@ -73,7 +74,7 @@ describe('usuarioService — actualizarUsuario', () => {
     mockedAxios.put.mockRejectedValueOnce(new Error('Forbidden'))
 
     await expect(
-      usuarioService.actualizarUsuario(usuarioDataMock as any),
+      usuarioService.actualizarUsuario(usuarioDataMock)
     ).rejects.toThrow('Forbidden')
   })
 })

@@ -77,3 +77,88 @@ describe("Libro - fromJson", () => {
     expect(libro.paginas).toBe(464)
   })
 })
+describe("Libro - estaDevuelto()", () => {
+  it("retorna false si fechaHasta es undefined", () => {
+    const libro = Libro.fromPrestamoJson({ ...prestamoBase, fechaHasta: null })
+    expect(libro.estaDevuelto()).toBe(false)
+  })
+
+  it("retorna true si fechaHasta es ayer", () => {
+    const libro = Libro.fromPrestamoJson({ ...prestamoBase, fechaHasta: formatDate(ayer) })
+    expect(libro.estaDevuelto()).toBe(true)
+  })
+
+  it("retorna false si fechaHasta es mañana", () => {
+    const libro = Libro.fromPrestamoJson({ ...prestamoBase, fechaHasta: formatDate(manana) })
+    expect(libro.estaDevuelto()).toBe(false)
+  })
+
+  it("retorna false si fechaHasta es hoy", () => {
+    const libro = Libro.fromPrestamoJson({ ...prestamoBase, fechaHasta: formatDate(hoy) })
+    expect(libro.estaDevuelto()).toBe(false)
+  })
+})
+
+describe("Libro - estaProximoAVencer()", () => {
+  it("retorna true si faltan exactamente 3 días", () => {
+    const en3Dias = new Date(hoy); en3Dias.setDate(hoy.getDate() + 3)
+    const libro = Libro.fromPrestamoJson({ ...prestamoBase, fechaHasta: formatDate(en3Dias) })
+    expect(libro.estaProximoAVencer()).toBe(true)
+  })
+
+  it("retorna true si vence hoy", () => {
+    const libro = Libro.fromPrestamoJson({ ...prestamoBase, fechaHasta: formatDate(hoy) })
+    expect(libro.estaProximoAVencer()).toBe(true)
+  })
+
+  it("retorna false si ya fue devuelto", () => {
+    const libro = Libro.fromPrestamoJson({ ...prestamoBase, fechaHasta: formatDate(ayer) })
+    expect(libro.estaProximoAVencer()).toBe(false)
+  })
+
+  it("retorna false si faltan más de 3 días", () => {
+    const libro = Libro.fromPrestamoJson({ ...prestamoBase, fechaHasta: formatDate(en5Dias) })
+    expect(libro.estaProximoAVencer()).toBe(false)
+  })
+
+  it("retorna false si no tiene fechaHasta", () => {
+    const libro = Libro.fromPrestamoJson({ ...prestamoBase, fechaHasta: null })
+    expect(libro.estaProximoAVencer()).toBe(false)
+  })
+})
+
+describe("Libro - calcularBibliokarma()", () => {
+  it("retorna 0 si faltan fechas", () => {
+    const libro = new Libro({ id: 1, tipo: "Comun", paginas: 300, reservas: [], ultimasCalificaciones: [] })
+    expect(libro.calcularBibliokarma("", "", 500)).toBe(0)
+  })
+
+  it("calcula correctamente para LibroComun con karma < 1000", () => {
+    // base = 5 * 10 días = 50; plus = 300 * 5 = 1500; total = 1550
+    const libro = new Libro({ tipo: "Comun", paginas: 300, reservas: [], ultimasCalificaciones: [] })
+    expect(libro.calcularBibliokarma("2026-03-01", "2026-03-10", 500)).toBe(1550)
+  })
+
+  it("calcula correctamente para LibroComun con karma >= 1000", () => {
+    // base = 5 * 10 = 50; plus = 300 * 2 = 600; total = 650
+    const libro = new Libro({ tipo: "Comun", paginas: 300, reservas: [], ultimasCalificaciones: [] })
+    expect(libro.calcularBibliokarma("2026-03-01", "2026-03-10", 1000)).toBe(650)
+  })
+
+  it("calcula correctamente para LibroConDedicatoria sin reservas previas", () => {
+    // base = 5 * 10 = 50; plus = 200 + (10 * 0) = 200; total = 250
+    const libro = new Libro({ tipo: "ConDedicatoria", cantidadReservas: 0, reservas: [], ultimasCalificaciones: [] })
+    expect(libro.calcularBibliokarma("2026-03-01", "2026-03-10", 0)).toBe(250)
+  })
+
+  it("calcula correctamente para LibroColeccionable", () => {
+    // base = 5 * 10 = 50; plus = ceil(2000/5) + 500 = 400 + 500 = 900; total = 950
+    const libro = new Libro({ tipo: "Coleccionable", paginas: 500, reservas: [], ultimasCalificaciones: [] })
+    expect(libro.calcularBibliokarma("2026-03-01", "2026-03-10", 2000)).toBe(950)
+  })
+
+  it("retorna 0 si fechaHasta es anterior a fechaDesde", () => {
+    const libro = new Libro({ tipo: "Comun", paginas: 300, reservas: [], ultimasCalificaciones: [] })
+    expect(libro.calcularBibliokarma("2026-03-10", "2026-03-01", 500)).toBe(0)
+  })
+})
