@@ -107,12 +107,6 @@ export const ReservaCard = ({
     }
   }
 
-  const limpiarFechas = () => {
-    setFechaDesde("")
-    setFechaHasta("")
-    setCalendarAbierto(true)
-  }
-
   const handleToggleCalendario = () => {
     setFechaDesde("")
     setFechaHasta("")
@@ -226,7 +220,6 @@ export const ReservaCard = ({
 
         {hayFechasSeleccionadas && !errorValidacion && (
           <p
-            onClick={limpiarFechas}
             className="text-xs text-secondary/40 hover:text-secondary/60 transition-colors text-center cursor-pointer"
           >
             Con la reserva no se encontrará disponible en el rango de fechas
