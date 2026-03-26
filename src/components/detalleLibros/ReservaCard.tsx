@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { type DateRange } from "react-day-picker"
+import { format } from "date-fns"
 import { Card, CardHeader } from "../ui/Card"
 import { Boton } from "../ui/Boton"
 import { formatearFechaVisual, calcularDiferenciaDias } from "../../utils/dateHandlerReserva"
@@ -21,7 +22,7 @@ interface ReservaCardProps {
 }
 
 const strToDate = (str: string) => new Date(str + "T12:00:00")
-const dateToStr = (d: Date) => d.toISOString().split("T")[0]
+const dateToStr = (d: Date) => format(d, "yyyy-MM-dd")
 
 export const ReservaCard = ({
   libro, usuarioId, onReservaExitosa,
@@ -106,10 +107,10 @@ export const ReservaCard = ({
     }
   }
 
-  const limpiarFechas = () => {
+  const handleToggleCalendario = () => {
     setFechaDesde("")
     setFechaHasta("")
-    setCalendarAbierto(true)
+    setCalendarAbierto((v) => !v)
   }
 
   const hayFechasSeleccionadas = fechaDesde && fechaHasta && !errorValidacion
@@ -169,7 +170,7 @@ export const ReservaCard = ({
 
       <button
         type="button"
-        onClick={() => setCalendarAbierto(v => !v)}
+        onClick={handleToggleCalendario}
         className="flex items-center justify-between px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-secondary/50 hover:text-secondary/80 transition-colors border-b border-gray-100/10"
       >
         <span>{calendarAbierto ? "Cerrar Calendario" : "Cambiar Fechas"}</span>
@@ -219,7 +220,6 @@ export const ReservaCard = ({
 
         {hayFechasSeleccionadas && !errorValidacion && (
           <p
-            onClick={limpiarFechas}
             className="text-xs text-secondary/40 hover:text-secondary/60 transition-colors text-center cursor-pointer"
           >
             Con la reserva no se encontrará disponible en el rango de fechas

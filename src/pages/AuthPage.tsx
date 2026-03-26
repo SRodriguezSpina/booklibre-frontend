@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import { Eye, EyeOff } from "lucide-react"
 import { Auth } from "../classes/Auth"
 import type { AuthMode, FieldConfig } from "../classes/Auth"
 import { authService } from "../services/AuthService"
@@ -164,9 +165,10 @@ const FormField = ({ field, value, error, onChange }: FormFieldProps) => {
           <button
             type="button"
             onClick={() => setShow((v) => !v)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary-light hover:text-secondary transition-colors text-xs font-medium"
+            aria-label={show ? "Ocultar contraseña" : "Mostrar contraseña"}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary-light hover:text-secondary transition-colors"
           >
-            {show ? "Ocultar" : "Ver"}
+            {show ? <EyeOff size={25} /> : <Eye size={25} />}
           </button>
         </div>
       ) : (
