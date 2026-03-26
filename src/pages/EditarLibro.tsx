@@ -133,9 +133,9 @@ export const EditarLibro = () => {
     handleChange("fechaPublicacion", value)
   }
 
-  const handleFechaFromCalendar = (range: { from?: Date; to?: Date } | undefined) => {
-    if (!range?.from) return
-    handleChange("fechaPublicacion", dateToInputValue(range.from))
+  const handleFechaFromCalendar = (fecha: Date | undefined) => {
+    if (!fecha) return
+    handleChange("fechaPublicacion", dateToInputValue(fecha))
     setFechaPickerAbierto(false)
   }
 
@@ -182,7 +182,7 @@ export const EditarLibro = () => {
       } else {
         await libroService.actualizarLibro(instance.toDTO(Number(id)), Number(values.propietarioId))
       }
-      navigate("/home")
+      window.location.assign("/home")
     } catch {
       setServerError("No se pudo guardar el libro. Intentá de nuevo.")
     } finally {
@@ -269,12 +269,14 @@ export const EditarLibro = () => {
           {fechaPickerAbierto && (
             <div className="mt-2 rounded-lg border border-accent bg-surface-high p-2">
               <Calendario
+                modo="single"
                 rangeSeleccionado={
                   fechaComoDate
                     ? { from: fechaComoDate, to: fechaComoDate }
                     : undefined
                 }
-                onSelect={handleFechaFromCalendar}
+                fechaSeleccionada={fechaComoDate}
+                onSelectFecha={handleFechaFromCalendar}
                 diasDeshabilitados={diasNoSeleccionables}
                 mes={mesCalendario}
               />

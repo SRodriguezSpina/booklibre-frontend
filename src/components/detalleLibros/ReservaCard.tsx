@@ -1,5 +1,6 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { type DateRange } from "react-day-picker"
+import { format } from "date-fns"
 import { Card, CardHeader } from "../ui/Card"
 import { Boton } from "../ui/Boton"
 import { formatearFechaVisual, calcularDiferenciaDias } from "../../utils/dateHandlerReserva"
@@ -21,7 +22,7 @@ interface ReservaCardProps {
 }
 
 const strToDate = (str: string) => new Date(str + "T12:00:00")
-const dateToStr = (d: Date) => d.toISOString().split("T")[0]
+const dateToStr = (d: Date) => format(d, "yyyy-MM-dd")
 
 export const ReservaCard = ({
   libro, usuarioId, onReservaExitosa,
@@ -40,6 +41,27 @@ export const ReservaCard = ({
       to: strToDate(r.fechaHasta),
     })),
   ]
+
+  //Abre el calendario en el mes de la primer fecha disponible (hoy o el día después de la última reserva)
+  const primerFechaDisponible = useMemo(() => {
+    const reservasOrdenadas = [...libro.reservas]
+      .map((r) => ({ from: strToDate(r.fechaDesde), to: strToDate(r.fechaHasta) }))
+      .sort((a, b) => a.from.getTime() - b.from.getTime())
+
+    const candidato = new Date(hoy)
+
+    for (const reserva of reservasOrdenadas) {
+      if (reserva.to < candidato) continue
+
+      if (reserva.from <= candidato) {
+        candidato.setDate(reserva.to.getDate() + 1)
+      } else {
+        break
+      }
+    }
+
+    return candidato
+  }, [hoy, libro.reservas])
 
   const rangeSeleccionado: DateRange | undefined = fechaDesde
     ? { from: strToDate(fechaDesde), to: fechaHasta ? strToDate(fechaHasta) : undefined }
@@ -112,6 +134,12 @@ export const ReservaCard = ({
     setCalendarAbierto(true)
   }
 
+  const handleToggleCalendario = () => {
+    setFechaDesde("")
+    setFechaHasta("")
+    setCalendarAbierto((v) => !v)
+  }
+
   const hayFechasSeleccionadas = fechaDesde && fechaHasta && !errorValidacion
 
   return (
@@ -169,7 +197,7 @@ export const ReservaCard = ({
 
       <button
         type="button"
-        onClick={() => setCalendarAbierto(v => !v)}
+        onClick={handleToggleCalendario}
         className="flex items-center justify-between px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-secondary/50 hover:text-secondary/80 transition-colors border-b border-gray-100/10"
       >
         <span>{calendarAbierto ? "Cerrar Calendario" : "Cambiar Fechas"}</span>
@@ -183,6 +211,7 @@ export const ReservaCard = ({
             rangeSeleccionado={rangeSeleccionado}
             onSelect={handleSelect}
             diasDeshabilitados={diasDeshabilitados}
+            defaultMonth={primerFechaDisponible}
           />
 
           {libro.reservas.length > 0 && (
