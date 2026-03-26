@@ -91,7 +91,12 @@ export class LibroForm {
       genero: !this.genero ? "El género es obligatorio" : undefined,
       paginas: this.paginas === "" || Number(this.paginas) <= 0
         ? "Ingresá una cantidad de páginas válida" : undefined,
-      isbn: !this.isbn.trim() ? "Ingresá un ISBN válido" : undefined,
+      isbn: (() => {
+        const isbnStr = this.isbn.trim()
+        if (isbnStr.length !== 13) return "El ISBN debe tener exactamente 13 dígitos"
+        if (isNaN(Number(isbnStr))) return "El ISBN debe contener solo dígitos"
+        return undefined
+      })(),
       idioma: !this.idioma ? "El idioma es obligatorio" : undefined,
       estado: !this.estado ? "El estado es obligatorio" : undefined,
       fechaPublicacion: !this.fechaPublicacion
