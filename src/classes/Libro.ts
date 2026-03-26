@@ -15,7 +15,6 @@ export class Libro {
   prestamoId?: number
   titulo: string
   autor: string
-  autorImg?: string
   estado: EstadoLibro
   propietarioId: number
   imagenUrl: string

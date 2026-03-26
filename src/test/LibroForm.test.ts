@@ -11,10 +11,10 @@ function libroFormValido(): LibroForm {
   form.tipo = 'Comun'
   form.genero = 'DISENO'
   form.paginas = 464
-  form.isbn = '978-0132350884'
+  form.isbn = '9780132350884'
   form.idioma = 'INGLES'
   form.estado = 'EXCELENTE'
-  form.fechaPublicacion = '2008-08-01'
+  form.fechaPublicacion = new Date('2008-08-01')
   form.propietarioId = 1
   return form
 }
@@ -28,7 +28,7 @@ function libroBase(): Libro {
     tipo: 'Comun' as TipoLibro,
     genero: 'DISENO' as Genero,
     paginas: 448,
-    isbn: '978-0201485677',
+    isbn: '9780201485677',
     idioma: 'INGLES' as Idioma,
     estado: 'MUY_BUENO' as EstadoLibro,
     fechaPublicacion: '2018-11-20',
@@ -179,13 +179,13 @@ describe('LibroForm — validate()', () => {
     it('retorna error si el ISBN está vacío', () => {
       const form = libroFormValido()
       form.isbn = ''
-      expect(form.validate().isbn).toBe('Ingresá un ISBN válido')
+      expect(form.validate().isbn).toBe('El ISBN debe tener exactamente 13 dígitos')
     })
 
     it('retorna error si el ISBN contiene solo espacios', () => {
       const form = libroFormValido()
       form.isbn = '   '
-      expect(form.validate().isbn).toBe('Ingresá un ISBN válido')
+      expect(form.validate().isbn).toBe('El ISBN debe tener exactamente 13 dígitos')
     })
 
     it('no retorna error con un ISBN válido', () => {
@@ -231,7 +231,7 @@ describe('LibroForm — validate()', () => {
   describe('validación de fecha de publicación', () => {
     it('retorna error si la fecha de publicación está vacía', () => {
       const form = libroFormValido()
-      form.fechaPublicacion = ''
+      form.fechaPublicacion = '' as any
       expect(form.validate().fechaPublicacion).toBe('La fecha de publicación es obligatoria')
     })
 
@@ -299,7 +299,7 @@ describe('LibroForm — fromLibro()', () => {
 
   it('mapea el ISBN correctamente', () => {
     const form = LibroForm.fromLibro(libroBase())
-    expect(form.isbn).toBe('978-0201485677')
+    expect(form.isbn).toBe('9780201485677')
   })
 
   it('mapea el idioma correctamente', () => {
@@ -314,7 +314,8 @@ describe('LibroForm — fromLibro()', () => {
 
   it('mapea la fecha de publicación correctamente', () => {
     const form = LibroForm.fromLibro(libroBase())
-    expect(form.fechaPublicacion).toBe('2018-11-20')
+    expect(form.fechaPublicacion).toBeInstanceOf(Date)
+    expect(form.fechaPublicacion?.toISOString().split('T')[0]).toBe('2018-11-20')
   })
 
   it('mapea el propietarioId correctamente', () => {
@@ -336,7 +337,6 @@ describe('LibroForm — fromLibro()', () => {
       propietarioId: 1,
       imagenUrl: '',
       rating: 0,
-      // optional fields deliberately omitted
     })
     const form = LibroForm.fromLibro(libro)
     expect(form.descripcion).toBe('')
@@ -344,7 +344,7 @@ describe('LibroForm — fromLibro()', () => {
     expect(form.genero).toBe('')
     expect(form.isbn).toBe('')
     expect(form.idioma).toBe('')
-    expect(form.fechaPublicacion).toBe('')
+    expect(form.fechaPublicacion).toBe(undefined)
   })
 })
 

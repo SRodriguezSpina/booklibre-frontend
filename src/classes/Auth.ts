@@ -11,11 +11,11 @@ export type FieldConfig = {
 }
 
 export class Auth {
-  // Login fields
+  // Campos Login
   email: string = ""
   password: string = ""
 
-  // Register-only fields
+  // Campos Registro
   nombre: string = ""
   confirmarPassword: string = ""
 
@@ -39,6 +39,8 @@ export class Auth {
   }
 
   validateRegister(): Record<string, string | undefined> {
+    const password = this.password.trim()
+    const confirmar = this.confirmarPassword.trim()
     return {
       nombre:   !this.nombre.trim()
         ? "El nombre es obligatorio" : undefined,
@@ -46,13 +48,13 @@ export class Auth {
         ? "El email es obligatorio"
         : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)
         ? "Ingresá un email válido" : undefined,
-      password: !this.password
+      password: !password
         ? "La contraseña es obligatoria"
-        : this.password.length < 6
+        : password.length < 6
         ? "Mínimo 6 caracteres" : undefined,
-      confirmarPassword: !this.confirmarPassword.trim()
+      confirmarPassword: !confirmar
         ? "Repetí tu contraseña"
-        : this.confirmarPassword.trim() !== this.password.trim()
+        : confirmar !== password
         ? "Las contraseñas no coinciden" : undefined,
     }
   }

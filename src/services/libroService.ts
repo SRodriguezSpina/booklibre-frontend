@@ -79,10 +79,12 @@ export const libroService = {
     return Libro.fromJson(res.data)
   },
 
-  async actualizarLibro(dto: LibroDTO): Promise<Libro> {
+  async actualizarLibro(dto: LibroDTO, usuarioId: number): Promise<Libro> {
     const res = await axios.put<LibroDTO>(
       `${API_BASE_URL}/libros/${dto.id}`,
-      dto,
+      dto, { 
+        params: { usuarioId } 
+      },
     )
     return Libro.fromJson(res.data)
   },
@@ -106,6 +108,7 @@ export const libroService = {
         libro.autor.toLowerCase().includes(q),
     )
   },
+  
   async calificarLibro(
     libroId: number,
     usuarioId: number,

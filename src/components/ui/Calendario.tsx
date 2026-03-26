@@ -7,12 +7,18 @@ interface CalendarioProps {
   onSelect: (range: DateRange | undefined) => void
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   diasDeshabilitados: any[]
+  defaultMonth?: Date
+  mes?: Date
+  onMesCambio?: (mes: Date) => void
 }
 
 export const Calendario = ({
   rangeSeleccionado,
   onSelect,
   diasDeshabilitados,
+  defaultMonth,
+  mes,
+  onMesCambio,
 }: CalendarioProps) => {
   const defaultClassNames = getDefaultClassNames()
 
@@ -24,6 +30,9 @@ export const Calendario = ({
         selected={rangeSeleccionado}
         onSelect={onSelect}
         disabled={diasDeshabilitados}
+        defaultMonth={defaultMonth}
+        month={mes}
+        onMonthChange={onMesCambio}
         showOutsideDays={false}
         classNames={{
           root: `${defaultClassNames.root} w-full p-4 font-sans relative`,
