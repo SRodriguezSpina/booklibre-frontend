@@ -115,7 +115,7 @@ export const EditarLibro = () => {
       const libro = await libroService.getLibroById(Number(id))
       setValues(toValues(LibroForm.fromLibro(libro)))
     } catch {
-      toast.error("No se pudo cargar el libro.")
+      toast.error("No se pudo cargar el libro.", { toastId: "editar-libro-load-error" })
       navigate("/home")
     } finally {
       setLoading(false)
