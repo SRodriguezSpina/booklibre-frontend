@@ -245,6 +245,7 @@ export const EditarLibro = () => {
               label={field.label}
               type={field.type}
               placeholder={field.placeholder}
+              maxLength={field.name === "isbn" ? 13 : undefined}
               value={values[field.name] ?? ""}
               error={errors[field.name]}
               onChange={(v) => handleChange(field.name, v)}
@@ -437,6 +438,7 @@ interface FieldProps {
   label: string
   type?: string
   placeholder?: string
+  maxLength?: number
   value: string
   error?: string
   disabled?: boolean
@@ -447,6 +449,7 @@ const Field = ({
   label,
   type = "text",
   placeholder,
+  maxLength,
   value,
   error,
   disabled,
@@ -460,6 +463,7 @@ const Field = ({
       type={type}
       value={value}
       placeholder={placeholder}
+      maxLength={maxLength}
       disabled={disabled}
       onChange={(e) => onChange(e.target.value)}
       className={`w-full px-4 py-2.5 rounded-lg border bg-background text-secondary-dark text-sm placeholder:text-secondary-light outline-none transition-colors focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed ${
