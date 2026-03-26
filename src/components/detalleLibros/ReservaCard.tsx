@@ -7,8 +7,6 @@ import { reservaService } from "../../services/reservaService"
 import { Libro } from "../../classes/Libro"
 import { CalendarDays, ChevronDown, ChevronUp, Package, RotateCcw, Clock } from "lucide-react"
 import axios from "axios"
-
-// Importamos el nuevo componente
 import { Calendario} from "../ui/Calendario"
 
 interface ReservaCardProps {
@@ -119,8 +117,6 @@ export const ReservaCard = ({
 
   return (
     <Card className="flex flex-col gap-0 overflow-hidden p-0">
-
-      {/* Header */}
       <div className="px-5 pt-5 pb-4 border-b border-gray-100/10">
         <CardHeader
           titulo="Tu Reserva"
@@ -129,7 +125,6 @@ export const ReservaCard = ({
         />
       </div>
 
-      {/* Resumen de fechas seleccionadas */}
       {hayFechasSeleccionadas && !calendarAbierto && (
         <div className="px-5 py-4 border-b border-gray-100/10">
           <p className="text-[10px] font-bold uppercase tracking-widest text-secondary/50 mb-3">
@@ -173,7 +168,6 @@ export const ReservaCard = ({
         </div>
       )}
 
-      {/* Toggle del calendario */}
       <button
         type="button"
         onClick={() => setCalendarAbierto(v => !v)}
@@ -183,18 +177,15 @@ export const ReservaCard = ({
         {calendarAbierto ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
       </button>
 
-      {/* Calendario desplegable */}
+
       {calendarAbierto && (
         <div className="border-b border-gray-100/10">
-          
-          {/* Aquí inyectamos el nuevo componente */}
           <Calendario
             rangeSeleccionado={rangeSeleccionado}
             onSelect={handleSelect}
             diasDeshabilitados={diasDeshabilitados}
           />
 
-          {/* Fechas no disponibles */}
           {libro.reservas.length > 0 && (
             <div className="px-5 pb-4 flex flex-col gap-1.5">
               <p className="text-[10px] font-bold uppercase tracking-widest text-secondary/40 mb-0.5">
@@ -211,14 +202,12 @@ export const ReservaCard = ({
         </div>
       )}
 
-      {/* Error de validación */}
       {errorValidacion && (
         <div className="px-5 py-3 border-b border-gray-100/10">
           <p className="text-xs text-danger">{errorValidacion}</p>
         </div>
       )}
 
-      {/* Botones */}
       <div className="px-5 py-4 flex flex-col gap-2">
         <Boton
           tipo="primario"

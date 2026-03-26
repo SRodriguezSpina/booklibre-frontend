@@ -7,6 +7,7 @@ import { AuthPage } from "./pages/AuthPage"
 import { PerfilUsuario } from "./pages/PerfilUsuario"
 import { PerfilUsuarioLayout } from "./layouts/PerfilUsuarioLayout"
 import { DetalleLibro } from "./pages/DetalleLibro"
+import { VerMasResenias } from "./pages/VerMasResenias"
 import { NotFound } from "./pages/NotFound"
 
 export function AppRouter() {
@@ -22,6 +23,7 @@ export function AppRouter() {
           <Route path="mis-prestamos" element={<DetallePrestamos />} />
 
           <Route path="libros/:id" element={<DetalleLibro />} />
+          <Route path="libros/:id/resenias" element={<VerMasResenias />} />
           <Route path="libros/:id/editar" element={<EditarLibro />} />
           <Route path="perfil" element={<PerfilUsuarioLayout />}>
             <Route index element={<PerfilUsuario />} />

@@ -1,8 +1,8 @@
 import type { LibroHome } from '../models/libroModel'
-import { API_BASE_URL } from "../env";
+import { API_BASE_URL } from "../env"
 import axios from 'axios'
 import type { FiltersState } from '../components/home/Filters'
-import { INITIAL_FILTERS } from '../components/home/Filters';
+import { INITIAL_FILTERS } from '../components/home/Filters'
 
 interface SearchResponse {
     content: LibroHome[]
