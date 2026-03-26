@@ -1,12 +1,10 @@
 import { NavLink, useNavigate } from "react-router-dom"
 import { TrendingUp, LogOut, Menu, X } from "lucide-react"
 import navBarLogo from "../../assets/icons/booklibre-logo.svg"
-import { usuarioService } from "../../services/usuarioService"
 import { authService } from "../../services/AuthService"
-import type { UsuarioData } from "../../classes/usuario"
 import { useState } from "react"
-import { useOnInit } from "../../utils/hooks"
 import { Avatar } from "./Avatar"
+import { useAuthContext } from "../../utils/hooks"
 
 interface NavItemProps {
   text: string
@@ -35,18 +33,10 @@ export const NavItem = ({ text, to, onClick }: NavItemProps) => {
 }
 
 export const NavbarSuperior = () => {
-  const [usuario, setUsuario] = useState<UsuarioData | null>(null)
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false)
-  const userId = authService.obtenerIdUsuarioActual()
-
-  useOnInit(() => {
-    if (userId) {
-      usuarioService
-        .obtenerUsuario(userId)
-        .then(setUsuario)
-        .catch(console.error)
-    }
-  })
+  
+  // Consumimos el usuario global
+  const { usuario } = useAuthContext()
 
   const nombre = usuario?.nombre ?? "Usuario"
   const bibliokarmas = usuario?.bibliokarmas ?? 0
