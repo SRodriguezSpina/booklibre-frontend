@@ -16,22 +16,25 @@ export const DetalleLibro = () => {
   const [loading, setLoading] = useState(true)
   const [fechaDesde, setFechaDesde] = useState<string>("")
   const [fechaHasta, setFechaHasta] = useState<string>("")
-  
+
   const [bibliokarmasUsuario, setBibliokarmasUsuario] = useState<number>(0)
-  const usuarioId = authService.obtenerIdUsuarioActual() 
+  const usuarioId = authService.obtenerIdUsuarioActual()
   const fetchDatos = async () => {
     try {
-      if (id && usuarioId) {  
-        const [dataLibro, dataUsuario] = await Promise.all([
-          libroService.getLibroById(Number(id)),
-          usuarioService.obtenerUsuario(usuarioId)
-        ])
-        
+      if (id) {
+        const dataLibro = await libroService.getLibroById(Number(id))
         setLibro(dataLibro)
-        setBibliokarmasUsuario(dataUsuario.bibliokarmas)  
+        if (usuarioId) {
+          try {
+            const dataUsuario = await usuarioService.obtenerUsuario(usuarioId)
+            setBibliokarmasUsuario(dataUsuario.bibliokarmas)
+          } catch (error) {
+            console.error("Error fetching datos", error)
+          }
+        }
       }
     } catch (error) {
-      console.error("Error fetching datos", error)
+      console.error("Error fetching datos del libro", error)
     } finally {
       setLoading(false)
     }
@@ -59,7 +62,7 @@ export const DetalleLibro = () => {
             <ReservaCard
               libro={libro}
               usuarioId={usuarioId}
-              onReservaExitosa={fetchDatos} 
+              onReservaExitosa={fetchDatos}
               fechaDesde={fechaDesde}
               setFechaDesde={setFechaDesde}
               fechaHasta={fechaHasta}

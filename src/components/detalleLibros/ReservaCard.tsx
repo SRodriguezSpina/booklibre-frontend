@@ -6,8 +6,9 @@ import { formatearFechaVisual, calcularDiferenciaDias } from "../../utils/dateHa
 import { reservaService } from "../../services/reservaService"
 import { Libro } from "../../classes/Libro"
 import { CalendarDays, ChevronDown, ChevronUp, Package, RotateCcw, Clock } from "lucide-react"
-import axios from "axios"
-import { Calendario} from "../ui/Calendario"
+import { Calendario } from "../ui/Calendario"
+import { toast } from "react-toastify"
+import { obtenerMensajeError } from "../../utils/errorHandler"
 
 interface ReservaCardProps {
   libro: Libro
@@ -96,12 +97,10 @@ export const ReservaCard = ({
       setFechaHasta("")
       setCalendarAbierto(true)
       onReservaExitosa()
+      toast.success("¡Reserva confirmada con éxito!")
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.data?.message) {
-        alert(error.response.data.message)
-      } else {
-        alert("No se pudo confirmar la reserva. Intentá de nuevo.")
-      }
+      const err = obtenerMensajeError(error)
+      toast.error(err.mensaje || "No se pudo confirmar la reserva. Intentá de nuevo.")
     } finally {
       setLoading(false)
     }
@@ -188,11 +187,11 @@ export const ReservaCard = ({
 
           {libro.reservas.length > 0 && (
             <div className="px-5 pb-4 flex flex-col gap-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-secondary/40 mb-0.5">
+              <p className="text-xs font-bold uppercase tracking-widest text-secondary/40 mb-0.5">
                 No disponible:
               </p>
               {libro.reservas.map((r, i) => (
-                <div key={i} className="flex items-center gap-2 text-[10px] text-secondary/50">
+                <div key={i} className="flex items-center gap-2 text-xs text-secondary/50">
                   <span className="w-1.5 h-1.5 rounded-full bg-danger/60 shrink-0" />
                   {formatearFechaVisual(r.fechaDesde)} → {formatearFechaVisual(r.fechaHasta)}
                 </div>
@@ -221,7 +220,7 @@ export const ReservaCard = ({
         {hayFechasSeleccionadas && !errorValidacion && (
           <p
             onClick={limpiarFechas}
-            className="text-[10px] text-secondary/40 hover:text-secondary/60 transition-colors text-center cursor-pointer"
+            className="text-xs text-secondary/40 hover:text-secondary/60 transition-colors text-center cursor-pointer"
           >
             Con la reserva no se encontrará disponible en el rango de fechas
           </p>
