@@ -77,4 +77,23 @@ describe('usuarioService — actualizarUsuario', () => {
       usuarioService.actualizarUsuario(usuarioDataMock)
     ).rejects.toThrow('Forbidden')
   })
+
+  it('normaliza imagenUrl a null y omite campos internos', async () => {
+    mockedAxios.put.mockResolvedValueOnce({ data: usuarioDataMock })
+    const usuarioConCamposInternos = {
+      ...usuarioDataMock,
+      imagenUrl: undefined,
+      errors: { email: 'duplicado' },
+    } as unknown as UsuarioData & { errors: Record<string, string> }
+
+    await usuarioService.actualizarUsuario(usuarioConCamposInternos)
+
+    expect(mockedAxios.put).toHaveBeenCalledWith(
+      expect.stringContaining('/usuarios/1'),
+      expect.objectContaining({
+        imagenUrl: null,
+      })
+    )
+    expect(mockedAxios.put.mock.calls[0][1]).not.toHaveProperty('errors')
+  })
 })
