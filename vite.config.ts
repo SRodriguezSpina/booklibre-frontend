@@ -20,7 +20,7 @@ export default defineConfig({
     }
   },
   server: {
-    host: true,
+    host: process.env.VITE_BACKEND_URL ? true : "localhost",
     watch: {
       usePolling: true,
       interval: 500,

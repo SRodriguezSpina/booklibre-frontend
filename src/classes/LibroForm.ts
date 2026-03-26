@@ -18,8 +18,10 @@ export class LibroForm {
   idioma: Idioma | "" = "";
   estado: EstadoLibro | "" = "";
   estoyReservado: boolean = false;
-  fechaPublicacion: string = "";
+  fechaPublicacion: Date | undefined = undefined;
   propietarioId: number = 0;
+  imagenUrl: string = "";
+  editorial: string = "";
 
   static fields = [
     { name: "titulo", label: "Título", type: "text", placeholder: "Ingresá el título del libro..." },
@@ -61,6 +63,9 @@ export class LibroForm {
   ];
 
   static fromLibro(libro: Libro): LibroForm {
+    const parsed = libro.fechaPublicacion
+      ? new Date(libro.fechaPublicacion + "T12:00:00Z") // Sumo 12hs para evitar que la zona horaria afecte la fecha al parsear
+      : undefined
     const form = new LibroForm();
     form.titulo = libro.titulo;
     form.autor = libro.autor;
@@ -71,13 +76,15 @@ export class LibroForm {
     form.isbn = libro.isbn || "";
     form.idioma = libro.idioma || "";
     form.estado = libro.estado;
-    form.fechaPublicacion = libro.fechaPublicacion || "";
+    form.fechaPublicacion = parsed && !isNaN(parsed.getTime()) ? parsed : undefined
     form.propietarioId = libro.propietarioId;
+    form.imagenUrl = libro.imagenUrl || "";
+    form.editorial = libro.editorial || "";
     return form;
   }
 
   validate(): Record<string, string | undefined> {
-    return {
+    const errors: Record<string, string | undefined> = {
       titulo: !this.titulo.trim() ? "El título es obligatorio" : undefined,
       autor: !this.autor.trim() ? "El autor es obligatorio" : undefined,
       descripcion: !this.descripcion.trim() ? "La descripción es obligatoria" : undefined,
@@ -85,12 +92,27 @@ export class LibroForm {
       genero: !this.genero ? "El género es obligatorio" : undefined,
       paginas: this.paginas === "" || Number(this.paginas) <= 0
         ? "Ingresá una cantidad de páginas válida" : undefined,
-      isbn: !this.isbn.trim() ? "Ingresá un ISBN válido" : undefined,
+      isbn: (() => {
+        const isbnStr = this.isbn.trim()
+        if (isbnStr.length !== 13) return "El ISBN debe tener exactamente 13 dígitos"
+        if (isNaN(Number(isbnStr))) return "El ISBN debe contener solo dígitos"
+        return undefined
+      })(),
       idioma: !this.idioma ? "El idioma es obligatorio" : undefined,
       estado: !this.estado ? "El estado es obligatorio" : undefined,
       fechaPublicacion: !this.fechaPublicacion
         ? "La fecha de publicación es obligatoria" : undefined,
     };
+
+    if (!errors.fechaPublicacion && this.fechaPublicacion) {
+      const hoy = new Date()
+      hoy.setHours(0, 0, 0, 0)
+      if (this.fechaPublicacion > hoy) {
+        errors.fechaPublicacion = "La fecha de publicación no puede ser futura"
+      }
+    }
+
+    return errors
   }
 
   isValid(): boolean {
@@ -98,6 +120,10 @@ export class LibroForm {
   }
 
   toDTO(id: number): LibroDTO {
+    const apiFecha = this.fechaPublicacion
+      ? this.fechaPublicacion.toISOString().split("T")[0]
+      : ""
+
     return {
       id,
       titulo: this.titulo,
@@ -109,12 +135,12 @@ export class LibroForm {
       isbn: this.isbn,
       idioma: this.idioma as Idioma,
       estado: this.estado as EstadoLibro,
-      fechaPublicacion: this.fechaPublicacion,
+      fechaPublicacion: apiFecha,
+      fechaAgregado: new Date().toISOString(),
       propietarioId: this.propietarioId,
       estoyReservado: this.estoyReservado,
-      imagenUrl: "",
-      editorial: "",
-      autorImg: "",
+      imagenUrl: this.imagenUrl,
+      editorial: this.editorial,
       reservas: [],
       ultimasCalificaciones: [],
     };
