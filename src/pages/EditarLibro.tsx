@@ -1,66 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { parseISO, isValid, isFuture, startOfDay, format } from "date-fns"
-import { Calendario } from "../components/ui/Calendario"
+import { isFuture, startOfDay } from "date-fns"
+import { FechaPublicacionField } from "../components/libros/editar/FechaPublicacionField"
 import { LibroForm } from "../classes/LibroForm"
 import { libroService } from "../services/libroService"
 import { authService } from "../services/AuthService"
 import { useOnInit } from "../utils/hooks"
 import { toast } from "react-toastify"
-
-type Values = Record<string, string>
-
-/** "YYYY-MM-DD" → Date (medianoche local).  Devuelve undefined si inválido. */
-const parseNativeDate = (value: string): Date | undefined => {
-  if (!value) return undefined;
-  const parsed = parseISO(value);           // date-fns: sin problemas de TZ
-  return isValid(parsed) ? parsed : undefined;
-};
- 
-/** Date → "YYYY-MM-DD" para el value del <input type="date">. */
-const dateToInputValue = (date: Date): string => format(date, "yyyy-MM-dd");
-
-const emptyValues = (): Values => ({
-  titulo: "",
-  autor: "",
-  descripcion: "",
-  tipo: "",
-  genero: "",
-  paginas: "",
-  isbn: "",
-  idioma: "",
-  estado: "",
-  fechaPublicacion: "",
-  propietarioId: "",
-  imagenUrl: "",
-  editorial: ""
-})
-
-const fromValues = (values: Values): LibroForm => {
-  const instance = new LibroForm()
-  Object.assign(instance, {
-    ...values,
-    paginas: values.paginas === "" ? "" : Number(values.paginas),
-    fechaPublicacion: parseNativeDate(values.fechaPublicacion),
-  })
-  return instance
-}
-
-const toValues = (form: LibroForm): Values => ({
-  titulo: form.titulo,
-  autor: form.autor,
-  descripcion: form.descripcion,
-  tipo: form.tipo,
-  genero: form.genero,
-  paginas: String(form.paginas),
-  isbn: form.isbn,
-  idioma: form.idioma,
-  estado: form.estado,
-  fechaPublicacion: form.fechaPublicacion ? dateToInputValue(form.fechaPublicacion) : "",
-  propietarioId: String(form.propietarioId),
-  imagenUrl: form.imagenUrl,
-  editorial: form.editorial
-})
+import {
+  emptyLibroFormValues,
+  libroFormFromValues,
+  libroFormToValues,
+  type LibroFormValues,
+} from "../utils/libroFormMapper"
+import { formatLibroInputDate, parseLibroInputDate } from "../utils/libroDate"
 
 const MAX_FOTO_BYTES = 800_000
 
@@ -80,8 +33,9 @@ export const EditarLibro = () => {
   const navigate = useNavigate()
   const { id } = useParams()
   const esNuevo = id === "nuevo"
+  const rutaCancelar = esNuevo ? "/perfil" : id ? `/libros/${id}` : "/home"
 
-  const [values, setValues] = useState<Values>(emptyValues())
+  const [values, setValues] = useState<LibroFormValues>(emptyLibroFormValues())
   const [errors, setErrors] = useState<Record<string, string | undefined>>({})
   const [serverError, setServerError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -113,7 +67,7 @@ export const EditarLibro = () => {
     }
     try {
       const libro = await libroService.getLibroById(Number(id))
-      setValues(toValues(LibroForm.fromLibro(libro)))
+      setValues(libroFormToValues(LibroForm.fromLibro(libro)))
     } catch {
       toast.error("No se pudo cargar el libro.", { toastId: "editar-libro-load-error" })
       navigate("/home")
@@ -128,14 +82,9 @@ export const EditarLibro = () => {
     setServerError(null)
   }
 
-  const handleFechaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value   // "YYYY-MM-DD" o ""
-    handleChange("fechaPublicacion", value)
-  }
-
   const handleFechaFromCalendar = (fecha: Date | undefined) => {
     if (!fecha) return
-    handleChange("fechaPublicacion", dateToInputValue(fecha))
+    handleChange("fechaPublicacion", formatLibroInputDate(fecha))
     setFechaPickerAbierto(false)
   }
 
@@ -166,7 +115,7 @@ export const EditarLibro = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const instance = fromValues(values)
+    const instance = libroFormFromValues(values)
     const newErrors = instance.validate()
     if (Object.values(newErrors).some(Boolean)) {
       setErrors(newErrors)
@@ -182,7 +131,7 @@ export const EditarLibro = () => {
       } else {
         await libroService.actualizarLibro(instance.toDTO(Number(id)), Number(values.propietarioId))
       }
-      window.location.assign("/home")
+      navigate("/home", { replace: true })
     } catch {
       setServerError("No se pudo guardar el libro. Intentá de nuevo.")
     } finally {
@@ -190,7 +139,10 @@ export const EditarLibro = () => {
     }
   }
 
-  const fechaComoDate = parseNativeDate(values.fechaPublicacion)
+  const fechaComoDate = useMemo(
+    () => parseLibroInputDate(values.fechaPublicacion),
+    [values.fechaPublicacion],
+  )
   const fechaEsFutura = fechaComoDate && isFuture(startOfDay(fechaComoDate))
 
   useEffect(() => {
@@ -252,44 +204,19 @@ export const EditarLibro = () => {
             />
           ))}
 
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-bold text-secondary-light uppercase tracking-wider">
-            Fecha de publicación <span className="text-primary">*</span>
-          </label>
-          <input
-            type="date"
-            value={values.fechaPublicacion}
-            max={format(new Date(), "yyyy-MM-dd")}
-            onChange={handleFechaChange}
-            onFocus={() => setFechaPickerAbierto(true)}
-            className={`w-full px-4 py-2.5 rounded-lg border bg-background text-secondary-dark text-sm outline-none transition-colors focus:border-primary
-              ${errors.fechaPublicacion || fechaEsFutura ? "border-red-400" : "border-accent"}`}
-          />
-          {errors.fechaPublicacion && <p className="text-xs text-red-500">{errors.fechaPublicacion}</p>}
-          {fechaPickerAbierto && (
-            <div className="mt-2 rounded-lg border border-accent bg-surface-high p-2">
-              <Calendario
-                modo="single"
-                rangeSeleccionado={
-                  fechaComoDate
-                    ? { from: fechaComoDate, to: fechaComoDate }
-                    : undefined
-                }
-                fechaSeleccionada={fechaComoDate}
-                onSelectFecha={handleFechaFromCalendar}
-                diasDeshabilitados={diasNoSeleccionables}
-                mes={mesCalendario}
-              />
-              <button
-                type="button"
-                onClick={() => setFechaPickerAbierto(false)}
-                className="mt-1 w-full text-xs text-secondary/50 hover:text-secondary/80 transition-colors py-1"
-              >
-                Cerrar calendario
-              </button>
-            </div>
-          )}
-        </div>
+        <FechaPublicacionField
+          value={values.fechaPublicacion}
+          error={errors.fechaPublicacion}
+          fechaEsFutura={Boolean(fechaEsFutura)}
+          fechaPickerAbierto={fechaPickerAbierto}
+          fechaSeleccionada={fechaComoDate}
+          diasDeshabilitados={diasNoSeleccionables}
+          mesCalendario={mesCalendario}
+          onChange={(value) => handleChange("fechaPublicacion", value)}
+          onOpen={() => setFechaPickerAbierto(true)}
+          onClose={() => setFechaPickerAbierto(false)}
+          onCalendarSelect={handleFechaFromCalendar}
+        />
 
         <SelectField
           label="Tipo"
@@ -355,7 +282,7 @@ export const EditarLibro = () => {
           </button>
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate(rutaCancelar)}
             className="flex-1 py-2.5 bg-surface border border-accent text-secondary-dark rounded-lg text-sm font-bold hover:bg-accent transition-all"
           >
             Descartar cambios
@@ -371,7 +298,7 @@ export const EditarLibro = () => {
 interface ImagePickerProps {
   label: string
   src: string | null
-  shape: "circle" | "rect"
+  shape: "rect"
   inputRef: React.RefObject<HTMLInputElement>
   onElegir: (e: React.ChangeEvent<HTMLInputElement>) => void
   onQuitar: () => void
@@ -434,7 +361,6 @@ const ImagePicker = ({
     </div>
   )
 }
-// @@END-IMAGE-FIELDS
 
 interface FieldProps {
   label: string
