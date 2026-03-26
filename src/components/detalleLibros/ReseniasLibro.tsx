@@ -1,16 +1,15 @@
+import { useNavigate } from "react-router-dom"
 import type { CalificacionDTO } from "../../models/libroModel"
+import { ReseniaCard } from "./ReseniaCard"
 
 interface ReseniasLibroProps {
+  libroId: number
   calificaciones: CalificacionDTO[]
   totalCalificaciones?: number
 }
 
-const ESTRELLAS = (valor: number) =>
-  Array.from({ length: 5 }, (_, i) => (
-    <span key={i} className={i < valor ? "text-yellow-400" : "text-accent/30"}>★</span>
-  ))
-
-export const ReseniasLibro = ({ calificaciones, totalCalificaciones }: ReseniasLibroProps) => {
+export const ReseniasLibro = ({ libroId, calificaciones, totalCalificaciones }: ReseniasLibroProps) => {
+  const navigate = useNavigate()
   if (calificaciones.length === 0) return null
 
   return (
@@ -21,35 +20,21 @@ export const ReseniasLibro = ({ calificaciones, totalCalificaciones }: ReseniasL
         {totalCalificaciones !== undefined && totalCalificaciones > 2 && (
           <button
             type="button"
-            className="text-sm font-semibold text-blue-500 hover:text-blue-600 transition-colors flex items-center gap-1"
-            onClick={() => console.log("Abrir todas las reseñas")}
+            className="flex items-center gap-1.5 text-sm font-semibold text-secondary/50 hover:text-secondary transition-colors mb-3"
+            onClick={() => navigate(`/libros/${libroId}/resenias`)}
           >
-            Ver las {totalCalificaciones} reseñas &rarr;
+            Ver las {totalCalificaciones} reseñas →
           </button>
         )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {calificaciones.map((calificacion, i) => (
-          <div
-            key={i}
-            className="bg-surface-high border border-accent/30 rounded-2xl p-4 flex flex-col gap-2"
-          >
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary-light text-xs font-bold shrink-0">
-                U{calificacion.usuarioId}
-              </div>
-              <div>
-                <p className="text-xs font-bold text-secondary-dark">{calificacion.nombreUsuario}</p>
-                <div className="flex text-sm">{ESTRELLAS(calificacion.valor)}</div>
-              </div>
-            </div>
-            {calificacion.comentario && (
-              <p className="text-xs text-secondary/70 leading-relaxed line-clamp-3">
-                {calificacion.comentario}
-              </p>
-            )}
-          </div>
+        {calificaciones.map((calificacion, calificacionIndex) => (
+          <ReseniaCard 
+            key={calificacionIndex} 
+            calificacion={calificacion} 
+            truncate={true} 
+          />
         ))}
       </div>
     </section>
