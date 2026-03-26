@@ -30,10 +30,10 @@ const libroDTOMock: LibroDTO = {
   imagenUrl: "https://example.com/cover.jpg",
   alquiladoPorId: undefined,
   bibliokarma: undefined,
-  autorImg: "",
   estoyReservado: false,
   reservas: [],
   ultimasCalificaciones: [],
+  fechaAgregado: ""
 }
 
 const prestamoDTOMock: PrestamoDTO = {

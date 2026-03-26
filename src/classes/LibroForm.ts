@@ -22,7 +22,6 @@ export class LibroForm {
   propietarioId: number = 0;
   imagenUrl: string = "";
   editorial: string = "";
-  autorImg: string = "";
 
   static fields = [
     { name: "titulo", label: "Título", type: "text", placeholder: "Ingresá el título del libro..." },
@@ -78,7 +77,6 @@ export class LibroForm {
     form.propietarioId = libro.propietarioId;
     form.imagenUrl = libro.imagenUrl || "";
     form.editorial = libro.editorial || "";
-    form.autorImg = libro.autorImg || "";
     return form;
   }
 
@@ -121,7 +119,6 @@ export class LibroForm {
       estoyReservado: this.estoyReservado,
       imagenUrl: this.imagenUrl,
       editorial: this.editorial,
-      autorImg: this.autorImg,
       reservas: [],
       ultimasCalificaciones: [],
     };

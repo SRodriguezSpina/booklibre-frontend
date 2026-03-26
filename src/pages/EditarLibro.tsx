@@ -20,8 +20,7 @@ const emptyValues = (): Values => ({
   fechaPublicacion: "",
   propietarioId: "",
   imagenUrl: "",
-  editorial: "",
-  autorImg: ""
+  editorial: ""
 })
 
 const fromValues = (values: Values): LibroForm => {
@@ -46,8 +45,7 @@ const toValues = (form: LibroForm): Values => ({
   fechaPublicacion: form.fechaPublicacion,
   propietarioId: String(form.propietarioId),
   imagenUrl: form.imagenUrl,
-  editorial: form.editorial,
-  autorImg: form.autorImg
+  editorial: form.editorial
 })
 
 const MAX_FOTO_BYTES = 800_000
@@ -75,16 +73,13 @@ export const EditarLibro = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loading, setLoading] = useState(!esNuevo)
   const [previewPortada, setPreviewPortada] = useState<string | null>(null)
-  const [previewAutor, setPreviewAutor] = useState<string | null>(null)
   const inputPortadaRef = useRef<HTMLInputElement>(null)
-  const inputAutorRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     return () => {
       if (previewPortada) URL.revokeObjectURL(previewPortada)
-      if (previewAutor) URL.revokeObjectURL(previewAutor)
     }
-  }, [previewPortada, previewAutor])
+  }, [previewPortada])
 
   const titulo = esNuevo ? "Nuevo libro" : "Editar libro"
 
@@ -112,7 +107,7 @@ export const EditarLibro = () => {
 
   const handleElegirImagen = async (
     e: React.ChangeEvent<HTMLInputElement>,
-    fieldName: "imagenUrl" | "autorImg",
+    fieldName: "imagenUrl",
     setPreview: (url: string | null) => void,
     currentPreview: string | null,
   ) => {
@@ -133,7 +128,7 @@ export const EditarLibro = () => {
   }
 
   const handleQuitarImagen = (
-    fieldName: "imagenUrl" | "autorImg",
+    fieldName: "imagenUrl",
     setPreview: (url: string | null) => void,
     currentPreview: string | null,
   ) => {
@@ -178,7 +173,6 @@ export const EditarLibro = () => {
 
   // Imagenes existentes o nuevas
   const srcPortada = previewPortada || values.imagenUrl || null
-  const srcAutor = previewAutor || values.autorImg || null
 
   return (
     <div className="flex flex-col bg-background p-6 max-w-xl mx-auto mt-10 pt-24">
@@ -194,20 +188,6 @@ export const EditarLibro = () => {
         className="bg-surface border border-accent rounded-2xl p-6 flex flex-col gap-5"
         noValidate
       >
-        <ImagePicker
-          label="Foto del autor"
-          src={srcAutor}
-          shape="circle"
-          inputRef={inputAutorRef as React.RefObject<HTMLInputElement>}
-          onElegir={(e) =>
-            handleElegirImagen(e, "autorImg", setPreviewAutor, previewAutor)
-          }
-          onQuitar={() =>
-            handleQuitarImagen("autorImg", setPreviewAutor, previewAutor)
-          }
-          deshabilitado={isSubmitting}
-        />
-
         <ImagePicker
           label="Portada del libro"
           src={srcPortada}
