@@ -18,7 +18,7 @@ export class LibroForm {
   idioma: Idioma | "" = "";
   estado: EstadoLibro | "" = "";
   estoyReservado: boolean = false;
-  fechaPublicacion: string = "";
+  fechaPublicacion: Date | undefined = undefined;
   propietarioId: number = 0;
   imagenUrl: string = "";
   editorial: string = "";
@@ -73,7 +73,9 @@ export class LibroForm {
     form.isbn = libro.isbn || "";
     form.idioma = libro.idioma || "";
     form.estado = libro.estado;
-    form.fechaPublicacion = libro.fechaPublicacion || "";
+    form.fechaPublicacion = libro.fechaPublicacion
+      ? new Date(libro.fechaPublicacion + "T12:00:00")
+      : undefined;
     form.propietarioId = libro.propietarioId;
     form.imagenUrl = libro.imagenUrl || "";
     form.editorial = libro.editorial || "";
@@ -81,7 +83,7 @@ export class LibroForm {
   }
 
   validate(): Record<string, string | undefined> {
-    return {
+    const errors: Record<string, string | undefined> = {
       titulo: !this.titulo.trim() ? "El título es obligatorio" : undefined,
       autor: !this.autor.trim() ? "El autor es obligatorio" : undefined,
       descripcion: !this.descripcion.trim() ? "La descripción es obligatoria" : undefined,
@@ -95,6 +97,16 @@ export class LibroForm {
       fechaPublicacion: !this.fechaPublicacion
         ? "La fecha de publicación es obligatoria" : undefined,
     };
+
+    if (!errors.fechaPublicacion && this.fechaPublicacion) {
+      const hoy = new Date()
+      hoy.setHours(0, 0, 0, 0)
+      if (this.fechaPublicacion > hoy) {
+        errors.fechaPublicacion = "La fecha de publicación no puede ser futura"
+      }
+    }
+
+    return errors
   }
 
   isValid(): boolean {
@@ -102,6 +114,10 @@ export class LibroForm {
   }
 
   toDTO(id: number): LibroDTO {
+    const apiFecha = this.fechaPublicacion
+      ? this.fechaPublicacion.toISOString().split("T")[0]
+      : ""
+
     return {
       id,
       titulo: this.titulo,
@@ -113,7 +129,7 @@ export class LibroForm {
       isbn: this.isbn,
       idioma: this.idioma as Idioma,
       estado: this.estado as EstadoLibro,
-      fechaPublicacion: this.fechaPublicacion,
+      fechaPublicacion: apiFecha,
       fechaAgregado: new Date().toISOString(),
       propietarioId: this.propietarioId,
       estoyReservado: this.estoyReservado,
