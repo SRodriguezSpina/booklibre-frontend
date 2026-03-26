@@ -303,7 +303,7 @@ export const EditarLibro = () => {
           <input
             type="text"
             value={values.fechaPublicacion}
-            placeholder="dd-mm-yyyy"
+            placeholder="dd/mm/yyyy"
             maxLength={10}
             onFocus={() => setFechaPickerAbierto(true)}
             onChange={(e) => handleChange("fechaPublicacion", e.target.value)}
