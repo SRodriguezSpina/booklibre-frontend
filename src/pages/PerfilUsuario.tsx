@@ -13,10 +13,12 @@ import { ModalEditarPerfil } from "../components/perfil/ModalEditarPerfil"
 import { usuarioService } from "../services/usuarioService"
 import { toast } from "react-toastify"
 import { obtenerMensajeError } from "../utils/errorHandler"
+import { useAuthContext } from "../utils/hooks"
 
 
 export const PerfilUsuario = () => {
   const { usuario, setUsuario } = useOutletContext<ContextoPerfilUsuario>()
+  const { setUsuarioContext } = useAuthContext()
   const navigate = useNavigate()
   const [libros, setLibros] = useState<LibroUsuarioItemDTO[]>([])
   const [cargandoLibros, setCargandoLibros] = useState(false)
@@ -48,6 +50,7 @@ export const PerfilUsuario = () => {
       const nuevo = new Usuario({ ...uSinErrores, ...data, imagenUrl })
       nuevo.errors = {}
       setUsuario(nuevo)
+      setUsuarioContext(nuevo)
       toast.success("¡Perfil actualizado con éxito!")
     } catch (e: unknown) {
       const err = obtenerMensajeError(e)

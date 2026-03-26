@@ -17,8 +17,13 @@ export const InfoLibro = ({ libro, karmaCalculado }: InfoLibroProps) => {
           <span className="bg-blue-100 text-blue-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
             {GENERO_LABEL[libro.genero ?? ""] ?? libro.genero}
           </span>
-          <div className="flex text-yellow-400 text-sm">
-            ★★★★★ <span className="text-secondary opacity-60 ml-1">({libro.rating})</span>
+          <div className="flex items-center gap-0.5 text-sm">
+            {Array.from({ length: 5 }, (_, i) => (
+              <span key={i} className={i < Math.round(libro.rating) ? "text-yellow-400" : "text-accent/30"}>
+                ★
+              </span>
+            ))}
+            <span className="text-secondary opacity-60 ml-1">({libro.rating})</span>
           </div>
         </div>
         <h1 className="text-4xl font-extrabold text-secondary-dark mb-4">{libro.titulo}</h1>

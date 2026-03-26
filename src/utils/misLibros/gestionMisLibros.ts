@@ -20,10 +20,8 @@ const estrategiasFiltro: Record<FiltroMisLibros, (l: LibroUsuarioItemDTO) => boo
     prestados: (l) => !l.disponible,
   }
 
-const comparadoresOrden: Record<
-  CampoOrdenMisLibros,
-  (a: LibroUsuarioItemDTO, b: LibroUsuarioItemDTO) => number
-> = {
+const comparadoresOrden: Record<CampoOrdenMisLibros,
+  (a: LibroUsuarioItemDTO, b: LibroUsuarioItemDTO) => number> = {
   titulo: (a, b) => a.titulo.localeCompare(b.titulo),
   estado: (a, b) => Number(a.disponible) - Number(b.disponible),
   fecha: (a, b) => {
@@ -34,19 +32,12 @@ const comparadoresOrden: Record<
 }
 
 /** Filtra la lista según pestaña (todos / disponibles / prestados). */
-export function filtrarMisLibros(
-  libros: LibroUsuarioItemDTO[],
-  filtro: FiltroMisLibros,
-): LibroUsuarioItemDTO[] {
+export function filtrarMisLibros(libros: LibroUsuarioItemDTO[], filtro: FiltroMisLibros): LibroUsuarioItemDTO[] {
   return libros.filter(estrategiasFiltro[filtro])
 }
 
 /** Ordena por título, estado o fecha según el sentido indicado. */
-export function ordenarMisLibros(
-  libros: LibroUsuarioItemDTO[],
-  campo: CampoOrdenMisLibros,
-  sentido: SentidoOrden,
-): LibroUsuarioItemDTO[] {
+export function ordenarMisLibros(libros: LibroUsuarioItemDTO[], campo: CampoOrdenMisLibros, sentido: SentidoOrden): LibroUsuarioItemDTO[] {
   const comparador = comparadoresOrden[campo]
   return [...libros].sort((a, b) => {
     const resultado = comparador(a, b)
@@ -77,11 +68,7 @@ export function paginarMisLibros(
 }
 
 /** Texto "desde–hasta de total" para el pie de la tabla. */
-export function rangoEtiquetaPaginacion(
-  inicio: number,
-  fin: number,
-  totalLibros: number,
-): { desde: number; hasta: number; total: number } {
+export function rangoEtiquetaPaginacion(inicio: number, fin: number, totalLibros: number): { desde: number; hasta: number; total: number } {
   return {
     desde: inicio + 1,
     hasta: Math.min(fin, totalLibros),
