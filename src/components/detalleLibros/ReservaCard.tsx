@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { type DateRange } from "react-day-picker"
 import { format } from "date-fns"
 import { Card, CardHeader } from "../ui/Card"
@@ -41,27 +41,6 @@ export const ReservaCard = ({
       to: strToDate(r.fechaHasta),
     })),
   ]
-
-  //Abre el calendario en el mes de la primer fecha disponible (hoy o el día después de la última reserva)
-  const primerFechaDisponible = useMemo(() => {
-    const reservasOrdenadas = [...libro.reservas]
-      .map((r) => ({ from: strToDate(r.fechaDesde), to: strToDate(r.fechaHasta) }))
-      .sort((a, b) => a.from.getTime() - b.from.getTime())
-
-    const candidato = new Date(hoy)
-
-    for (const reserva of reservasOrdenadas) {
-      if (reserva.to < candidato) continue
-
-      if (reserva.from <= candidato) {
-        candidato.setDate(reserva.to.getDate() + 1)
-      } else {
-        break
-      }
-    }
-
-    return candidato
-  }, [hoy, libro.reservas])
 
   const rangeSeleccionado: DateRange | undefined = fechaDesde
     ? { from: strToDate(fechaDesde), to: fechaHasta ? strToDate(fechaHasta) : undefined }
@@ -211,7 +190,6 @@ export const ReservaCard = ({
             rangeSeleccionado={rangeSeleccionado}
             onSelect={handleSelect}
             diasDeshabilitados={diasDeshabilitados}
-            defaultMonth={primerFechaDisponible}
           />
 
           {libro.reservas.length > 0 && (
