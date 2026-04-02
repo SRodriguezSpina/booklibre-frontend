@@ -10,12 +10,12 @@ export const EstadisticaCard = ({
   icono,
 }: PropsEstadisticaCard) => {
   return (
-    <div className="flex flex-col items-center justify-center text-center bg-surface-high rounded-2xl p-5 border border-outline/20 shadow-sm gap-1 transition-transform duration-300 hover:-translate-y-1 hover:bg-surface-high/80">
-      {icono && <span className="text-2xl mb-1">{icono}</span>}
+    <div className="flex flex-col items-center justify-center text-center bg-surface rounded border border-accent/15 shadow-[0_8px_24px_rgba(0,0,0,0.3)] p-5 gap-1 transition-transform duration-300 hover:-translate-y-1">
+      {icono && <span className="text-xl mb-1">{icono}</span>}
       <span className="text-4xl font-black text-primary-light leading-none tabular-nums">
         {valor}
       </span>
-      <span className="text-[11px] font-semibold text-on-surface-variant tracking-widest uppercase leading-snug mt-1">
+      <span className="text-[9px] font-bold text-on-surface-variant/50 tracking-widest uppercase mt-1">
         {etiqueta}
       </span>
     </div>
