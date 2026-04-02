@@ -228,9 +228,12 @@ export const ModalEditarPerfil = ({
                 id="editar-perfil-desc"
                 value={form.desc}
                 onChange={setCampo("desc")}
-                className={`${claseInput} resize-none min-h-[80px]`}
+                className={`${claseInput} ${claseInputError} resize-none min-h-[80px]`}
                 rows={3}
               />
+              {form.errors?.desc && (
+                <p className="mt-1 text-xs text-red-500">{form.errors.desc}</p>
+              )}
             </div>
 
             <div>
