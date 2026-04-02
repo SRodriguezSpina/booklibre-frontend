@@ -29,7 +29,7 @@ export const TablaLibros = ({
   const navigate = useNavigate()
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto min-h-[360px]">
       <table className="w-full text-left text-sm">
         <thead>
           <tr className="border-b border-accent/15">

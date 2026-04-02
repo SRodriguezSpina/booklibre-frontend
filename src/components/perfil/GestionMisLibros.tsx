@@ -170,13 +170,15 @@ export const GestionMisLibros = ({
               <div
                 className={`transition-all duration-150 ${animating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"}`}
               >
-                <TablaLibros
-                  libros={librosPagina}
-                  campoOrden={campoOrden}
-                  sentidoOrden={sentidoOrden}
-                  alCambiarOrden={handleCambiarOrden}
-                  alEliminar={solicitarEliminar}
-                />
+                <div className="min-h-[21rem]">
+                  <TablaLibros
+                    libros={librosPagina}
+                    campoOrden={campoOrden}
+                    sentidoOrden={sentidoOrden}
+                    alCambiarOrden={handleCambiarOrden}
+                    alEliminar={solicitarEliminar}
+                  />
+                </div>
               </div>
 
               {/* Paginación fuera de la animación para no parpadear */}

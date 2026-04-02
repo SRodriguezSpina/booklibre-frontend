@@ -48,7 +48,7 @@ export const PerfilResumen = ({ usuario, onEditar }: PropsPerfilResumen) => {
       <div className="shrink-0 flex sm:justify-end">
         <button
           onClick={onEditar}
-          className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider text-on-surface-variant border border-accent/20 rounded hover:bg-surface-high hover:text-on-surface transition-all"
+          className="cursor-pointer flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider text-on-surface-variant border border-accent/20 rounded hover:bg-surface-high hover:text-on-surface transition-all"
         >
           <Settings className="h-3.5 w-3.5" />
           Editar Perfil
