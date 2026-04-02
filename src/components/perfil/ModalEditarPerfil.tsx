@@ -304,7 +304,7 @@ export const ModalEditarPerfil = ({
             <div>
               <label
                 htmlFor="editar-perfil-tipo"
-                className="cursor-pointer text-[11px] font-semibold text-on-surface-variant tracking-widest uppercase"
+                className="text-[11px] font-semibold text-on-surface-variant tracking-widest uppercase"
               >
                 Tipo de lector
               </label>
@@ -312,7 +312,7 @@ export const ModalEditarPerfil = ({
                 id="editar-perfil-tipo"
                 value={form.tipoUsuario}
                 onChange={setCampo("tipoUsuario")}
-                className={"cursor-pointer" + claseInput}
+                className={"cursor-pointer " + claseInput}
               >
                 {opcionesTipo.map((opcion) => (
                   <option key={opcion} value={opcion}>
