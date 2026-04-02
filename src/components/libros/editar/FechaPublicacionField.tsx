@@ -7,6 +7,7 @@ interface FechaPublicacionFieldProps {
   fechaEsFutura: boolean
   fechaPickerAbierto: boolean
   fechaSeleccionada?: Date
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   diasDeshabilitados: any[]
   mesCalendario?: Date
   onChange: (value: string) => void

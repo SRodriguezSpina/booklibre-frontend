@@ -15,7 +15,6 @@ import { toast } from "react-toastify"
 import { obtenerMensajeError } from "../utils/errorHandler"
 import { useAuthContext } from "../utils/hooks"
 
-
 export const PerfilUsuario = () => {
   const { usuario, setUsuario } = useOutletContext<ContextoPerfilUsuario>()
   const { setUsuarioContext } = useAuthContext()
@@ -45,7 +44,9 @@ export const PerfilUsuario = () => {
   const guardarDesdeModal = async (u: Usuario) => {
     try {
       const data = await usuarioService.actualizarUsuario(u)
-      const imagenUrl = data.imagenUrl !== undefined ? data.imagenUrl : u.imagenUrl
+      const imagenUrl =
+        data.imagenUrl !== undefined ? data.imagenUrl : u.imagenUrl
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { errors: _, ...uSinErrores } = u
       const nuevo = new Usuario({ ...uSinErrores, ...data, imagenUrl })
       nuevo.errors = {}
@@ -78,12 +79,21 @@ export const PerfilUsuario = () => {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 pt-20 animate-in fade-in duration-300">
-      <div className="animate-in fade-in duration-300" style={{ animationDelay: "60ms" }}>
-        <PerfilResumen usuario={usuario} onEditar={() => setModalEditarAbierto(true)} />
+      <div
+        className="animate-in fade-in duration-300"
+        style={{ animationDelay: "60ms" }}
+      >
+        <PerfilResumen
+          usuario={usuario}
+          onEditar={() => setModalEditarAbierto(true)}
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-4 space-y-6 animate-in fade-in duration-300" style={{ animationDelay: "120ms" }}>
+        <div
+          className="lg:col-span-4 space-y-6 animate-in fade-in duration-300"
+          style={{ animationDelay: "120ms" }}
+        >
           <MisDatosCard usuario={usuario} />
 
           <div className="grid grid-cols-2 gap-4">
@@ -91,14 +101,14 @@ export const PerfilUsuario = () => {
               valor={cantidadPrestados}
               etiqueta="Libros Prestados"
             />
-            <EstadisticaCard
-              valor={libros.length}
-              etiqueta="Libros Leídos"
-            />
+            <EstadisticaCard valor={libros.length} etiqueta="Libros Leídos" />
           </div>
         </div>
 
-        <div className="lg:col-span-8 animate-in fade-in duration-300" style={{ animationDelay: "160ms" }}>
+        <div
+          className="lg:col-span-8 animate-in fade-in duration-300"
+          style={{ animationDelay: "160ms" }}
+        >
           <GestionMisLibros
             libros={libros}
             onAgregar={manejarAgregarLibro}

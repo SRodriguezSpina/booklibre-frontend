@@ -1,47 +1,41 @@
-import { User } from 'lucide-react'
-import { Card } from '../ui'
-import type { Usuario } from '../../classes/usuario'
+import { User } from "lucide-react"
+import type { Usuario } from "../../classes/usuario"
 
 export type PropsMisDatosCard = {
   usuario: Usuario
 }
 
-const etiquetaTipo = (t: Usuario['tipoUsuario']) =>
-  t === 'LectorPublicador' ? 'Lector & Publicador' : t
+const etiquetaTipo = (t: Usuario["tipoUsuario"]) =>
+  t === "LectorPublicador" ? "Lector & Publicador" : t
 
 export const MisDatosCard = ({ usuario }: PropsMisDatosCard) => {
   return (
-    <Card className="bg-surface/60 border border-white/60 shadow-[0_18px_40px_rgba(15,23,42,0.08)] rounded-3xl transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_24px_50px_rgba(15,23,42,0.14)]">
-      <div className="flex items-center gap-3 px-5 pt-5">
-        <div className="h-9 w-9 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-          <User className="h-4.5 w-4.5" />
+    <div className="bg-surface rounded border border-accent/15 shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:-translate-y-1 transition-transform duration-300">
+      <div className="flex items-center gap-3 px-5 pt-5 pb-3 border-b border-accent/10">
+        <div className="h-8 w-8 rounded bg-primary/10 flex items-center justify-center">
+          <User className="h-4 w-4 text-primary-light" />
         </div>
-        <h3 className="text-xl font-bold text-secondary">Mis Datos</h3>
+        <h3 className="text-base font-serif font-bold text-on-surface">
+          Mis Datos
+        </h3>
       </div>
-
-      <div className="px-5 pb-5 pt-3 divide-y divide-secondary/10">
-        <div className="py-3">
-          <div className="text-xs font-bold tracking-widest text-secondary/40">EMAIL</div>
-          <div className="mt-1 text-sm font-semibold text-secondary">{usuario.email}</div>
-        </div>
-
-        <div className="py-3">
-          <div className="text-xs font-bold tracking-widest text-secondary/40">TELÉFONO</div>
-          <div className="mt-1 text-sm font-semibold text-secondary">{usuario.celular}</div>
-        </div>
-
-        <div className="py-3">
-          <div className="text-xs font-bold tracking-widest text-secondary/40">CIUDAD</div>
-          <div className="mt-1 text-sm font-semibold text-secondary">{usuario.ciudad}</div>
-        </div>
-
-        <div className="py-3">
-          <div className="text-xs font-bold tracking-widest text-secondary/40">TIPO DE PERFIL</div>
-          <div className="mt-1 text-sm font-semibold text-secondary">
-            {etiquetaTipo(usuario.tipoUsuario)}
+      <div className="px-5 pb-5 pt-1 divide-y divide-accent/10">
+        {[
+          { label: "Email", value: usuario.email },
+          { label: "Teléfono", value: usuario.celular },
+          { label: "Ciudad", value: usuario.ciudad },
+          { label: "Tipo de perfil", value: etiquetaTipo(usuario.tipoUsuario) },
+        ].map(({ label, value }) => (
+          <div key={label} className="py-3">
+            <div className="text-[9px] font-bold tracking-widest text-on-surface-variant/50 uppercase">
+              {label}
+            </div>
+            <div className="mt-0.5 text-sm font-medium text-on-surface">
+              {value}
+            </div>
           </div>
-        </div>
+        ))}
       </div>
-    </Card>
+    </div>
   )
 }
