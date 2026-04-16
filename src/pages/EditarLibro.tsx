@@ -14,7 +14,6 @@ import {
   type LibroFormValues,
 } from "../utils/libroFormMapper"
 import { formatLibroInputDate, parseLibroInputDate } from "../utils/libroDate"
-import { obtenerMensajeError } from "../utils/errorHandler"
 
 const MAX_FOTO_BYTES = 800_000
 
@@ -133,9 +132,8 @@ export const EditarLibro = () => {
         await libroService.actualizarLibro(instance.toDTO(Number(id)), Number(values.propietarioId))
       }
       navigate("/home", { replace: true })
-    } catch (error) {
-      const err = obtenerMensajeError(error)
-      setServerError(err.mensaje)
+    } catch {
+      setServerError("No se pudo guardar el libro. Intentá de nuevo.")
     } finally {
       setIsSubmitting(false)
     }
