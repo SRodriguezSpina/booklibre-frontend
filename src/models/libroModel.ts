@@ -33,6 +33,8 @@ export interface LibroDTO {
   propietarioId: number
   imagenUrl: string
   estoyReservado: boolean
+  rating?: number
+  cantidadReservas?: number
   alquiladoPorId?: number
   bibliokarma?: number
   reservas: RangoReservaDTO[]

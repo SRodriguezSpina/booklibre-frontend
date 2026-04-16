@@ -19,6 +19,7 @@ function libroFormValido(): LibroForm {
   form.isbn = "9780132350884"
   form.idioma = "INGLES"
   form.estado = "EXCELENTE"
+  form.editorial = "Prentice Hall"
   form.fechaPublicacion = new Date("2008-08-01")
   form.propietarioId = 1
   return form
@@ -35,6 +36,7 @@ function libroBase(): Libro {
     paginas: 448,
     isbn: "9780201485677",
     idioma: "INGLES" as Idioma,
+    editorial: "Addison-Wesley",
     estado: "MUY_BUENO" as EstadoLibro,
     fechaPublicacion: "2018-11-20",
     propietarioId: 5,
@@ -222,6 +224,20 @@ describe("LibroForm — validate()", () => {
     })
   })
 
+  describe("validación de editorial", () => {
+    it("retorna error si la editorial está vacía", () => {
+      const form = libroFormValido()
+      form.editorial = ""
+      expect(form.validate().editorial).toBe("La editorial es obligatoria")
+    })
+
+    it("no retorna error con una editorial válida", () => {
+      const form = libroFormValido()
+      form.editorial = "Sudamericana"
+      expect(form.validate().editorial).toBeUndefined()
+    })
+  })
+
   describe("validación de estado", () => {
     it("retorna error si el estado está vacío", () => {
       const form = libroFormValido()
@@ -270,6 +286,7 @@ describe("LibroForm — validate()", () => {
       expect(errors.paginas).toBeDefined()
       expect(errors.isbn).toBeDefined()
       expect(errors.idioma).toBeDefined()
+      expect(errors.editorial).toBeDefined()
       expect(errors.estado).toBeDefined()
       expect(errors.fechaPublicacion).toBeDefined()
     })
@@ -415,6 +432,17 @@ describe("LibroForm — toDTO()", () => {
     form.propietarioId = 7
     const dto = form.toDTO(1)
     expect(dto.propietarioId).toBe(7)
+  })
+
+  it("envía valores por defecto compatibles con el backend al crear", () => {
+    const dto = libroFormValido().toDTO(0)
+
+    expect(dto.fechaAgregado).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+    expect(dto.rating).toBe(0)
+    expect(dto.cantidadReservas).toBe(0)
+    expect(dto.cantidadCalificaciones).toBe(0)
+    expect(dto.alquiladoPorId).toBeUndefined()
+    expect(dto.bibliokarma).toBeUndefined()
   })
 
   it("toDTO con id 0 produce dto con id 0 (libro nuevo)", () => {

@@ -28,6 +28,7 @@ export class LibroForm {
     { name: "titulo", label: "Título", type: "text", placeholder: "Ingresá el título del libro..." },
     { name: "autor", label: "Autor", type: "text", placeholder: "Ingresá el autor..." },
     { name: "descripcion", label: "Descripción", type: "text", placeholder: "Breve descripción del libro..." },
+    { name: "editorial", label: "Editorial", type: "text", placeholder: "Ingresá la editorial..." },
     { name: "paginas", label: "Páginas", type: "number", placeholder: "Cantidad de páginas..." },
     { name: "isbn", label: "ISBN", type: "text", placeholder: "Código ISBN..." },
     { name: "fechaPublicacion", label: "Fecha de publicación", type: "date", placeholder: "" },
@@ -100,6 +101,7 @@ export class LibroForm {
         if (isNaN(Number(isbnStr))) return "El ISBN debe contener solo dígitos"
         return undefined
       })(),
+      editorial: !this.editorial.trim() ? "La editorial es obligatoria" : undefined,
       idioma: !this.idioma ? "El idioma es obligatorio" : undefined,
       estado: !this.estado ? "El estado es obligatorio" : undefined,
       fechaPublicacion: !this.fechaPublicacion
@@ -124,6 +126,7 @@ export class LibroForm {
     const apiFecha = this.fechaPublicacion
       ? this.fechaPublicacion.toISOString().split("T")[0]
       : ""
+    const fechaAgregado = new Date().toISOString().split("T")[0]
 
     return {
       id,
@@ -137,12 +140,17 @@ export class LibroForm {
       idioma: this.idioma as Idioma,
       estado: this.estado as EstadoLibro,
       fechaPublicacion: apiFecha,
-      fechaAgregado: new Date().toISOString(),
+      fechaAgregado,
       propietarioId: this.propietarioId,
       estoyReservado: this.estoyReservado,
       imagenUrl: this.imagenUrl,
       editorial: this.editorial,
+      rating: 0,
+      cantidadReservas: 0,
+      alquiladoPorId: undefined,
+      bibliokarma: undefined,
       reservas: [],
+      cantidadCalificaciones: 0,
       ultimasCalificaciones: [],
     };
   }
