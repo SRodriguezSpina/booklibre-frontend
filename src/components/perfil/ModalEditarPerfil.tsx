@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { Boton, Avatar } from "../ui"
 import { Usuario } from "../../classes/usuario"
 import type { TipoUsuario } from "../../models/usuarioModel"
@@ -38,6 +39,7 @@ export const ModalEditarPerfil = ({
   const [enviando, setEnviando] = useState(false)
   const [archivoLocal, setArchivoLocal] = useState<File | null>(null)
   const [previewLocal, setPreviewLocal] = useState<string | null>(null)
+  const [closing, setClosing] = useState(false)
   const inputArchivoRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -45,6 +47,14 @@ export const ModalEditarPerfil = ({
       if (previewLocal) URL.revokeObjectURL(previewLocal)
     }
   }, [previewLocal])
+
+  const handleClose = () => {
+    setClosing(true)
+    setTimeout(() => {
+      setClosing(false)
+      onClose()
+    }, 180)
+  }
 
   const detectarCampoDuplicado = (
     mensaje: string,
@@ -55,9 +65,8 @@ export const ModalEditarPerfil = ({
       texto.includes("celular") ||
       texto.includes("telefono") ||
       texto.includes("teléfono")
-    ) {
+    )
       return "celular"
-    }
     return null
   }
 
@@ -109,7 +118,7 @@ export const ModalEditarPerfil = ({
         aGuardar = new Usuario({ ...validado, imagenUrl: dataUrl })
       }
       await onGuardar(aGuardar)
-      onClose()
+      handleClose()
     } catch (e: unknown) {
       if (e instanceof Error && e.message.includes("demasiado grande")) {
         toast.error(e.message)
@@ -134,16 +143,16 @@ export const ModalEditarPerfil = ({
 
   const srcVistaPrevia = previewLocal || form.imagenUrl || null
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+      className="backdrop-enter fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-editar-perfil-titulo"
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div
-        className="bg-surface border border-outline/25 rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.6)] w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto"
+        className={`${closing ? "modal-out" : "modal-enter"} bg-surface border border-outline/25 rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.6)] w-full max-w-lg overflow-hidden max-h-[90vh] overflow-y-auto`}
         onClick={(e) => e.stopPropagation()}
       >
         <form onSubmit={handleSubmit}>
@@ -228,7 +237,7 @@ export const ModalEditarPerfil = ({
                 id="editar-perfil-desc"
                 value={form.desc}
                 onChange={setCampo("desc")}
-                className={`${claseInput} ${claseInputError} resize-none min-h-[80px]`}
+                className={`${claseInput} resize-none min-h-[80px]`}
                 rows={3}
               />
               {form.errors?.desc && (
@@ -330,7 +339,7 @@ export const ModalEditarPerfil = ({
               type="button"
               tipo="gris"
               className="flex-1 rounded-none py-3 text-sm font-semibold"
-              onClick={onClose}
+              onClick={handleClose}
               deshabilitado={enviando}
             >
               Cancelar
@@ -346,6 +355,7 @@ export const ModalEditarPerfil = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
