@@ -33,7 +33,7 @@ const libroDTOMock: LibroDTO = {
   estoyReservado: false,
   reservas: [],
   ultimasCalificaciones: [],
-  fechaAgregado: ""
+  fechaAgregado: "",
 }
 
 const prestamoDTOMock: PrestamoDTO = {
@@ -77,17 +77,26 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   it("llama al endpoint correcto con el usuarioId", async () => {
     mockedAxios.get.mockResolvedValueOnce({ data: [] })
 
-    await libroService.obtenerTodosLosPrestamos(1)
+    await libroService.obtenerTodosLosPrestamos(1, "prestados-a-mi")
 
     expect(mockedAxios.get).toHaveBeenCalledWith(
-      expect.stringContaining("/reservas/1"),
+      expect.stringContaining("/reservas"),
+      expect.objectContaining({
+        params: expect.objectContaining({
+          usuarioId: 1,
+          tipo: "HECHAS",
+        }),
+      }),
     )
   })
 
   it("devuelve un array de instancias de Libro", async () => {
     mockedAxios.get.mockResolvedValueOnce({ data: [prestamoDTOMock] })
 
-    const result = await libroService.obtenerTodosLosPrestamos(1)
+    const result = await libroService.obtenerTodosLosPrestamos(
+      1,
+      "prestados-a-mi",
+    )
 
     expect(result).toHaveLength(1)
     expect(result[0]).toBeInstanceOf(Libro)
@@ -96,7 +105,10 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   it("mapea el título del préstamo correctamente", async () => {
     mockedAxios.get.mockResolvedValueOnce({ data: [prestamoDTOMock] })
 
-    const result = await libroService.obtenerTodosLosPrestamos(1)
+    const result = await libroService.obtenerTodosLosPrestamos(
+      1,
+      "prestados-a-mi",
+    )
 
     expect(result[0].titulo).toBe("1984")
   })
@@ -104,7 +116,10 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   it("mapea fechaHasta del DTO a fechaDevolucion del Libro", async () => {
     mockedAxios.get.mockResolvedValueOnce({ data: [prestamoDTOMock] })
 
-    const result = await libroService.obtenerTodosLosPrestamos(1)
+    const result = await libroService.obtenerTodosLosPrestamos(
+      1,
+      "prestados-a-mi",
+    )
 
     expect(result[0].fechaHasta).toBe("2026-03-20")
   })
@@ -112,7 +127,10 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   it("mapea alquiladoPorId correctamente", async () => {
     mockedAxios.get.mockResolvedValueOnce({ data: [prestamoDTOMock] })
 
-    const result = await libroService.obtenerTodosLosPrestamos(1)
+    const result = await libroService.obtenerTodosLosPrestamos(
+      1,
+      "prestados-a-mi",
+    )
 
     expect(result[0].alquiladoPorId).toBe(1)
   })
@@ -120,7 +138,10 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   it("devuelve array vacío si el backend no devuelve préstamos", async () => {
     mockedAxios.get.mockResolvedValueOnce({ data: [] })
 
-    const result = await libroService.obtenerTodosLosPrestamos(1)
+    const result = await libroService.obtenerTodosLosPrestamos(
+      1,
+      "prestados-a-mi",
+    )
 
     expect(result).toHaveLength(0)
   })
@@ -130,7 +151,10 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
       data: [prestamoDTOMock, prestamoDTOMock2],
     })
 
-    const result = await libroService.obtenerTodosLosPrestamos(1)
+    const result = await libroService.obtenerTodosLosPrestamos(
+      1,
+      "prestados-a-mi",
+    )
 
     expect(result).toHaveLength(2)
     expect(result[1].titulo).toBe("Dune")
@@ -139,9 +163,9 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   it("propaga el error si axios falla", async () => {
     mockedAxios.get.mockRejectedValueOnce(new Error("Network Error"))
 
-    await expect(libroService.obtenerTodosLosPrestamos(1)).rejects.toThrow(
-      "Network Error",
-    )
+    await expect(
+      libroService.obtenerTodosLosPrestamos(1, "prestados-a-mi"),
+    ).rejects.toThrow("Network Error")
   })
 })
 
@@ -582,46 +606,81 @@ describe("libroService - obtenerPrestamosFiltrados", () => {
     expect(result).toHaveLength(2)
   })
 
-  it("filtra por título con query", async () => {
-    mockedAxios.get.mockResolvedValueOnce({
-      data: [prestamoDTOMock, prestamoDTOMock2],
+  describe("libroService - obtenerPrestamosFiltrados", () => {
+    beforeEach(() => {
+      vi.clearAllMocks()
     })
 
-    const result = await libroService.obtenerPrestamosFiltrados(1, "dune")
+    it("devuelve todos los libros sin query", async () => {
+      mockedAxios.get.mockResolvedValueOnce({
+        data: [prestamoDTOMock, prestamoDTOMock2],
+      })
 
-    expect(result).toHaveLength(1)
-    expect(result[0].titulo).toBe("Dune")
-  })
+      const result = await libroService.obtenerPrestamosFiltrados(
+        1,
+        "prestados-a-mi",
+      )
 
-  it("filtra por autor con query", async () => {
-    mockedAxios.get.mockResolvedValueOnce({
-      data: [prestamoDTOMock, prestamoDTOMock2],
+      expect(result).toHaveLength(2)
     })
 
-    const result = await libroService.obtenerPrestamosFiltrados(1, "orwell")
+    it("filtra por título con query", async () => {
+      mockedAxios.get.mockResolvedValueOnce({
+        data: [prestamoDTOMock, prestamoDTOMock2],
+      })
 
-    expect(result).toHaveLength(1)
-    expect(result[0].autor).toBe("George Orwell")
-  })
+      const result = await libroService.obtenerPrestamosFiltrados(
+        1,
+        "prestados-a-mi",
+        "dune",
+      )
 
-  it("la búsqueda es case-insensitive", async () => {
-    mockedAxios.get.mockResolvedValueOnce({
-      data: [prestamoDTOMock, prestamoDTOMock2],
+      expect(result).toHaveLength(1)
+      expect(result[0].titulo).toBe("Dune")
     })
 
-    const result = await libroService.obtenerPrestamosFiltrados(1, "GEORGE")
+    it("filtra por autor con query", async () => {
+      mockedAxios.get.mockResolvedValueOnce({
+        data: [prestamoDTOMock, prestamoDTOMock2],
+      })
 
-    expect(result).toHaveLength(1)
-  })
+      const result = await libroService.obtenerPrestamosFiltrados(
+        1,
+        "prestados-a-mi",
+        "orwell",
+      )
 
-  it("devuelve lista vacía si la query no coincide con nada", async () => {
-    mockedAxios.get.mockResolvedValueOnce({
-      data: [prestamoDTOMock, prestamoDTOMock2],
+      expect(result).toHaveLength(1)
+      expect(result[0].autor).toBe("George Orwell")
     })
 
-    const result = await libroService.obtenerPrestamosFiltrados(1, "zzznomatch")
+    it("la búsqueda es case-insensitive", async () => {
+      mockedAxios.get.mockResolvedValueOnce({
+        data: [prestamoDTOMock, prestamoDTOMock2],
+      })
 
-    expect(result).toHaveLength(0)
+      const result = await libroService.obtenerPrestamosFiltrados(
+        1,
+        "prestados-a-mi",
+        "GEORGE",
+      )
+
+      expect(result).toHaveLength(1)
+    })
+
+    it("devuelve lista vacía si la query no coincide con nada", async () => {
+      mockedAxios.get.mockResolvedValueOnce({
+        data: [prestamoDTOMock, prestamoDTOMock2],
+      })
+
+      const result = await libroService.obtenerPrestamosFiltrados(
+        1,
+        "prestados-a-mi",
+        "zzznomatch",
+      )
+
+      expect(result).toHaveLength(0)
+    })
   })
 
   it("propaga el error si axios falla", async () => {
