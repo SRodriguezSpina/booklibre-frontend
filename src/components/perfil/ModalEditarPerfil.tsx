@@ -152,7 +152,7 @@ export const ModalEditarPerfil = ({
       onClick={handleClose}
     >
       <div
-        className={`${closing ? "modal-out" : "modal-enter"} bg-surface border border-outline/25 rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.6)] w-full max-w-lg overflow-hidden max-h-[90vh] overflow-y-auto`}
+        className={`${closing ? "modal-out" : "modal-enter"} bg-surface border border-accent/15 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] w-full max-w-lg overflow-hidden max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-accent/20 hover:scrollbar-thumb-accent/30`}
         onClick={(e) => e.stopPropagation()}
       >
         <form onSubmit={handleSubmit}>

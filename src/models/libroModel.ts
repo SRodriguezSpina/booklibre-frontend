@@ -64,6 +64,7 @@ export interface PrestamoDTO {
   rating: number
   bibliokarma: number | null
   disponibilidad: "DISPONIBLE" | "RESERVADO"
+  disponible: boolean
 }
 
 export interface LibroHome {

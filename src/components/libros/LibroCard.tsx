@@ -44,20 +44,40 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
     navigate(`/libros/${libro.id}`)
   }
   const getEtiqueta = () => {
-    if (libro.estaDevuelto()) return "DEVUELTO"
+    // Si está devuelto, es DISPONIBLE
+    if (libro.estaDevuelto()) return "DISPONIBLE"
+
+    // Si está próximo a vencer, mostrar eso
     if (proximoAVencer) return "PRÓXIMO A VENCER"
-    if (estaDisponible) return "ACTIVO"
-    return "EN PRÉSTAMO" // Estado por defecto si no es ninguna de las anteriores
+
+    // Si está activo pero tiene fecha, mostrar días restantes o próximo a vencer
+    if (libro.fechaHasta) {
+      const diasRestantes = Math.ceil(
+        (new Date(libro.fechaHasta).getTime() - new Date().getTime()) /
+          (1000 * 60 * 60 * 24),
+      )
+      if (diasRestantes > 0) return `VENCE EN ${diasRestantes}D`
+    }
+
+    // Estado por defecto
+    return "RESERVADO"
   }
 
   const getBadgeStyles = () => {
+    // Si está devuelto, es disponible (verde)
     if (libro.estaDevuelto())
-      return "bg-danger-bg text-danger border border-danger/20 shadow-[0_0_8px_rgba(239,68,68,0.2)]"
+      return "bg-success-bg text-success border border-success/20 shadow-[0_0_8px_rgba(16,185,129,0.2)]"
+
+    // Si está próximo a vencer (naranja/warning)
     if (proximoAVencer)
       return "bg-warning-bg text-warning border border-warning/20 shadow-[0_0_8px_rgba(245,158,11,0.2)]"
+
+    // Si está activo (azul)
     if (estaDisponible)
       return "bg-[#0c2340] text-blue-400 border border-blue-400/20 shadow-[0_0_8px_rgba(96,165,250,0.2)]"
-    return "bg-success-bg text-success border border-success/20 shadow-[0_0_8px_rgba(16,185,129,0.2)]"
+
+    // Por defecto reservado (rojo/danger)
+    return "bg-danger-bg text-danger border border-danger/20 shadow-[0_0_8px_rgba(239,68,68,0.2)]"
   }
 
   return (
