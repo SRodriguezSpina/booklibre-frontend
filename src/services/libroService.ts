@@ -14,7 +14,7 @@ export const libroService = {
     usuarioId: number,
     tipo: TipoPrestamo,
   ): Promise<Libro[]> {
-    const tipoReserva = tipo === "prestados-a-mi" ? "RECIBIDAS" : "HECHAS"
+    const tipoReserva = tipo === "prestados-a-mi" ? "HECHAS" : "RECIBIDAS"
     const res = await axios.get<PrestamoDTO[]>(`${API_BASE_URL}/reservas`, {
       params: {
         usuarioId,
