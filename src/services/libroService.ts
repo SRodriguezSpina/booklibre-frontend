@@ -10,10 +10,17 @@ import type {
 import { API_BASE_URL } from "../env"
 
 export const libroService = {
-  async obtenerTodosLosPrestamos(usuarioId: number): Promise<Libro[]> {
-    const res = await axios.get<PrestamoDTO[]>(
-      `${API_BASE_URL}/reservas/${usuarioId}`,
-    )
+  async obtenerTodosLosPrestamos(
+    usuarioId: number,
+    tipo: TipoPrestamo,
+  ): Promise<Libro[]> {
+    const tipoReserva = tipo === "prestados-a-mi" ? "HECHAS" : "RECIBIDAS"
+    const res = await axios.get<PrestamoDTO[]>(`${API_BASE_URL}/reservas`, {
+      params: {
+        usuarioId,
+        tipo: tipoReserva,
+      },
+    })
     return res.data.map(Libro.fromPrestamoJson)
   },
 
@@ -52,7 +59,10 @@ export const libroService = {
     const res = await axios.get<LibroUsuarioItemDTO[]>(
       `${API_BASE_URL}/usuarios/${usuarioId}/libros`,
     )
-    return res.data
+    return res.data.map((libro) => ({
+      ...libro,
+      disponible: libro.disponible === true || libro.disponible === "true",
+    }))
   },
 
   async getLibroById(id: number): Promise<Libro> {
@@ -82,8 +92,9 @@ export const libroService = {
   async actualizarLibro(dto: LibroDTO, usuarioId: number): Promise<Libro> {
     const res = await axios.put<LibroDTO>(
       `${API_BASE_URL}/libros/${dto.id}`,
-      dto, { 
-        params: { usuarioId } 
+      dto,
+      {
+        params: { usuarioId },
       },
     )
     return Libro.fromJson(res.data)
@@ -97,9 +108,10 @@ export const libroService = {
 
   async obtenerPrestamosFiltrados(
     usuarioId: number,
+    tipo: TipoPrestamo,
     query: string = "",
   ): Promise<Libro[]> {
-    const todosLosLibros = await this.obtenerTodosLosPrestamos(usuarioId)
+    const todosLosLibros = await this.obtenerTodosLosPrestamos(usuarioId, tipo)
     if (!query) return todosLosLibros
     const q = query.toLowerCase()
     return todosLosLibros.filter(
@@ -108,7 +120,7 @@ export const libroService = {
         libro.autor.toLowerCase().includes(q),
     )
   },
-  
+
   async calificarLibro(
     libroId: number,
     usuarioId: number,

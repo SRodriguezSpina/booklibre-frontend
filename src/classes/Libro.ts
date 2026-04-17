@@ -6,7 +6,7 @@ import type {
   Idioma,
   PrestamoDTO,
   RangoReservaDTO,
-  CalificacionDTO
+  CalificacionDTO,
 } from "../models/libroModel"
 import { calcularDiferenciaDias } from "../utils/dateHandlerReserva"
 
@@ -36,19 +36,22 @@ export class Libro {
   cantidadCalificaciones?: number
   reservas: RangoReservaDTO[]
   ultimasCalificaciones: CalificacionDTO[]
+  disponibilidad?: "DISPONIBLE" | "RESERVADO"
+  disponible?: boolean
 
   constructor(data: Partial<Libro>) {
     Object.assign(this, data)
     this.id = data.id || 0
     this.titulo = data.titulo || ""
     this.autor = data.autor || ""
-    this.estado = data.estado || ("DISPONIBLE" as EstadoLibro)
+    this.estado = data.estado || ("EXCELENTE" as EstadoLibro)
     this.propietarioId = data.propietarioId || 0
     this.imagenUrl = data.imagenUrl || ""
     this.rating = data.rating || 0
     this.estoyReservado = data.estoyReservado ?? false
     this.reservas = data.reservas ?? []
     this.ultimasCalificaciones = data.ultimasCalificaciones ?? []
+    this.disponibilidad = data.disponibilidad ?? "DISPONIBLE"
   }
 
   static fromJson(json: LibroDTO): Libro {
@@ -71,6 +74,8 @@ export class Libro {
       rating: json.rating,
       bibliokarma: json.bibliokarma ?? undefined,
       reservas: [],
+      disponibilidad: json.disponibilidad ?? "DISPONIBLE",
+      disponible: json.disponible ?? false,
     })
   }
 
@@ -91,7 +96,7 @@ export class Libro {
   estaProximoAVencer(): boolean {
     if (!this.fechaHasta || this.estaDevuelto()) return false
     const hoy = new Date()
-    hoy.setHours(0, 0, 0, 0) 
+    hoy.setHours(0, 0, 0, 0)
     const fechaFin = new Date(this.fechaHasta + "T12:00:00")
     fechaFin.setHours(0, 0, 0, 0)
 

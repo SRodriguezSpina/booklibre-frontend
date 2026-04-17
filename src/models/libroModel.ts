@@ -1,5 +1,16 @@
-export type EstadoLibro = "EXCELENTE" | "MUY_BUENO" | "BUENO" | "REGULAR" | "MALO"
-export type Genero = "DRAMA" | "CIENCIA_FICCION" | "ROMANCE" | "AUTOAYUDA" | "DISENO" | "LITERATURA_CLASICA"
+export type EstadoLibro =
+  | "EXCELENTE"
+  | "MUY_BUENO"
+  | "BUENO"
+  | "REGULAR"
+  | "MALO"
+export type Genero =
+  | "DRAMA"
+  | "CIENCIA_FICCION"
+  | "ROMANCE"
+  | "AUTOAYUDA"
+  | "DISENO"
+  | "LITERATURA_CLASICA"
 export type Idioma = "ESPANOL" | "INGLES" | "FRANCES" | "PORTUGUES"
 export type TipoLibro = "Comun" | "ConDedicatoria" | "Coleccionable"
 export type TipoPrestamo = "prestados-a-mi" | "prestados-por-mi"
@@ -11,7 +22,7 @@ export type RangoReservaDTO = {
 
 export type CalificacionDTO = {
   usuarioId: number
-  nombreUsuario: string 
+  nombreUsuario: string
   valor: number
   comentario: string
 }
@@ -52,6 +63,8 @@ export interface PrestamoDTO {
   fechaHasta: string | null
   rating: number
   bibliokarma: number | null
+  disponibilidad: "DISPONIBLE" | "RESERVADO"
+  disponible: boolean
 }
 
 export interface LibroHome {
@@ -80,31 +93,31 @@ export type LibroUsuarioItemDTO = {
 }
 
 export const GENERO_LABEL: Record<string, string> = {
-    CIENCIA_FICCION: 'Ciencia Ficción',
-    DRAMA: 'Drama',
-    AUTOAYUDA: 'Autoayuda',
-    ROMANCE: 'Romance',
-    DISENO: 'Diseño',
-    LITERATURA_CLASICA: 'Literatura Clásica',
+  CIENCIA_FICCION: "Ciencia Ficción",
+  DRAMA: "Drama",
+  AUTOAYUDA: "Autoayuda",
+  ROMANCE: "Romance",
+  DISENO: "Diseño",
+  LITERATURA_CLASICA: "Literatura Clásica",
 }
 
 export const IDIOMA_LABEL: Record<string, string> = {
-    ESPANOL: 'Español',
-    INGLES: 'Inglés',
-    FRANCES: 'Francés',
-    PORTUGUES: 'Portugués',
+  ESPANOL: "Español",
+  INGLES: "Inglés",
+  FRANCES: "Francés",
+  PORTUGUES: "Portugués",
 }
 
 export const ESTADO_LABEL: Record<string, string> = {
-    EXCELENTE: 'Excelente',
-    MUY_BUENO: 'Muy bueno',
-    BUENO: 'Bueno',
-    REGULAR: 'Regular',
-    MALO: 'Malo',
+  EXCELENTE: "Excelente",
+  MUY_BUENO: "Muy bueno",
+  BUENO: "Bueno",
+  REGULAR: "Regular",
+  MALO: "Malo",
 }
 
 export const TIPO_LABEL: Record<string, string> = {
-    Comun: 'Común',
-    ConDedicatoria: 'Con dedicatoria',
-    Coleccionable: 'Coleccionable',
+  Comun: "Común",
+  ConDedicatoria: "Con dedicatoria",
+  Coleccionable: "Coleccionable",
 }

@@ -32,7 +32,7 @@ export const DetallePrestamos = () => {
     { id: "prestados-por-mi", etiqueta: "Prestados por mí" },
   ]
 
-  const fetchTodosLosPrestamos = async () => {
+  const fetchTodosLosPrestamos = async (tipo: TipoPrestamo = activeTab) => {
     if (!usuarioId) {
       setError({
         estado: 401,
@@ -45,7 +45,7 @@ export const DetallePrestamos = () => {
     setLoading(true)
     setError(null)
     try {
-      const data = await libroService.obtenerTodosLosPrestamos(usuarioId)
+      const data = await libroService.obtenerTodosLosPrestamos(usuarioId, tipo)
       setTodosLosLibros(data)
     } catch (e: unknown) {
       const err = obtenerMensajeError(e)
@@ -61,13 +61,14 @@ export const DetallePrestamos = () => {
 
   const librosFiltrados = useMemo(() => {
     if (!usuarioId) return []
-    return libroService.filtrarPrestamos(
-      todosLosLibros,
-      activeTab,
-      usuarioId,
-      searchQuery,
+    const query = searchQuery.toLowerCase().trim()
+    if (!query) return todosLosLibros
+    return todosLosLibros.filter(
+      (libro) =>
+        libro.titulo.toLowerCase().includes(query) ||
+        libro.autor.toLowerCase().includes(query),
     )
-  }, [todosLosLibros, activeTab, searchQuery, usuarioId])
+  }, [todosLosLibros, searchQuery, usuarioId])
 
   const handleSearch = (query: string) => {
     setAnimating(true)
@@ -87,12 +88,14 @@ export const DetallePrestamos = () => {
   }
 
   const handleTabChange = (id: string) => {
+    const nuevoTipo = id as TipoPrestamo
     setAnimating(true)
     setTimeout(() => {
-      setActiveTab(id as TipoPrestamo)
+      setActiveTab(nuevoTipo)
       setCurrentPage(1)
       setAnimating(false)
     }, 150)
+    fetchTodosLosPrestamos(nuevoTipo)
   }
 
   const totalPages = Math.max(
