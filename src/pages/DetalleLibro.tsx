@@ -6,7 +6,6 @@ import { Libro } from "../classes/Libro"
 import { ReseniasLibro } from "../components/detalleLibros/ReseniasLibro"
 import { ReservaCard } from "../components/detalleLibros/ReservaCard"
 import { InfoLibro } from "../components/detalleLibros/InfoLibro"
-import { Card } from "../components/ui/Card"
 import { useAuthContext } from "../utils/hooks"
 import { ChevronRight } from "lucide-react"
 
@@ -19,10 +18,10 @@ export const DetalleLibro = () => {
   const [fechaDesde, setFechaDesde] = useState<string>("")
   const [fechaHasta, setFechaHasta] = useState<string>("")
 
-  // Usamos el contexto
   const { usuario, actualizarUsuario } = useAuthContext()
   const usuarioId = usuario?.id || 1
   const bibliokarmasUsuario = usuario?.bibliokarmas || 0
+  const puedeReservar = !!usuarioId && usuario?.tipoUsuario !== "Publicador"
 
   const fetchLibro = async () => {
     try {
@@ -40,8 +39,8 @@ export const DetalleLibro = () => {
   useOnInit(() => { fetchLibro() })
 
   const handleReservaExitosa = async () => {
-    await fetchLibro() // Actualizamos el libro localmente para ver las fechas ocupadas
-    await actualizarUsuario() // Actualizamos el contexto global (Navbar)
+    await fetchLibro()
+    await actualizarUsuario()
   }
 
   let karmaCalculado = 0
@@ -53,44 +52,79 @@ export const DetalleLibro = () => {
   if (!libro) return <div className="p-10 text-center text-red-500">Libro no encontrado</div>
 
   return (
-    <main className="min-h-screen bg-background p-6 md:p-10 text-secondary-dark">
-      <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto pt-20">
+    <main className="min-h-screen bg-background text-secondary-dark">
+      <div className="max-w-screen-xl mx-auto px-6 lg:px-10 pt-24 pb-16">
 
-        <div className="w-full lg:w-1/3 flex flex-col gap-6">
-          
-          <button
-            type="button"
-            onClick={() => navigate("/home")}
-            className="flex items-center gap-1.5 text-xs font-semibold text-secondary/50 hover:text-secondary transition-colors w-fit"
-          >
-            Explorar <ChevronRight size={14} /> <span className="text-secondary-dark">{libro.titulo}</span>
-          </button>
+        {/* Breadcrumb */}
+        <button
+          type="button"
+          onClick={() => navigate("/home")}
+          className="flex items-center gap-1.5 text-xs font-semibold text-secondary/50 hover:text-secondary transition-colors mb-8"
+        >
+          Explorar <ChevronRight size={14} /> <span className="text-secondary-dark">{libro.titulo}</span>
+        </button>
 
-          <Card className="p-4 flex justify-center">
-            <img src={libro.imagenUrl} alt={libro.titulo} className="w-full max-w-[280px] rounded-md shadow-md object-cover" />
-          </Card>
+        {/* Main grid: cover | info+reviews | calendar */}
+        <div
+          className={
+            puedeReservar
+              ? "grid gap-8 items-start lg:grid-cols-[240px_1fr_320px] xl:grid-cols-[260px_1fr_340px]"
+              : "grid gap-8 items-start lg:grid-cols-[240px_1fr] xl:grid-cols-[260px_1fr]"
+          }
+        >
+          {/* Column 1: cover — sticky */}
+          <div className="lg:sticky lg:top-24 flex flex-col gap-3">
+            <div className="rounded-2xl overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-white/5">
+              <img
+                src={libro.imagenUrl}
+                alt={libro.titulo}
+                className="w-full object-cover"
+              />
+            </div>
+            <div className="flex flex-col items-center gap-2 pt-1">
+              {libro.disponibilidad === "DISPONIBLE" ? (
+                <span className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-success-bg text-success border border-success/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+                  Disponible
+                </span>
+              ) : (
+                <span className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-danger-bg text-danger border border-danger/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-danger" />
+                  Reservado
+                </span>
+              )}
+              {(libro.cantidadReservas ?? 0) > 0 && (
+                <p className="text-xs text-secondary/40">
+                  {libro.cantidadReservas} {libro.cantidadReservas === 1 ? "reserva histórica" : "reservas históricas"}
+                </p>
+              )}
+            </div>
+          </div>
 
-          {usuarioId && (
-            <ReservaCard
-              libro={libro}
-              usuarioId={usuarioId}
-              onReservaExitosa={handleReservaExitosa}
-              fechaDesde={fechaDesde}
-              setFechaDesde={setFechaDesde}
-              fechaHasta={fechaHasta}
-              setFechaHasta={setFechaHasta}
+          {/* Column 2: info + reviews */}
+          <div className="flex flex-col gap-8 min-w-0">
+            <InfoLibro libro={libro} karmaCalculado={karmaCalculado} mostrarKarma={puedeReservar} />
+            <ReseniasLibro
+              libroId={Number(id)}
+              calificaciones={libro.ultimasCalificaciones}
+              totalCalificaciones={libro.cantidadCalificaciones}
             />
+          </div>
+
+          {/* Column 3: reservation calendar — sticky, only for non-Publicador */}
+          {puedeReservar && (
+            <div className="lg:sticky lg:top-24">
+              <ReservaCard
+                libro={libro}
+                usuarioId={usuarioId}
+                onReservaExitosa={handleReservaExitosa}
+                fechaDesde={fechaDesde}
+                setFechaDesde={setFechaDesde}
+                fechaHasta={fechaHasta}
+                setFechaHasta={setFechaHasta}
+              />
+            </div>
           )}
-        </div>
-
-        <div className="w-full lg:w-2/3 flex flex-col gap-8">
-          <InfoLibro libro={libro} karmaCalculado={karmaCalculado} />
-
-          <ReseniasLibro
-            libroId={Number(id)}
-            calificaciones={libro.ultimasCalificaciones}
-            totalCalificaciones={libro.cantidadCalificaciones}
-          />
         </div>
 
       </div>

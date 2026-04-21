@@ -219,10 +219,8 @@ export const ReservaCard = ({
         </Boton>
 
         {hayFechasSeleccionadas && !errorValidacion && (
-          <p
-            className="text-xs text-secondary/40 hover:text-secondary/60 transition-colors text-center cursor-pointer"
-          >
-            Con la reserva no se encontrará disponible en el rango de fechas
+          <p className="text-xs text-secondary/40 text-center">
+            El libro no estará disponible para otros lectores en este período
           </p>
         )}
       </div>
