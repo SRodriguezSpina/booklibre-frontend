@@ -21,7 +21,7 @@ export const DetalleLibro = () => {
   const { usuario, actualizarUsuario } = useAuthContext()
   const usuarioId = usuario?.id || 1
   const bibliokarmasUsuario = usuario?.bibliokarmas || 0
-  const puedeReservar = !!usuarioId && usuario?.tipoUsuario !== "Publicador"
+  const puedeReservar = !!usuarioId && usuario?.tipoUsuario !== "Publicador" && libro?.propietarioId !== usuarioId
 
   const fetchLibro = async () => {
     try {
