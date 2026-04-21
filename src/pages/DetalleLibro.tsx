@@ -73,7 +73,7 @@ export const DetalleLibro = () => {
           }
         >
           {/* Column 1: cover — sticky */}
-          <div className="lg:sticky lg:top-24 flex flex-col gap-3">
+          <div className="lg:sticky lg:top-24 flex flex-col gap-3 mx-auto w-48 sm:w-56 lg:w-auto lg:mx-0">
             <div className="rounded-2xl overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-white/5">
               <img
                 src={libro.imagenUrl}
