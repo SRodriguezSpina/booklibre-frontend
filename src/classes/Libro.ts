@@ -38,6 +38,7 @@ export class Libro {
   ultimasCalificaciones: CalificacionDTO[]
   disponibilidad?: "DISPONIBLE" | "RESERVADO"
   disponible?: boolean
+  libroActivo?: boolean
 
   constructor(data: Partial<Libro>) {
     Object.assign(this, data)
@@ -76,6 +77,7 @@ export class Libro {
       reservas: [],
       disponibilidad: json.disponibilidad ?? "DISPONIBLE",
       disponible: json.disponible ?? false,
+      libroActivo: json.libroActivo
     })
   }
 
