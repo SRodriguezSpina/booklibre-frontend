@@ -91,7 +91,7 @@ export const InfoLibro = ({ libro, karmaCalculado, mostrarKarma = true }: InfoLi
                 {ESTADO_LABEL[libro.estado ?? ""] ?? libro.estado}
               </span>
             </DetalleItem>
-            <DetalleItem label="Reservas">{libro.cantidadReservas ?? 0}</DetalleItem>
+            <DetalleItem label="Préstamos totales">{libro.cantidadReservas ?? 0}</DetalleItem>
           </DetalleFila>
 
         </div>

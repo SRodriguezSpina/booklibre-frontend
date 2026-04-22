@@ -51,7 +51,7 @@ export class Libro {
     this.estoyReservado = data.estoyReservado ?? false
     this.reservas = data.reservas ?? []
     this.ultimasCalificaciones = data.ultimasCalificaciones ?? []
-    this.disponibilidad = data.disponibilidad ?? "DISPONIBLE"
+    this.disponibilidad = data.disponibilidad ?? (data.estoyReservado ? "RESERVADO" : "DISPONIBLE")
   }
 
   static fromJson(json: LibroDTO): Libro {

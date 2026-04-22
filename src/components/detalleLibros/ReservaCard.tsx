@@ -6,7 +6,7 @@ import { Boton } from "../ui/Boton"
 import { formatearFechaVisual, calcularDiferenciaDias } from "../../utils/dateHandlerReserva"
 import { reservaService } from "../../services/reservaService"
 import { Libro } from "../../classes/Libro"
-import { CalendarDays, ChevronDown, ChevronUp, Package, RotateCcw, Clock } from "lucide-react"
+import { CalendarDays, Package, RotateCcw, Clock, Pencil, CheckCircle2 } from "lucide-react"
 import { Calendario } from "../ui/Calendario"
 import { toast } from "react-toastify"
 import { obtenerMensajeError } from "../../utils/errorHandler"
@@ -30,17 +30,12 @@ export const ReservaCard = ({
 }: ReservaCardProps) => {
   const [loading, setLoading] = useState(false)
   const [calendarAbierto, setCalendarAbierto] = useState(true)
+  const [reservaConfirmada, setReservaConfirmada] = useState<{ desde: string; hasta: string } | null>(null)
 
   const hoy = new Date()
   hoy.setHours(0, 0, 0, 0)
 
-  const diasDeshabilitados = [
-    { before: hoy },
-    ...libro.reservas.map(r => ({
-      from: strToDate(r.fechaDesde),
-      to: strToDate(r.fechaHasta),
-    })),
-  ]
+  const diasDeshabilitados = [{ before: hoy }]
 
   const rangeSeleccionado: DateRange | undefined = fechaDesde
     ? { from: strToDate(fechaDesde), to: fechaHasta ? strToDate(fechaHasta) : undefined }
@@ -70,35 +65,21 @@ export const ReservaCard = ({
     }
   }
 
-  const errorValidacion: string | null = (() => {
-    if (!fechaDesde || !fechaHasta) return null
-    const inicio = strToDate(fechaDesde)
-    const fin = strToDate(fechaHasta)
-    const conflicto = libro.reservas.find(r => {
-      const rDesde = strToDate(r.fechaDesde)
-      const rHasta = strToDate(r.fechaHasta)
-      return inicio <= rHasta && fin >= rDesde
-    })
-    if (conflicto) {
-      return `El libro ya está reservado del ${formatearFechaVisual(conflicto.fechaDesde)} al ${formatearFechaVisual(conflicto.fechaHasta)}.`
-    }
-    return null
-  })()
-
   const duracionDias = fechaDesde && fechaHasta
     ? calcularDiferenciaDias(fechaDesde, fechaHasta)
     : 0
 
   const handleReservar = async () => {
-    if (!fechaDesde || !fechaHasta || errorValidacion) return
+    if (!fechaDesde || !fechaHasta) return
     setLoading(true)
     try {
       await reservaService.crearReserva({ libroId: libro.id, usuarioId, fechaDesde, fechaHasta })
+      setReservaConfirmada({ desde: fechaDesde, hasta: fechaHasta })
       setFechaDesde("")
       setFechaHasta("")
       setCalendarAbierto(true)
-      onReservaExitosa()
       toast.success("¡Reserva confirmada con éxito!")
+      onReservaExitosa()
     } catch (error) {
       const err = obtenerMensajeError(error)
       toast.error(err.mensaje || "No se pudo confirmar la reserva. Intentá de nuevo.")
@@ -107,29 +88,79 @@ export const ReservaCard = ({
     }
   }
 
-  const handleToggleCalendario = () => {
+  const handleModificarFechas = () => {
     setFechaDesde("")
     setFechaHasta("")
-    setCalendarAbierto((v) => !v)
+    setCalendarAbierto(true)
   }
 
-  const hayFechasSeleccionadas = fechaDesde && fechaHasta && !errorValidacion
+  const hayFechasSeleccionadas = !!(fechaDesde && fechaHasta)
 
   return (
     <Card className="flex flex-col gap-0 overflow-hidden p-0">
       <div className="px-5 pt-5 pb-4 border-b border-gray-100/10">
         <CardHeader
-          titulo="Tu Reserva"
-          icono={<CalendarDays size={18} className="text-primary" />}
+          titulo={reservaConfirmada ? "Reserva Confirmada" : "Tu Reserva"}
+          icono={
+            reservaConfirmada
+              ? <CheckCircle2 size={18} className="text-success" />
+              : <CalendarDays size={18} className="text-primary" />
+          }
           className="text-lg mb-0"
         />
       </div>
 
+      {reservaConfirmada ? (
+        <div className="px-5 py-8 flex flex-col items-center gap-4 text-center">
+          <div className="w-14 h-14 rounded-full bg-success-bg flex items-center justify-center">
+            <CheckCircle2 size={28} className="text-success" />
+          </div>
+          <p className="text-sm font-semibold text-secondary-dark">
+            ¡El libro está reservado para vos!
+          </p>
+          <div className="w-full flex flex-col gap-0">
+            <div className="flex items-center justify-between py-2.5 border-b border-gray-100/10">
+              <div className="flex items-center gap-2 text-secondary/60">
+                <Package size={13} />
+                <span className="text-xs font-semibold">Retiro</span>
+              </div>
+              <span className="text-xs font-bold text-secondary-dark">
+                {formatearFechaVisual(reservaConfirmada.desde)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between py-2.5">
+              <div className="flex items-center gap-2 text-secondary/60">
+                <RotateCcw size={13} />
+                <span className="text-xs font-semibold">Devolución</span>
+              </div>
+              <span className="text-xs font-bold text-secondary-dark">
+                {formatearFechaVisual(reservaConfirmada.hasta)}
+              </span>
+            </div>
+          </div>
+          <p className="text-xs text-secondary/40">
+            El libro quedará reservado a tu nombre hasta el{" "}
+            <span className="font-semibold text-secondary/60">{formatearFechaVisual(reservaConfirmada.hasta)}</span>
+          </p>
+        </div>
+      ) : (
+        <>
+
       {hayFechasSeleccionadas && !calendarAbierto && (
         <div className="px-5 py-4 border-b border-gray-100/10">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-secondary/50 mb-3">
-            Fechas Seleccionadas:
-          </p>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-secondary/50">
+              Fechas Seleccionadas
+            </p>
+            <button
+              type="button"
+              onClick={handleModificarFechas}
+              className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-primary/70 hover:text-primary transition-colors"
+            >
+              <Pencil size={10} />
+              Modificar
+            </button>
+          </div>
           <div className="flex items-center gap-3 mb-3 bg-primary/10 rounded-lg px-3 py-2.5">
             <CalendarDays size={14} className="text-primary shrink-0" />
             <span className="text-sm font-semibold text-secondary-dark">
@@ -168,16 +199,6 @@ export const ReservaCard = ({
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={handleToggleCalendario}
-        className="flex items-center justify-between px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-secondary/50 hover:text-secondary/80 transition-colors border-b border-gray-100/10"
-      >
-        <span>{calendarAbierto ? "Cerrar Calendario" : "Cambiar Fechas"}</span>
-        {calendarAbierto ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-      </button>
-
-
       {calendarAbierto && (
         <div className="border-b border-gray-100/10">
           <Calendario
@@ -185,45 +206,27 @@ export const ReservaCard = ({
             onSelect={handleSelect}
             diasDeshabilitados={diasDeshabilitados}
           />
+        </div>
+      )}
 
-          {libro.reservas.length > 0 && (
-            <div className="px-5 pb-4 flex flex-col gap-1.5">
-              <p className="text-xs font-bold uppercase tracking-widest text-secondary/40 mb-0.5">
-                No disponible:
-              </p>
-              {libro.reservas.map((r, i) => (
-                <div key={i} className="flex items-center gap-2 text-xs text-secondary/50">
-                  <span className="w-1.5 h-1.5 rounded-full bg-danger/60 shrink-0" />
-                  {formatearFechaVisual(r.fechaDesde)} → {formatearFechaVisual(r.fechaHasta)}
-                </div>
-              ))}
-            </div>
+        <div className="px-5 py-4 flex flex-col gap-2">
+          <Boton
+            tipo="primario"
+            className="w-full"
+            onClick={handleReservar}
+            deshabilitado={loading || !fechaDesde || !fechaHasta}
+          >
+            {loading ? "Procesando..." : "Confirmar Reserva ✓"}
+          </Boton>
+
+          {hayFechasSeleccionadas && (
+            <p className="text-xs text-secondary/40 text-center">
+              El libro quedará reservado a tu nombre hasta el {formatearFechaVisual(fechaHasta)}
+            </p>
           )}
         </div>
+        </>
       )}
-
-      {errorValidacion && (
-        <div className="px-5 py-3 border-b border-gray-100/10">
-          <p className="text-xs text-danger">{errorValidacion}</p>
-        </div>
-      )}
-
-      <div className="px-5 py-4 flex flex-col gap-2">
-        <Boton
-          tipo="primario"
-          className="w-full"
-          onClick={handleReservar}
-          deshabilitado={loading || !fechaDesde || !fechaHasta || !!errorValidacion}
-        >
-          {loading ? "Procesando..." : "Confirmar Reserva ✓"}
-        </Boton>
-
-        {hayFechasSeleccionadas && !errorValidacion && (
-          <p className="text-xs text-secondary/40 text-center">
-            El libro no estará disponible para otros lectores en este período
-          </p>
-        )}
-      </div>
     </Card>
   )
 }
