@@ -27,9 +27,9 @@ describe('Filters', () => {
     const mockApply = vi.fn()
     render(<Filters onApplyFilters={mockApply} />)
 
-    // Simulamos un click en el checkbox de Drama
-    const dramaCheckbox = screen.getByLabelText('Drama')
-    fireEvent.click(dramaCheckbox)
+    // Simulamos un click en la etiqueta de Drama
+    const dramaButton = screen.getByText('Drama')
+    fireEvent.click(dramaButton)
 
     fireEvent.click(screen.getByText('Aplicar Filtros'))
 

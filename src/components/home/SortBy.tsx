@@ -11,20 +11,25 @@ const SORT_OPTIONS = [
 
 export const SortBy = ({ value, onChange }: SortByProps) => {
     return (
-        <div className="flex items-center gap-1.5 text-xs text-secondary-light">
-            <span className="text-secondary-light">Ordenar por:</span>
-            <select
-                data-testid="sort-select"
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                className="border border-accent rounded px-2 py-0.5 text-xs text-secondary-dark bg-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
-            >
-                {SORT_OPTIONS.map(opt => (
-                    <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                    </option>
-                ))}
-            </select>
+        <div className="flex items-center gap-2">
+            <span className="text-secondary-light font-medium text-xs">Ordenar por:</span>
+            <div className="relative">
+                <select
+                    data-testid="sort-select"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="appearance-none w-32 bg-black/20 border border-transparent rounded px-3 py-1.5 pr-8 text-xs font-semibold text-secondary-dark outline-none focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer shadow-sm hover:bg-black/30"
+                >
+                    {SORT_OPTIONS.map(opt => (
+                        <option key={opt.value} value={opt.value} className="bg-surface text-secondary-dark font-medium">
+                            {opt.label}
+                        </option>
+                    ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-primary">
+                    <svg className="w-4 h-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+                </div>
+            </div>
         </div>
     )
 }
