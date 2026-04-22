@@ -54,7 +54,7 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
     if (libro.fechaHasta) {
       const diasRestantes = Math.ceil(
         (new Date(libro.fechaHasta).getTime() - new Date().getTime()) /
-          (1000 * 60 * 60 * 24),
+        (1000 * 60 * 60 * 24),
       )
       if (diasRestantes > 0) return `VENCE EN ${diasRestantes}D`
     }
@@ -81,7 +81,7 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
   }
 
   return (
-    <div className="bg-surface rounded border border-accent/10 shadow-[0_8px_24px_rgba(0,0,0,0.3)] flex flex-col h-full group hover:-translate-y-1 transition-transform duration-300">
+    <div className="relative bg-surface rounded border border-accent/10 shadow-[0_8px_24px_rgba(0,0,0,0.3)] flex flex-col h-full group hover:-translate-y-1 transition-transform duration-300">
       <div
         onClick={goToDetail}
         className="relative overflow-hidden cursor-pointer rounded-t"
@@ -163,11 +163,10 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
           onClick={() => !yaCalificado && setIsModalOpen(true)}
           className={`mt-auto w-full py-2 text-[10px] font-bold uppercase tracking-[0.1em] rounded transition-all border
           ${esPrestamoRecibido && libro.estaDevuelto() ? "visible" : "invisible pointer-events-none"}
-          ${
-            yaCalificado
+          ${yaCalificado
               ? "bg-success-bg text-success border-success/20 cursor-default"
               : "border-primary/40 text-primary-light hover:bg-primary/10 cursor-pointer"
-          }`}
+            }`}
         >
           {yaCalificado ? "✓ Calificado" : "★ Calificar"}
         </button>
@@ -178,6 +177,13 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
         onSubmit={handleCalificar}
         tituloLibro={libro.titulo}
       />
+      {!libro.libroActivo && (
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded">
+          <span className="text-white font-semibold text-sm">
+            Libro no disponible
+          </span>
+        </div>
+      )}
     </div>
   )
 }
