@@ -26,6 +26,7 @@ export const Home = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<ErrorPersonalizado | null>(null)
   const [animating, setAnimating] = useState(false)
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false)
 
   const userId = authService.obtenerIdUsuarioActual()
 
@@ -99,13 +100,27 @@ export const Home = () => {
         comunidad.
       </p>
 
-      <div className="flex gap-10">
-        <aside className="w-56 shrink-0">
-          <Filters
-            onApplyFilters={(filters: FiltersState) =>
-              handleApplyFilters(filters)
-            }
-          />
+      <div className="flex flex-col md:flex-row gap-6 md:gap-10">
+        <aside className="w-full md:w-56 shrink-0">
+          <button 
+            type="button"
+            className="md:hidden w-full flex items-center justify-between bg-surface border border-accent/20 rounded px-5 py-3.5 mb-2 text-secondary-dark font-semibold shadow-sm active:scale-[0.98] transition-all"
+            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+          >
+            <span className="flex items-center gap-2 text-sm">
+              <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+              {isFiltersOpen ? 'Ocultar Filtros' : 'Mostrar Filtros'}
+            </span>
+            <svg className={`w-4 h-4 text-secondary-light transition-transform duration-300 ${isFiltersOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+          </button>
+
+          <div className={`transition-all duration-300 md:block ${isFiltersOpen ? 'block' : 'hidden'}`}>
+            <Filters
+              onApplyFilters={(filters: FiltersState) =>
+                handleApplyFilters(filters)
+              }
+            />
+          </div>
         </aside>
 
         <div className="flex-1 flex flex-col gap-3">
@@ -114,7 +129,7 @@ export const Home = () => {
             placeholder="Buscar por título..."
           />
 
-          <div className="felx justify-end">
+          <div className="flex justify-end">
             <SortBy value={sortBy} onChange={handleSortChange} />
           </div>
 
