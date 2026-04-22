@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import axios from 'axios'
 import type { UsuarioData } from '../../classes/usuario'
 
-vi.mock('axios')
-const mockedAxios = vi.mocked(axios, true)
+vi.mock('../../services/apiClient', () => ({
+  apiClient: { get: vi.fn(), put: vi.fn() },
+}))
+import { apiClient } from '../../services/apiClient'
+const mockedApiClient = vi.mocked(apiClient, true)
 
 // Importar después del mock
 import { usuarioService } from '../../services/usuarioService'
@@ -25,18 +27,16 @@ describe('usuarioService — obtenerUsuario', () => {
   })
 
   it('llama al endpoint correcto y devuelve el data', async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: usuarioDataMock })
+    mockedApiClient.get.mockResolvedValueOnce({ data: usuarioDataMock } as any)
 
     const result = await usuarioService.obtenerUsuario(1)
 
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-      expect.stringContaining('/usuarios/1')
-    )
+    expect(mockedApiClient.get).toHaveBeenCalledWith('/usuarios/1')
     expect(result).toEqual(usuarioDataMock)
   })
 
   it('propaga el error si axios falla', async () => {
-    mockedAxios.get.mockRejectedValueOnce(new Error('Unauthorized'))
+    mockedApiClient.get.mockRejectedValueOnce(new Error('Unauthorized'))
 
     await expect(usuarioService.obtenerUsuario(1)).rejects.toThrow('Unauthorized')
   })
@@ -50,12 +50,12 @@ describe('usuarioService — actualizarUsuario', () => {
   it('envía el payload correcto (UsuarioUpdateRequest)', async () => {
     const usuarioActualizado: UsuarioData = { ...usuarioDataMock, nombre: 'Juan 2' }
 
-    mockedAxios.put.mockResolvedValueOnce({ data: usuarioActualizado })
+    mockedApiClient.put.mockResolvedValueOnce({ data: usuarioActualizado } as any)
 
     const result = await usuarioService.actualizarUsuario(usuarioActualizado)
 
-    expect(mockedAxios.put).toHaveBeenCalledWith(
-      expect.stringContaining('/usuarios/1'),
+    expect(mockedApiClient.put).toHaveBeenCalledWith(
+      '/usuarios/1',
       expect.objectContaining({
         nombre: 'Juan 2',
         desc: 'desc',
@@ -71,7 +71,7 @@ describe('usuarioService — actualizarUsuario', () => {
   })
 
   it('propaga el error si axios falla', async () => {
-    mockedAxios.put.mockRejectedValueOnce(new Error('Forbidden'))
+    mockedApiClient.put.mockRejectedValueOnce(new Error('Forbidden'))
 
     await expect(
       usuarioService.actualizarUsuario(usuarioDataMock)
@@ -79,7 +79,7 @@ describe('usuarioService — actualizarUsuario', () => {
   })
 
   it('normaliza imagenUrl a null y omite campos internos', async () => {
-    mockedAxios.put.mockResolvedValueOnce({ data: usuarioDataMock })
+    mockedApiClient.put.mockResolvedValueOnce({ data: usuarioDataMock } as any)
     const usuarioConCamposInternos = {
       ...usuarioDataMock,
       imagenUrl: undefined,
@@ -88,12 +88,12 @@ describe('usuarioService — actualizarUsuario', () => {
 
     await usuarioService.actualizarUsuario(usuarioConCamposInternos)
 
-    expect(mockedAxios.put).toHaveBeenCalledWith(
-      expect.stringContaining('/usuarios/1'),
+    expect(mockedApiClient.put).toHaveBeenCalledWith(
+      '/usuarios/1',
       expect.objectContaining({
         imagenUrl: null,
       })
     )
-    expect(mockedAxios.put.mock.calls[0][1]).not.toHaveProperty('errors')
+    expect(mockedApiClient.put.mock.calls[0][1]).not.toHaveProperty('errors')
   })
 })

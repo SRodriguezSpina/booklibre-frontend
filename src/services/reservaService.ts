@@ -1,5 +1,4 @@
-import axios from "axios"
-import { API_BASE_URL } from "../env"
+import { apiClient } from "./apiClient"
 
 export interface CrearReservaDTO {
   libroId: number
@@ -10,7 +9,7 @@ export interface CrearReservaDTO {
 
 export const reservaService = {
   async crearReserva(dto: CrearReservaDTO) {
-    const res = await axios.post(`${API_BASE_URL}/reservas`, dto)
+    const res = await apiClient.post(`/reservas`, dto)
     return res.data
   }
 }

@@ -1,6 +1,5 @@
 import type { LibroHome } from '../models/libroModel'
-import { API_BASE_URL } from "../env"
-import axios from 'axios'
+import { apiClient } from './apiClient'
 import type { FiltersState } from '../components/home/Filters'
 import { INITIAL_FILTERS } from '../components/home/Filters'
 
@@ -33,7 +32,7 @@ class HomeService {
             .map(([key]) => GENERO_MAP[key])
             .join(',')
 
-        const response = await axios.get<SearchResponse>(`${API_BASE_URL}/libros/home`, {
+        const response = await apiClient.get<SearchResponse>(`/libros/home`, {
             params: {
                 query, generos, page, size, 
                 ...(usuarioId !== null && {usuarioId}),
