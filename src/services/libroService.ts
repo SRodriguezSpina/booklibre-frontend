@@ -1,4 +1,3 @@
-import axios from "axios"
 import { Libro } from "../classes/Libro"
 import type {
   CalificacionDTO,
@@ -7,7 +6,7 @@ import type {
   PrestamoDTO,
   TipoPrestamo,
 } from "../models/libroModel"
-import { API_BASE_URL } from "../env"
+import { apiClient } from "./apiClient"
 
 export const libroService = {
   async obtenerTodosLosPrestamos(
@@ -15,7 +14,7 @@ export const libroService = {
     tipo: TipoPrestamo,
   ): Promise<Libro[]> {
     const tipoReserva = tipo === "prestados-a-mi" ? "HECHAS" : "RECIBIDAS"
-    const res = await axios.get<PrestamoDTO[]>(`${API_BASE_URL}/reservas`, {
+    const res = await apiClient.get<PrestamoDTO[]>(`/reservas`, {
       params: {
         usuarioId,
         tipo: tipoReserva,
@@ -26,7 +25,7 @@ export const libroService = {
 
   filtrarPrestamos(
     libros: Libro[],
-    tipo: TipoPrestamo, // "prestados-a-mi" | "prestados-por-mi"
+    tipo: TipoPrestamo,
     usuarioId: number,
     searchQuery: string = "",
   ): Libro[] {
@@ -47,17 +46,15 @@ export const libroService = {
   },
 
   async obtenerLibrosDeUsuario(usuarioId: number): Promise<Libro[]> {
-    const res = await axios.get<LibroDTO[]>(
-      `${API_BASE_URL}/usuarios/${usuarioId}/libros`,
-    )
+    const res = await apiClient.get<LibroDTO[]>(`/usuarios/${usuarioId}/libros`)
     return res.data.map(Libro.fromJson)
   },
 
   async obtenerLibrosUsuarioPerfil(
     usuarioId: number,
   ): Promise<LibroUsuarioItemDTO[]> {
-    const res = await axios.get<LibroUsuarioItemDTO[]>(
-      `${API_BASE_URL}/usuarios/${usuarioId}/libros`,
+    const res = await apiClient.get<LibroUsuarioItemDTO[]>(
+      `/usuarios/${usuarioId}/libros`,
     )
     return res.data.map((libro) => ({
       ...libro,
@@ -66,42 +63,33 @@ export const libroService = {
   },
 
   async getLibroById(id: number): Promise<Libro> {
-    const res = await axios.get<LibroDTO>(`${API_BASE_URL}/libros/${id}`)
+    const res = await apiClient.get<LibroDTO>(`/libros/${id}`)
     return Libro.fromJson(res.data)
   },
+
   async getCalificaciones(libroId: number): Promise<CalificacionDTO[]> {
-    const res = await axios.get<CalificacionDTO[]>(
-      `${API_BASE_URL}/libros/${libroId}/calificaciones`,
+    const res = await apiClient.get<CalificacionDTO[]>(
+      `/libros/${libroId}/calificaciones`,
     )
     return res.data
   },
 
   async crearLibro(dto: LibroDTO, usuarioId: number): Promise<Libro> {
-    const res = await axios.post<LibroDTO>(
-      `${API_BASE_URL}/libros/nuevo`,
-      dto,
-      {
-        params: {
-          usuarioId,
-        },
-      },
-    )
+    const res = await apiClient.post<LibroDTO>(`/libros/nuevo`, dto, {
+      params: { usuarioId },
+    })
     return Libro.fromJson(res.data)
   },
 
   async actualizarLibro(dto: LibroDTO, usuarioId: number): Promise<Libro> {
-    const res = await axios.put<LibroDTO>(
-      `${API_BASE_URL}/libros/${dto.id}`,
-      dto,
-      {
-        params: { usuarioId },
-      },
-    )
+    const res = await apiClient.put<LibroDTO>(`/libros/${dto.id}`, dto, {
+      params: { usuarioId },
+    })
     return Libro.fromJson(res.data)
   },
 
   async eliminarLibro(libroId: number, usuarioId: number): Promise<void> {
-    await axios.delete(`${API_BASE_URL}/libros/${libroId}`, {
+    await apiClient.delete(`/libros/${libroId}`, {
       params: { usuarioId },
     })
   },
@@ -127,7 +115,7 @@ export const libroService = {
     valor: number,
     comentario: string,
   ) {
-    return await axios.post(`${API_BASE_URL}/libros/${libroId}/calificar`, {
+    return await apiClient.post(`/libros/${libroId}/calificar`, {
       usuarioId,
       valor,
       comentario,

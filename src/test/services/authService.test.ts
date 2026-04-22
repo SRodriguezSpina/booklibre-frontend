@@ -4,8 +4,9 @@ import axios from 'axios'
 vi.mock('axios')
 const mockedAxios = vi.mocked(axios, true)
 
-// Importamos DESPUÉS del mock para que el módulo use la versión mockeada
 import { authService } from '../../services/AuthService'
+
+const TOKEN_MOCK = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqdWFuQG1haWwuY29tIn0.abc'
 
 const usuarioMock = {
   id: 1,
@@ -27,7 +28,7 @@ describe('AuthService - login', () => {
 
   it('guarda idUsuario en localStorage tras login exitoso', async () => {
     mockedAxios.post.mockResolvedValueOnce({
-      data: { success: true, message: 'Login exitoso', usuario: usuarioMock }
+      data: { success: true, message: 'Login exitoso', token: TOKEN_MOCK, usuario: usuarioMock }
     })
 
     await authService.login({ email: 'juan@mail.com', password: '123' })
@@ -37,7 +38,7 @@ describe('AuthService - login', () => {
 
   it('guarda nombreUsuario en localStorage tras login exitoso', async () => {
     mockedAxios.post.mockResolvedValueOnce({
-      data: { success: true, message: 'Login exitoso', usuario: usuarioMock }
+      data: { success: true, message: 'Login exitoso', token: TOKEN_MOCK, usuario: usuarioMock }
     })
 
     await authService.login({ email: 'juan@mail.com', password: '123' })
@@ -45,8 +46,18 @@ describe('AuthService - login', () => {
     expect(localStorage.getItem('nombreUsuario')).toBe('Juan Pérez')
   })
 
+  it('guarda token en localStorage tras login exitoso', async () => {
+    mockedAxios.post.mockResolvedValueOnce({
+      data: { success: true, message: 'Login exitoso', token: TOKEN_MOCK, usuario: usuarioMock }
+    })
+
+    await authService.login({ email: 'juan@mail.com', password: '123' })
+
+    expect(localStorage.getItem('token')).toBe(TOKEN_MOCK)
+  })
+
   it('retorna los datos del response correctamente', async () => {
-    const responseMock = { success: true, message: 'Login exitoso', usuario: usuarioMock }
+    const responseMock = { success: true, message: 'Login exitoso', token: TOKEN_MOCK, usuario: usuarioMock }
     mockedAxios.post.mockResolvedValueOnce({ data: responseMock })
 
     const result = await authService.login({ email: 'juan@mail.com', password: '123' })
@@ -56,13 +67,14 @@ describe('AuthService - login', () => {
 
   it('no guarda nada en localStorage si success es false', async () => {
     mockedAxios.post.mockResolvedValueOnce({
-      data: { success: false, message: 'Credenciales inválidas', usuario: null }
+      data: { success: false, message: 'Credenciales inválidas', token: '', usuario: null }
     })
 
     await authService.login({ email: 'juan@mail.com', password: 'wrong' })
 
     expect(localStorage.getItem('idUsuario')).toBeNull()
     expect(localStorage.getItem('nombreUsuario')).toBeNull()
+    expect(localStorage.getItem('token')).toBeNull()
   })
 
   it('lanza el error si axios falla', async () => {
@@ -75,7 +87,7 @@ describe('AuthService - login', () => {
 
   it('llama al endpoint correcto', async () => {
     mockedAxios.post.mockResolvedValueOnce({
-      data: { success: true, usuario: usuarioMock }
+      data: { success: true, token: TOKEN_MOCK, usuario: usuarioMock }
     })
 
     await authService.login({ email: 'juan@mail.com', password: '123' })
@@ -95,7 +107,7 @@ describe('AuthService - registro', () => {
   })
 
   it('retorna el response del servidor', async () => {
-    const responseMock = { success: true, message: 'Registro exitoso', usuario: usuarioMock }
+    const responseMock = { success: true, message: 'Registro exitoso', token: TOKEN_MOCK, usuario: usuarioMock }
     mockedAxios.post.mockResolvedValueOnce({ data: responseMock })
 
     const result = await authService.registro({
@@ -108,9 +120,9 @@ describe('AuthService - registro', () => {
     expect(result).toEqual(responseMock)
   })
 
-  it('no guarda nada en localStorage al registrarse', async () => {
+  it('guarda token en localStorage si el backend lo devuelve al registrarse', async () => {
     mockedAxios.post.mockResolvedValueOnce({
-      data: { success: true, usuario: usuarioMock }
+      data: { success: true, token: TOKEN_MOCK, usuario: usuarioMock }
     })
 
     await authService.registro({
@@ -120,12 +132,26 @@ describe('AuthService - registro', () => {
       confirmarPassword: '123456',
     })
 
-    // El registro no loguea automáticamente al usuario
+    expect(localStorage.getItem('token')).toBe(TOKEN_MOCK)
+  })
+
+  it('no guarda idUsuario en localStorage al registrarse', async () => {
+    mockedAxios.post.mockResolvedValueOnce({
+      data: { success: true, token: TOKEN_MOCK, usuario: usuarioMock }
+    })
+
+    await authService.registro({
+      nombre: 'Juan',
+      email: 'juan@mail.com',
+      password: '123456',
+      confirmarPassword: '123456',
+    })
+
     expect(localStorage.getItem('idUsuario')).toBeNull()
   })
 
   it('llama al endpoint correcto', async () => {
-    mockedAxios.post.mockResolvedValueOnce({ data: { success: true } })
+    mockedAxios.post.mockResolvedValueOnce({ data: { success: true, token: TOKEN_MOCK } })
 
     await authService.registro({
       nombre: 'Juan', email: 'juan@mail.com',
@@ -151,6 +177,12 @@ describe('AuthService - logout', () => {
     localStorage.setItem('nombreUsuario', 'Juan')
     authService.logout()
     expect(localStorage.getItem('nombreUsuario')).toBeNull()
+  })
+
+  it('elimina token del localStorage', () => {
+    localStorage.setItem('token', TOKEN_MOCK)
+    authService.logout()
+    expect(localStorage.getItem('token')).toBeNull()
   })
 
   it('no falla si localStorage ya estaba vacío', () => {
@@ -187,6 +219,15 @@ describe('AuthService - helpers de sesión', () => {
 
   it('estaAutenticado retorna false si no hay id en localStorage', () => {
     expect(authService.estaAutenticado()).toBe(false)
+  })
+
+  it('obtenerToken retorna el token si existe', () => {
+    localStorage.setItem('token', TOKEN_MOCK)
+    expect(authService.obtenerToken()).toBe(TOKEN_MOCK)
+  })
+
+  it('obtenerToken retorna null si no hay token', () => {
+    expect(authService.obtenerToken()).toBeNull()
   })
 })
 

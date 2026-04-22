@@ -1,18 +1,18 @@
 import axios from "axios"
 import type { RegisterData, LoginData, AuthResponseUsuario } from "../types/UsuarioTypes"
 import { API_BASE_URL, AUTH_PATH } from "../env"
+import { tokenService } from "./tokenService"
 
 class AuthService {
-  // ── Auth ──────────────────────────────────────────────────────────────────
-
   async login(data: LoginData): Promise<AuthResponseUsuario> {
     const response = await axios.post<AuthResponseUsuario>(
       `${API_BASE_URL}${AUTH_PATH('login')}`,
       data,
     )
     if (response.data.success && response.data.usuario) {
-      localStorage.setItem("idUsuario", response.data.usuario.id.toString())
-      localStorage.setItem("nombreUsuario", response.data.usuario.nombre)
+      tokenService.setIdUsuario(response.data.usuario.id)
+      tokenService.setNombreUsuario(response.data.usuario.nombre)
+      tokenService.setToken(response.data.token)
     }
     return response.data
   }
@@ -22,30 +22,31 @@ class AuthService {
       `${API_BASE_URL}${AUTH_PATH('register')}`,
       data,
     )
+    if (response.data.token) {
+      tokenService.setToken(response.data.token)
+    }
     return response.data
   }
 
   logout(): void {
-    localStorage.removeItem("idUsuario")
-    localStorage.removeItem("nombreUsuario")
+    tokenService.clearAll()
   }
 
-  // ── Session helpers ───────────────────────────────────────────────────────
+  obtenerToken(): string | null {
+    return tokenService.getToken()
+  }
 
   obtenerIdUsuarioActual(): number | null {
-    const id = localStorage.getItem("idUsuario")
-    return id ? Number(id) : null
+    return tokenService.getIdUsuario()
   }
 
   obtenerNombreUsuarioActual(): string | null {
-    return localStorage.getItem("nombreUsuario")
+    return tokenService.getNombreUsuario()
   }
 
   estaAutenticado(): boolean {
-    return this.obtenerIdUsuarioActual() !== null
+    return tokenService.estaAutenticado()
   }
-
-  // ── Error handling ────────────────────────────────────────────────────────
 
   manejarError(error: unknown): string {
     if (axios.isAxiosError(error)) {

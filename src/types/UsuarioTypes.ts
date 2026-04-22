@@ -15,5 +15,6 @@ export type LoginData = {
 export type AuthResponseUsuario = {
     success: boolean,
     message: string,
+    token: string,
     usuario: UsuarioResponse
 }

@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import axios from 'axios'
-
-vi.mock('axios')
-const mockedAxios = vi.mocked(axios, true)
+vi.mock('../../services/apiClient', () => ({
+  apiClient: { get: vi.fn() },
+}))
+import { apiClient } from '../../services/apiClient'
+const mockedApiClient = vi.mocked(apiClient, true)
 
 import { homeService } from '../../services/homeService'
 import { INITIAL_FILTERS } from '../../components/home/Filters'
@@ -38,18 +39,18 @@ describe('HomeService - search', () => {
     })
 
     it('llama al endpoint correcto', async () => {
-        mockedAxios.get.mockResolvedValueOnce(responseMock)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
 
         await homeService.search('', INITIAL_FILTERS, 0, 6, null)
 
-        expect(mockedAxios.get).toHaveBeenCalledWith(
-            expect.stringContaining('/libros/home'),
+        expect(mockedApiClient.get).toHaveBeenCalledWith(
+            '/libros/home',
             expect.any(Object)
         )
     })
 
     it('retorna el contenido de la respuesta correctamente', async () => {
-        mockedAxios.get.mockResolvedValueOnce(responseMock)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
 
         const result = await homeService.search('', INITIAL_FILTERS, 0, 6, null)
 
@@ -59,43 +60,43 @@ describe('HomeService - search', () => {
     })
 
     it('no incluye usuarioId en los params cuando es null', async () => {
-        mockedAxios.get.mockResolvedValueOnce(responseMock)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
 
         await homeService.search('', INITIAL_FILTERS, 0, 6, null)
 
-        const params = mockedAxios.get.mock.calls[0][1]?.params
+        const params = mockedApiClient.get.mock.calls[0][1]?.params
         expect(params).not.toHaveProperty('usuarioId')
     })
 
     it('incluye usuarioId en los params cuando está presente', async () => {
-        mockedAxios.get.mockResolvedValueOnce(responseMock)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
 
         await homeService.search('', INITIAL_FILTERS, 0, 6, 42)
 
-        const params = mockedAxios.get.mock.calls[0][1]?.params
+        const params = mockedApiClient.get.mock.calls[0][1]?.params
         expect(params.usuarioId).toBe(42)
     })
 
     it('incluye sortBy en los params', async () => {
-        mockedAxios.get.mockResolvedValueOnce(responseMock)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
 
         await homeService.search('', INITIAL_FILTERS, 0, 6, null, 'autor')
 
-        const params = mockedAxios.get.mock.calls[0][1]?.params
+        const params = mockedApiClient.get.mock.calls[0][1]?.params
         expect(params.sortBy).toBe('autor')
     })
 
     it('usa titulo como sortBy por defecto', async () => {
-        mockedAxios.get.mockResolvedValueOnce(responseMock)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
 
         await homeService.search('', INITIAL_FILTERS, 0, 6, null)
 
-        const params = mockedAxios.get.mock.calls[0][1]?.params
+        const params = mockedApiClient.get.mock.calls[0][1]?.params
         expect(params.sortBy).toBe('titulo')
     })
 
     it('mapea los géneros seleccionados correctamente', async () => {
-        mockedAxios.get.mockResolvedValueOnce(responseMock)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
 
         const filtersConGenero: FiltersState = {
             ...INITIAL_FILTERS,
@@ -105,31 +106,31 @@ describe('HomeService - search', () => {
 
         await homeService.search('', filtersConGenero, 0, 6, null)
 
-        const params = mockedAxios.get.mock.calls[0][1]?.params
+        const params = mockedApiClient.get.mock.calls[0][1]?.params
         expect(params.generos).toContain('DRAMA')
         expect(params.generos).toContain('ROMANCE')
     })
 
     it('envía generos vacío cuando no hay géneros seleccionados', async () => {
-        mockedAxios.get.mockResolvedValueOnce(responseMock)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
 
         await homeService.search('', INITIAL_FILTERS, 0, 6, null)
 
-        const params = mockedAxios.get.mock.calls[0][1]?.params
+        const params = mockedApiClient.get.mock.calls[0][1]?.params
         expect(params.generos).toBe('')
     })
 
     it('no incluye paginasMin en params cuando no está definido', async () => {
-        mockedAxios.get.mockResolvedValueOnce(responseMock)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
 
         await homeService.search('', INITIAL_FILTERS, 0, 6, null)
 
-        const params = mockedAxios.get.mock.calls[0][1]?.params
+        const params = mockedApiClient.get.mock.calls[0][1]?.params
         expect(params.paginasMin).toBeUndefined()
     })
 
     it('incluye paginasMin y paginasMax cuando están definidos', async () => {
-        mockedAxios.get.mockResolvedValueOnce(responseMock)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
 
         const filtersConPaginas: FiltersState = {
             ...INITIAL_FILTERS,
@@ -139,13 +140,13 @@ describe('HomeService - search', () => {
 
         await homeService.search('', filtersConPaginas, 0, 6, null)
 
-        const params = mockedAxios.get.mock.calls[0][1]?.params
+        const params = mockedApiClient.get.mock.calls[0][1]?.params
         expect(params.paginasMin).toBe(100)
         expect(params.paginasMax).toBe(500)
     })
 
     it('lanza el error si axios falla', async () => {
-        mockedAxios.get.mockRejectedValueOnce(new Error('Network Error'))
+        mockedApiClient.get.mockRejectedValueOnce(new Error('Network Error'))
 
         await expect(
             homeService.search('', INITIAL_FILTERS, 0, 6, null)

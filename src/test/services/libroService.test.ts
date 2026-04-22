@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import axios from "axios"
-
-vi.mock("axios")
-const mockedAxios = vi.mocked(axios, true)
+vi.mock("../../services/apiClient", () => ({
+  apiClient: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
+}))
+import { apiClient } from "../../services/apiClient"
+const mockedApiClient = vi.mocked(apiClient, true)
 
 // Importamos DESPUÉS del mock para que el módulo use la versión mockeada
 import { libroService } from "../../services/libroService"
@@ -75,12 +76,12 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   })
 
   it("llama al endpoint correcto con el usuarioId", async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: [] })
+    mockedApiClient.get.mockResolvedValueOnce({ data: [] } as any)
 
     await libroService.obtenerTodosLosPrestamos(1, "prestados-a-mi")
 
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-      expect.stringContaining("/reservas"),
+    expect(mockedApiClient.get).toHaveBeenCalledWith(
+      "/reservas",
       expect.objectContaining({
         params: expect.objectContaining({
           usuarioId: 1,
@@ -91,7 +92,7 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   })
 
   it("devuelve un array de instancias de Libro", async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: [prestamoDTOMock] })
+    mockedApiClient.get.mockResolvedValueOnce({ data: [prestamoDTOMock] } as any)
 
     const result = await libroService.obtenerTodosLosPrestamos(
       1,
@@ -103,7 +104,7 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   })
 
   it("mapea el título del préstamo correctamente", async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: [prestamoDTOMock] })
+    mockedApiClient.get.mockResolvedValueOnce({ data: [prestamoDTOMock] } as any)
 
     const result = await libroService.obtenerTodosLosPrestamos(
       1,
@@ -114,7 +115,7 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   })
 
   it("mapea fechaHasta del DTO a fechaDevolucion del Libro", async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: [prestamoDTOMock] })
+    mockedApiClient.get.mockResolvedValueOnce({ data: [prestamoDTOMock] } as any)
 
     const result = await libroService.obtenerTodosLosPrestamos(
       1,
@@ -125,7 +126,7 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   })
 
   it("mapea alquiladoPorId correctamente", async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: [prestamoDTOMock] })
+    mockedApiClient.get.mockResolvedValueOnce({ data: [prestamoDTOMock] } as any)
 
     const result = await libroService.obtenerTodosLosPrestamos(
       1,
@@ -136,7 +137,7 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   })
 
   it("devuelve array vacío si el backend no devuelve préstamos", async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: [] })
+    mockedApiClient.get.mockResolvedValueOnce({ data: [] } as any)
 
     const result = await libroService.obtenerTodosLosPrestamos(
       1,
@@ -147,9 +148,9 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   })
 
   it("mapea múltiples préstamos correctamente", async () => {
-    mockedAxios.get.mockResolvedValueOnce({
+    mockedApiClient.get.mockResolvedValueOnce({
       data: [prestamoDTOMock, prestamoDTOMock2],
-    })
+    } as any)
 
     const result = await libroService.obtenerTodosLosPrestamos(
       1,
@@ -161,7 +162,7 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   })
 
   it("propaga el error si axios falla", async () => {
-    mockedAxios.get.mockRejectedValueOnce(new Error("Network Error"))
+    mockedApiClient.get.mockRejectedValueOnce(new Error("Network Error"))
 
     await expect(
       libroService.obtenerTodosLosPrestamos(1, "prestados-a-mi"),
@@ -300,17 +301,15 @@ describe("libroService - getLibroById", () => {
   })
 
   it("llama al endpoint correcto con el libroId", async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: libroDTOMock })
+    mockedApiClient.get.mockResolvedValueOnce({ data: libroDTOMock } as any)
 
     await libroService.getLibroById(1)
 
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-      expect.stringContaining("/libros/1"),
-    )
+    expect(mockedApiClient.get).toHaveBeenCalledWith("/libros/1")
   })
 
   it("devuelve una instancia de Libro", async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: libroDTOMock })
+    mockedApiClient.get.mockResolvedValueOnce({ data: libroDTOMock } as any)
 
     const result = await libroService.getLibroById(1)
 
@@ -318,7 +317,7 @@ describe("libroService - getLibroById", () => {
   })
 
   it("mapea el título correctamente", async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: libroDTOMock })
+    mockedApiClient.get.mockResolvedValueOnce({ data: libroDTOMock } as any)
 
     const result = await libroService.getLibroById(1)
 
@@ -326,7 +325,7 @@ describe("libroService - getLibroById", () => {
   })
 
   it("mapea el autor correctamente", async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: libroDTOMock })
+    mockedApiClient.get.mockResolvedValueOnce({ data: libroDTOMock } as any)
 
     const result = await libroService.getLibroById(1)
 
@@ -334,7 +333,7 @@ describe("libroService - getLibroById", () => {
   })
 
   it("mapea el propietarioId correctamente", async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: libroDTOMock })
+    mockedApiClient.get.mockResolvedValueOnce({ data: libroDTOMock } as any)
 
     const result = await libroService.getLibroById(1)
 
@@ -342,7 +341,7 @@ describe("libroService - getLibroById", () => {
   })
 
   it("propaga el error si axios falla", async () => {
-    mockedAxios.get.mockRejectedValueOnce(new Error("Not Found"))
+    mockedApiClient.get.mockRejectedValueOnce(new Error("Not Found"))
 
     await expect(libroService.getLibroById(999)).rejects.toThrow("Not Found")
   })
@@ -354,43 +353,43 @@ describe("libroService - crearLibro", () => {
   })
 
   it("llama al endpoint correcto", async () => {
-    mockedAxios.post.mockResolvedValueOnce({ data: libroDTOMock })
+    mockedApiClient.post.mockResolvedValueOnce({ data: libroDTOMock } as any)
 
     await libroService.crearLibro(libroDTOMock, 3)
 
-    expect(mockedAxios.post).toHaveBeenCalledWith(
-      expect.stringContaining("/libros/nuevo"),
+    expect(mockedApiClient.post).toHaveBeenCalledWith(
+      "/libros/nuevo",
       libroDTOMock,
       expect.objectContaining({ params: { usuarioId: 3 } }),
     )
   })
 
   it("pasa el usuarioId como query param", async () => {
-    mockedAxios.post.mockResolvedValueOnce({ data: libroDTOMock })
+    mockedApiClient.post.mockResolvedValueOnce({ data: libroDTOMock } as any)
 
     await libroService.crearLibro(libroDTOMock, 7)
 
-    expect(mockedAxios.post).toHaveBeenCalledWith(
-      expect.any(String),
+    expect(mockedApiClient.post).toHaveBeenCalledWith(
+      "/libros/nuevo",
       expect.anything(),
       { params: { usuarioId: 7 } },
     )
   })
 
   it("envía el DTO completo como body", async () => {
-    mockedAxios.post.mockResolvedValueOnce({ data: libroDTOMock })
+    mockedApiClient.post.mockResolvedValueOnce({ data: libroDTOMock } as any)
 
     await libroService.crearLibro(libroDTOMock, 3)
 
-    expect(mockedAxios.post).toHaveBeenCalledWith(
-      expect.any(String),
+    expect(mockedApiClient.post).toHaveBeenCalledWith(
+      "/libros/nuevo",
       libroDTOMock,
       expect.anything(),
     )
   })
 
   it("devuelve una instancia de Libro", async () => {
-    mockedAxios.post.mockResolvedValueOnce({ data: libroDTOMock })
+    mockedApiClient.post.mockResolvedValueOnce({ data: libroDTOMock } as any)
 
     const result = await libroService.crearLibro(libroDTOMock, 3)
 
@@ -398,7 +397,7 @@ describe("libroService - crearLibro", () => {
   })
 
   it("el libro devuelto tiene el título del DTO", async () => {
-    mockedAxios.post.mockResolvedValueOnce({ data: libroDTOMock })
+    mockedApiClient.post.mockResolvedValueOnce({ data: libroDTOMock } as any)
 
     const result = await libroService.crearLibro(libroDTOMock, 3)
 
@@ -406,7 +405,7 @@ describe("libroService - crearLibro", () => {
   })
 
   it("propaga el error si axios falla", async () => {
-    mockedAxios.post.mockRejectedValueOnce(new Error("Server Error"))
+    mockedApiClient.post.mockRejectedValueOnce(new Error("Server Error"))
 
     await expect(libroService.crearLibro(libroDTOMock, 3)).rejects.toThrow(
       "Server Error",
@@ -420,12 +419,12 @@ describe("libroService - actualizarLibro", () => {
   })
 
   it("llama al endpoint correcto con el id del libro", async () => {
-    mockedAxios.put.mockResolvedValueOnce({ data: libroDTOMock })
+    mockedApiClient.put.mockResolvedValueOnce({ data: libroDTOMock } as any)
 
     await libroService.actualizarLibro(libroDTOMock, 3)
 
-    expect(mockedAxios.put).toHaveBeenCalledWith(
-      expect.stringContaining("/libros/1"),
+    expect(mockedApiClient.put).toHaveBeenCalledWith(
+      "/libros/1",
       libroDTOMock,
       { params: { usuarioId: 3 } },
     )
@@ -433,31 +432,31 @@ describe("libroService - actualizarLibro", () => {
 
   it("usa el id del DTO para construir la URL", async () => {
     const dtoConId5 = { ...libroDTOMock, id: 5 }
-    mockedAxios.put.mockResolvedValueOnce({ data: dtoConId5 })
+    mockedApiClient.put.mockResolvedValueOnce({ data: dtoConId5 } as any)
 
     await libroService.actualizarLibro(dtoConId5, 3)
 
-    expect(mockedAxios.put).toHaveBeenCalledWith(
-      expect.stringContaining("/libros/5"),
+    expect(mockedApiClient.put).toHaveBeenCalledWith(
+      "/libros/5",
       expect.anything(),
       { params: { usuarioId: 3 } },
     )
   })
 
   it("envía el DTO completo como body", async () => {
-    mockedAxios.put.mockResolvedValueOnce({ data: libroDTOMock })
+    mockedApiClient.put.mockResolvedValueOnce({ data: libroDTOMock } as any)
 
     await libroService.actualizarLibro(libroDTOMock, 3)
 
-    expect(mockedAxios.put).toHaveBeenCalledWith(
-      expect.any(String),
+    expect(mockedApiClient.put).toHaveBeenCalledWith(
+      "/libros/1",
       libroDTOMock,
       { params: { usuarioId: 3 } },
     )
   })
 
   it("devuelve una instancia de Libro", async () => {
-    mockedAxios.put.mockResolvedValueOnce({ data: libroDTOMock })
+    mockedApiClient.put.mockResolvedValueOnce({ data: libroDTOMock } as any)
 
     const result = await libroService.actualizarLibro(libroDTOMock, 3)
 
@@ -466,7 +465,7 @@ describe("libroService - actualizarLibro", () => {
 
   it("el libro devuelto refleja los datos actualizados", async () => {
     const dtoActualizado = { ...libroDTOMock, titulo: "Clean Code 2nd Ed" }
-    mockedAxios.put.mockResolvedValueOnce({ data: dtoActualizado })
+    mockedApiClient.put.mockResolvedValueOnce({ data: dtoActualizado } as any)
 
     const result = await libroService.actualizarLibro(dtoActualizado, 3)
 
@@ -474,7 +473,7 @@ describe("libroService - actualizarLibro", () => {
   })
 
   it("propaga el error si axios falla", async () => {
-    mockedAxios.put.mockRejectedValueOnce(new Error("Not Found"))
+    mockedApiClient.put.mockRejectedValueOnce(new Error("Not Found"))
 
     await expect(libroService.actualizarLibro(libroDTOMock, 3)).rejects.toThrow(
       "Not Found",
@@ -488,28 +487,28 @@ describe("libroService - eliminarLibro", () => {
   })
 
   it("llama al endpoint correcto con el libroId", async () => {
-    mockedAxios.delete.mockResolvedValueOnce({})
+    mockedApiClient.delete.mockResolvedValueOnce({} as any)
 
     await libroService.eliminarLibro(1, 3)
 
-    expect(mockedAxios.delete).toHaveBeenCalledWith(
-      expect.stringContaining("/libros/1"),
+    expect(mockedApiClient.delete).toHaveBeenCalledWith(
+      "/libros/1",
       expect.objectContaining({ params: { usuarioId: 3 } }),
     )
   })
 
   it("pasa el usuarioId como query param", async () => {
-    mockedAxios.delete.mockResolvedValueOnce({})
+    mockedApiClient.delete.mockResolvedValueOnce({} as any)
 
     await libroService.eliminarLibro(1, 42)
 
-    expect(mockedAxios.delete).toHaveBeenCalledWith(expect.any(String), {
+    expect(mockedApiClient.delete).toHaveBeenCalledWith("/libros/1", {
       params: { usuarioId: 42 },
     })
   })
 
   it("no devuelve nada (void) cuando tiene éxito", async () => {
-    mockedAxios.delete.mockResolvedValueOnce({})
+    mockedApiClient.delete.mockResolvedValueOnce({} as any)
 
     const result = await libroService.eliminarLibro(1, 3)
 
@@ -517,15 +516,15 @@ describe("libroService - eliminarLibro", () => {
   })
 
   it("llama a delete exactamente una vez", async () => {
-    mockedAxios.delete.mockResolvedValueOnce({})
+    mockedApiClient.delete.mockResolvedValueOnce({} as any)
 
     await libroService.eliminarLibro(1, 3)
 
-    expect(mockedAxios.delete).toHaveBeenCalledTimes(1)
+    expect(mockedApiClient.delete).toHaveBeenCalledTimes(1)
   })
 
   it("propaga el error si axios falla", async () => {
-    mockedAxios.delete.mockRejectedValueOnce(new Error("Forbidden"))
+    mockedApiClient.delete.mockRejectedValueOnce(new Error("Forbidden"))
 
     await expect(libroService.eliminarLibro(1, 3)).rejects.toThrow("Forbidden")
   })
@@ -537,17 +536,15 @@ describe("libroService - obtenerLibrosUsuarioPerfil", () => {
   })
 
   it("llama al endpoint correcto con el usuarioId", async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: [libroUsuarioItemMock] })
+    mockedApiClient.get.mockResolvedValueOnce({ data: [libroUsuarioItemMock] } as any)
 
     await libroService.obtenerLibrosUsuarioPerfil(1)
 
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-      expect.stringContaining("/usuarios/1/libros"),
-    )
+    expect(mockedApiClient.get).toHaveBeenCalledWith("/usuarios/1/libros")
   })
 
   it("devuelve los LibroUsuarioItemDTO sin transformar", async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: [libroUsuarioItemMock] })
+    mockedApiClient.get.mockResolvedValueOnce({ data: [libroUsuarioItemMock] } as any)
 
     const result = await libroService.obtenerLibrosUsuarioPerfil(1)
 
@@ -557,7 +554,7 @@ describe("libroService - obtenerLibrosUsuarioPerfil", () => {
   })
 
   it("devuelve array vacío si el usuario no tiene libros", async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: [] })
+    mockedApiClient.get.mockResolvedValueOnce({ data: [] } as any)
 
     const result = await libroService.obtenerLibrosUsuarioPerfil(1)
 
@@ -566,7 +563,7 @@ describe("libroService - obtenerLibrosUsuarioPerfil", () => {
 
   it("preserva el campo disponible: false", async () => {
     const noDisponible = { ...libroUsuarioItemMock, disponible: false }
-    mockedAxios.get.mockResolvedValueOnce({ data: [noDisponible] })
+    mockedApiClient.get.mockResolvedValueOnce({ data: [noDisponible] } as any)
 
     const result = await libroService.obtenerLibrosUsuarioPerfil(1)
 
@@ -575,7 +572,7 @@ describe("libroService - obtenerLibrosUsuarioPerfil", () => {
 
   it("preserva fechaAgregado nulo", async () => {
     const sinFecha = { ...libroUsuarioItemMock, fechaAgregado: null }
-    mockedAxios.get.mockResolvedValueOnce({ data: [sinFecha] })
+    mockedApiClient.get.mockResolvedValueOnce({ data: [sinFecha] } as any)
 
     const result = await libroService.obtenerLibrosUsuarioPerfil(1)
 
@@ -583,7 +580,7 @@ describe("libroService - obtenerLibrosUsuarioPerfil", () => {
   })
 
   it("propaga el error si axios falla", async () => {
-    mockedAxios.get.mockRejectedValueOnce(new Error("Unauthorized"))
+    mockedApiClient.get.mockRejectedValueOnce(new Error("Unauthorized"))
 
     await expect(libroService.obtenerLibrosUsuarioPerfil(1)).rejects.toThrow(
       "Unauthorized",
@@ -597,9 +594,9 @@ describe("libroService - obtenerPrestamosFiltrados", () => {
   })
 
   it("devuelve todos los libros si no hay query", async () => {
-    mockedAxios.get.mockResolvedValueOnce({
+    mockedApiClient.get.mockResolvedValueOnce({
       data: [prestamoDTOMock, prestamoDTOMock2],
-    })
+    } as any)
 
     const result = await libroService.obtenerPrestamosFiltrados(1)
 
@@ -612,9 +609,9 @@ describe("libroService - obtenerPrestamosFiltrados", () => {
     })
 
     it("devuelve todos los libros sin query", async () => {
-      mockedAxios.get.mockResolvedValueOnce({
+      mockedApiClient.get.mockResolvedValueOnce({
         data: [prestamoDTOMock, prestamoDTOMock2],
-      })
+      } as any)
 
       const result = await libroService.obtenerPrestamosFiltrados(
         1,
@@ -625,9 +622,9 @@ describe("libroService - obtenerPrestamosFiltrados", () => {
     })
 
     it("filtra por título con query", async () => {
-      mockedAxios.get.mockResolvedValueOnce({
+      mockedApiClient.get.mockResolvedValueOnce({
         data: [prestamoDTOMock, prestamoDTOMock2],
-      })
+      } as any)
 
       const result = await libroService.obtenerPrestamosFiltrados(
         1,
@@ -640,9 +637,9 @@ describe("libroService - obtenerPrestamosFiltrados", () => {
     })
 
     it("filtra por autor con query", async () => {
-      mockedAxios.get.mockResolvedValueOnce({
+      mockedApiClient.get.mockResolvedValueOnce({
         data: [prestamoDTOMock, prestamoDTOMock2],
-      })
+      } as any)
 
       const result = await libroService.obtenerPrestamosFiltrados(
         1,
@@ -655,9 +652,9 @@ describe("libroService - obtenerPrestamosFiltrados", () => {
     })
 
     it("la búsqueda es case-insensitive", async () => {
-      mockedAxios.get.mockResolvedValueOnce({
+      mockedApiClient.get.mockResolvedValueOnce({
         data: [prestamoDTOMock, prestamoDTOMock2],
-      })
+      } as any)
 
       const result = await libroService.obtenerPrestamosFiltrados(
         1,
@@ -669,9 +666,9 @@ describe("libroService - obtenerPrestamosFiltrados", () => {
     })
 
     it("devuelve lista vacía si la query no coincide con nada", async () => {
-      mockedAxios.get.mockResolvedValueOnce({
+      mockedApiClient.get.mockResolvedValueOnce({
         data: [prestamoDTOMock, prestamoDTOMock2],
-      })
+      } as any)
 
       const result = await libroService.obtenerPrestamosFiltrados(
         1,
@@ -684,7 +681,7 @@ describe("libroService - obtenerPrestamosFiltrados", () => {
   })
 
   it("propaga el error si axios falla", async () => {
-    mockedAxios.get.mockRejectedValueOnce(new Error("Network Error"))
+    mockedApiClient.get.mockRejectedValueOnce(new Error("Network Error"))
 
     await expect(libroService.obtenerPrestamosFiltrados(1)).rejects.toThrow(
       "Network Error",
@@ -698,22 +695,19 @@ describe("libroService - calificarLibro", () => {
   })
 
   it("llama al endpoint correcto con el libroId", async () => {
-    mockedAxios.post.mockResolvedValueOnce({})
+    mockedApiClient.post.mockResolvedValueOnce({} as any)
 
     await libroService.calificarLibro(1, 2, 5, "Excelente libro")
 
-    expect(mockedAxios.post).toHaveBeenCalledWith(
-      expect.stringContaining("/libros/1/calificar"),
-      expect.anything(),
-    )
+    expect(mockedApiClient.post).toHaveBeenCalledWith("/libros/1/calificar", expect.anything())
   })
 
   it("envía usuarioId, valor y comentario en el body", async () => {
-    mockedAxios.post.mockResolvedValueOnce({})
+    mockedApiClient.post.mockResolvedValueOnce({} as any)
 
     await libroService.calificarLibro(1, 2, 5, "Excelente libro")
 
-    expect(mockedAxios.post).toHaveBeenCalledWith(expect.any(String), {
+    expect(mockedApiClient.post).toHaveBeenCalledWith("/libros/1/calificar", {
       usuarioId: 2,
       valor: 5,
       comentario: "Excelente libro",
@@ -721,11 +715,11 @@ describe("libroService - calificarLibro", () => {
   })
 
   it("funciona con comentario vacío", async () => {
-    mockedAxios.post.mockResolvedValueOnce({})
+    mockedApiClient.post.mockResolvedValueOnce({} as any)
 
     await libroService.calificarLibro(1, 2, 3, "")
 
-    expect(mockedAxios.post).toHaveBeenCalledWith(expect.any(String), {
+    expect(mockedApiClient.post).toHaveBeenCalledWith("/libros/1/calificar", {
       usuarioId: 2,
       valor: 3,
       comentario: "",
@@ -733,15 +727,15 @@ describe("libroService - calificarLibro", () => {
   })
 
   it("llama a post exactamente una vez", async () => {
-    mockedAxios.post.mockResolvedValueOnce({})
+    mockedApiClient.post.mockResolvedValueOnce({} as any)
 
     await libroService.calificarLibro(1, 2, 4, "Bueno")
 
-    expect(mockedAxios.post).toHaveBeenCalledTimes(1)
+    expect(mockedApiClient.post).toHaveBeenCalledTimes(1)
   })
 
   it("propaga el error si axios falla", async () => {
-    mockedAxios.post.mockRejectedValueOnce(new Error("Bad Request"))
+    mockedApiClient.post.mockRejectedValueOnce(new Error("Bad Request"))
 
     await expect(libroService.calificarLibro(1, 2, 5, "ok")).rejects.toThrow(
       "Bad Request",
