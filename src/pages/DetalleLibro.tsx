@@ -80,11 +80,17 @@ export const DetalleLibro = () => {
           {/* Column 1: cover — sticky */}
           <div className="lg:sticky lg:top-24 flex flex-col gap-3 mx-auto w-48 sm:w-56 lg:w-auto lg:mx-0">
             <div className="rounded-2xl overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-white/5">
-              <img
-                src={libro.imagenUrl}
-                alt={libro.titulo}
-                className="w-full object-cover"
-              />
+              {libro.imagenUrl ? (
+                <img
+                  src={libro.imagenUrl}
+                  alt={libro.titulo}
+                  className="w-full object-cover"
+                />
+              ) : (
+                <div className="w-full aspect-[2/3] bg-surface-high border border-accent flex items-center justify-center text-secondary/30 text-6xl select-none">
+                  📖
+                </div>
+              )}
             </div>
             <div className="flex flex-col items-center gap-2 pt-1">
               {libro.disponibilidad === "DISPONIBLE" ? (

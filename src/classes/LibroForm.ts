@@ -27,6 +27,7 @@ export class LibroForm {
   static fields = [
     { name: "titulo", label: "Título", type: "text", placeholder: "Ingresá el título del libro..." },
     { name: "autor", label: "Autor", type: "text", placeholder: "Ingresá el autor..." },
+    { name: "editorial", label: "Editorial", type: "text", placeholder: "Ingresá la editorial..." },
     { name: "descripcion", label: "Descripción", type: "text", placeholder: "Breve descripción del libro..." },
     { name: "paginas", label: "Páginas", type: "number", placeholder: "Cantidad de páginas..." },
     { name: "isbn", label: "ISBN", type: "text", placeholder: "Código ISBN..." },
