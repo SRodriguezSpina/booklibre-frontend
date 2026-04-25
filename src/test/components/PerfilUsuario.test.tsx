@@ -145,4 +145,37 @@ describe('PerfilUsuario', () => {
       expect(toast.success).toHaveBeenCalledWith('¡Perfil actualizado con éxito!')
     })
   })
+
+  it('no muestra GestionMisLibros cuando el usuario es solo lector', async () => {
+    render(<PerfilUsuario />)
+
+    expect(screen.queryByText('GestionMisLibros')).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(mockObtenerLibrosUsuarioPerfil).not.toHaveBeenCalled()
+    })
+  })
+
+  it('muestra GestionMisLibros y carga libros cuando puede publicar', async () => {
+    mockUseOutletContext.mockReturnValue({
+      usuario: new Usuario({
+        id: 1,
+        nombre: 'Ana',
+        desc: 'desc',
+        email: 'ana@mail.com',
+        celular: '123',
+        ciudad: 'CABA',
+        tipoUsuario: 'Publicador',
+        bibliokarmas: 10,
+        imagenUrl: 'img-original',
+      }),
+      setUsuario: mockSetUsuario,
+    })
+
+    render(<PerfilUsuario />)
+
+    expect(screen.getByText('GestionMisLibros')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(mockObtenerLibrosUsuarioPerfil).toHaveBeenCalledWith(1)
+    })
+  })
 })
