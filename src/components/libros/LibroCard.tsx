@@ -54,7 +54,7 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
     if (libro.fechaHasta) {
       const diasRestantes = Math.ceil(
         (new Date(libro.fechaHasta).getTime() - new Date().getTime()) /
-        (1000 * 60 * 60 * 24),
+          (1000 * 60 * 60 * 24),
       )
       if (diasRestantes > 0) return `VENCE EN ${diasRestantes}D`
     }
@@ -113,7 +113,7 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
           </p>
         </div>
 
-        <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent mb-2 mt-1" />
+        <div className="w-full h-px bg-linear-to-r from-transparent via-primary/30 to-transparent mb-2 mt-1" />
 
         <div className="space-y-3 mb-4">
           {/* Prestado por/a */}
@@ -161,12 +161,13 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
 
         <button
           onClick={() => !yaCalificado && setIsModalOpen(true)}
-          className={`mt-auto w-full py-2 text-[10px] font-bold uppercase tracking-[0.1em] rounded transition-all border
+          className={`mt-auto w-full py-2 text-[10px] font-bold uppercase tracking-widest rounded transition-all border
           ${esPrestamoRecibido && libro.estaDevuelto() ? "visible" : "invisible pointer-events-none"}
-          ${yaCalificado
+          ${
+            yaCalificado
               ? "bg-success-bg text-success border-success/20 cursor-default"
               : "border-primary/40 text-primary-light hover:bg-primary/10 cursor-pointer"
-            }`}
+          }`}
         >
           {yaCalificado ? "✓ Calificado" : "★ Calificar"}
         </button>
