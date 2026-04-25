@@ -89,7 +89,13 @@ export const libroService = {
   },
 
   async eliminarLibro(libroId: number, usuarioId: number): Promise<void> {
-    await apiClient.delete(`/libros/${libroId}`, {
+    await apiClient.put(`/libros/${libroId}/baja`, null, {
+      params: { usuarioId },
+    })
+  },
+
+  async reactivarLibro(libroId: number, usuarioId: number): Promise<void> {
+    await apiClient.put(`/libros/${libroId}/reactivar`, null, {
       params: { usuarioId },
     })
   },
