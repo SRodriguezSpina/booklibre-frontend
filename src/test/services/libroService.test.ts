@@ -491,20 +491,25 @@ describe("libroService - eliminarLibro", () => {
 
     await libroService.eliminarLibro(1, 3)
 
-    expect(mockedApiClient.delete).toHaveBeenCalledWith(
-      "/libros/1",
+    expect(mockedApiClient.put).toHaveBeenCalledWith(
+      "/libros/1/baja",
+      null,
       expect.objectContaining({ params: { usuarioId: 3 } }),
     )
   })
 
   it("pasa el usuarioId como query param", async () => {
-    mockedApiClient.delete.mockResolvedValueOnce({} as any)
+    mockedApiClient.put.mockResolvedValueOnce({} as any)
 
     await libroService.eliminarLibro(1, 42)
 
-    expect(mockedApiClient.delete).toHaveBeenCalledWith("/libros/1", {
-      params: { usuarioId: 42 },
-    })
+    expect(mockedApiClient.put).toHaveBeenCalledWith(
+      "/libros/1/baja",
+      null,
+      {
+        params: { usuarioId: 42 },
+      },
+    )
   })
 
   it("no devuelve nada (void) cuando tiene éxito", async () => {
@@ -520,11 +525,11 @@ describe("libroService - eliminarLibro", () => {
 
     await libroService.eliminarLibro(1, 3)
 
-    expect(mockedApiClient.delete).toHaveBeenCalledTimes(1)
+    expect(mockedApiClient.put).toHaveBeenCalledTimes(1)
   })
 
   it("propaga el error si axios falla", async () => {
-    mockedApiClient.delete.mockRejectedValueOnce(new Error("Forbidden"))
+    mockedApiClient.put.mockRejectedValueOnce(new Error("Forbidden"))
 
     await expect(libroService.eliminarLibro(1, 3)).rejects.toThrow("Forbidden")
   })
