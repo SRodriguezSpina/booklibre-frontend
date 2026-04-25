@@ -8,18 +8,20 @@ const backendUrl = process.env.VITE_BACKEND_URL || "http://localhost:8080"
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   test: {
-    environment: 'jsdom',
+    environment: "jsdom",
     globals: true,
-    setupFiles: './src/test/setup.ts',
-    include: ['src/test/**/*.test.ts', 'src/test/**/*.test.tsx'],
+    setupFiles: "./src/test/setup.ts",
+    include: ["src/test/**/*.test.ts", "src/test/**/*.test.tsx"],
     coverage: {
       // you can include other reporters, but 'json-summary' is required, json is recommended
-      reporter: ['text', 'json-summary', 'json'],
+      reporter: ["text", "json-summary", "json"],
       // If you want a coverage reports even if your tests are failing, include the reportOnFailure option
       reportOnFailure: true,
-    }
+    },
   },
   server: {
+    port: 5173,
+    strictPort: true, // Si el 5173 está ocupado, no arranca en otro puerto
     host: process.env.VITE_BACKEND_URL ? true : "localhost",
     watch: {
       usePolling: true,
@@ -30,5 +32,4 @@ export default defineConfig({
       "/usuarios": { target: backendUrl, changeOrigin: true },
     },
   },
-  
 })
