@@ -136,19 +136,19 @@ export const PerfilUsuario = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:items-stretch">
         <div
-          className={`${esSoloLector ? "lg:col-span-8" : "lg:col-span-4"} space-y-6 animate-in fade-in duration-300`}
+          className={`${esSoloLector ? "lg:col-span-8" : "lg:col-span-4 lg:h-full lg:flex lg:flex-col"} space-y-6 animate-in fade-in duration-300`}
           style={{ animationDelay: "120ms" }}
         >
           <MisDatosCard usuario={usuario} />
 
           {!esSoloLector && (
             <div
-              className={`grid gap-4 ${esSoloPublicador ? "grid-cols-1" : "grid-cols-2"}`}
+              className={`grid gap-4 lg:flex-1 lg:h-full ${esSoloPublicador ? "grid-cols-1" : "grid-cols-2"}`}
             >
               <EstadisticaCard
                 valor={cantidadPrestados}
                 etiqueta="Libros Prestados"
-                className={`min-h-[124px] ${esSoloPublicador ? "lg:min-h-[150px]" : ""}`}
+                className={`min-h-[124px] ${esSoloPublicador ? "lg:h-full" : "lg:min-h-0 lg:h-full"}`}
                 valorClassName={esSoloPublicador ? "text-6xl" : "text-5xl"}
                 etiquetaClassName="text-[10px] tracking-[0.18em] text-on-surface-variant/60"
               />
@@ -156,7 +156,7 @@ export const PerfilUsuario = () => {
                 <EstadisticaCard
                   valor={cantidadLeidos}
                   etiqueta="Libros Leídos"
-                  className="min-h-[124px]"
+                  className="min-h-[124px] lg:min-h-0 lg:h-full"
                   valorClassName="text-5xl"
                   etiquetaClassName="text-[10px] tracking-[0.18em] text-on-surface-variant/60"
                 />
@@ -186,7 +186,7 @@ export const PerfilUsuario = () => {
 
         {!esSoloLector && (
           <div
-            className="lg:col-span-8 animate-in fade-in duration-300"
+            className="lg:col-span-8 animate-in fade-in duration-300 h-full"
             style={{ animationDelay: "160ms" }}
           >
             <GestionMisLibros
