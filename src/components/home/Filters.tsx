@@ -18,6 +18,8 @@ export type FiltersState = {
 
 type Props = {
     onApplyFilters: (filters: FiltersState) => void
+    onClearFilters?: () => void
+    hasActiveFilters?: boolean
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -31,7 +33,7 @@ export const INITIAL_FILTERS: FiltersState = {
     // agregar fechas de hoy
 }
 
-export const Filters = ({ onApplyFilters }: Props) => {
+export const Filters = ({ onApplyFilters, onClearFilters, hasActiveFilters }: Props) => {
     const [filters, setFilters] = useState<FiltersState>(INITIAL_FILTERS)
     const [errors, setErrors] = useState<{ paginas?: string; fechas?: string }>({})
 
@@ -78,11 +80,10 @@ export const Filters = ({ onApplyFilters }: Props) => {
                                 key={key}
                                 type="button"
                                 onClick={() => updateFilter(key as keyof FiltersState, !isChecked)}
-                                className={`px-3 py-1.5 rounded text-[11px] font-medium transition-all duration-200 border ${
-                                    isChecked
+                                className={`px-3 py-1.5 rounded text-[11px] font-medium transition-all duration-200 border cursor-pointer ${isChecked
                                         ? "bg-primary/10 border-primary text-primary"
                                         : "bg-surface border-accent/50 text-secondary-light hover:border-secondary-light hover:text-secondary-dark"
-                                }`}
+                                    }`}
                             >
                                 {label}
                             </button>
@@ -121,7 +122,7 @@ export const Filters = ({ onApplyFilters }: Props) => {
                         <input
                             type="date"
                             onChange={(e) => updateFilter("fechaDesde", e.target.value)}
-                            className="bg-black/20 border border-transparent rounded px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-primary/50 transition-all [color-scheme:dark]"
+                            className="bg-black/20 border border-transparent rounded px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-primary/50 transition-all [color-scheme:dark] cursor-text [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                         />
                     </label>
                     <label className="flex flex-col gap-1.5">
@@ -129,7 +130,7 @@ export const Filters = ({ onApplyFilters }: Props) => {
                         <input
                             type="date"
                             onChange={(e) => updateFilter("fechaHasta", e.target.value)}
-                            className="bg-black/20 border border-transparent rounded px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-primary/50 transition-all [color-scheme:dark]"
+                            className="bg-black/20 border border-transparent rounded px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-primary/50 transition-all [color-scheme:dark] cursor-text [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                         />
                     </label>
                 </div>
@@ -156,10 +157,27 @@ export const Filters = ({ onApplyFilters }: Props) => {
 
             <button
                 onClick={handleApply}
-                className="w-full mt-2 flex items-center justify-center gap-2 bg-primary text-surface font-semibold text-xs py-3 rounded hover:brightness-110 active:scale-[0.98] transition-all shadow-md shadow-primary/10"
+                className="w-full mt-2 flex items-center justify-center gap-2 bg-primary text-surface font-semibold text-xs py-3 rounded hover:brightness-110 active:scale-[0.98] transition-all shadow-md shadow-primary/10 cursor-pointer"
             >
                 Aplicar Filtros
             </button>
+
+            {onClearFilters && (
+                <button
+                    type="button"
+                    onClick={onClearFilters}
+                    disabled={!hasActiveFilters}
+                    className={`w-full flex items-center justify-center gap-1.5 text-xs font-medium border py-2.5 rounded transition-all ${hasActiveFilters
+                            ? "text-secondary-light border-accent/30 hover:text-secondary-dark hover:border-accent/60 active:scale-[0.98] cursor-pointer"
+                            : "text-secondary-light/30 border-accent/15 cursor-not-allowed"
+                        }`}
+                >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Limpiar filtros
+                </button>
+            )}
 
         </div>
     )
