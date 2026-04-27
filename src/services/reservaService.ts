@@ -9,7 +9,7 @@ export interface CrearReservaDTO {
 
 export const reservaService = {
   async crearReserva(dto: CrearReservaDTO) {
-    const res = await apiClient.post(`/reservas`, dto)
+    const res = await apiClient.post(`/reservas/crear`, dto)
     return res.data
-  }
+  },
 }

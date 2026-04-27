@@ -58,7 +58,9 @@ export const libroService = {
     )
     return res.data.map((libro) => ({
       ...libro,
-      disponible: libro.disponible === true || libro.disponible === "true",
+      disponible:
+        libro.disponible === true ||
+        String(libro.disponible).toLowerCase() === "true",
     }))
   },
 
