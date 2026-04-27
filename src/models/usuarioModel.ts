@@ -1,4 +1,4 @@
-export type TipoUsuario = 'Lector' | 'Publicador' | 'LectorPublicador'
+export type TipoUsuario = "Lector" | "Publicador" | "LectorPublicador"
 
 export type UsuarioResponse = {
   id: number
@@ -10,6 +10,8 @@ export type UsuarioResponse = {
   tipoUsuario: string
   bibliokarmas: number
   imagenUrl?: string | null
+  reservados: number
+  leidos: number
 }
 
 export type UsuarioUpdateResponse = {

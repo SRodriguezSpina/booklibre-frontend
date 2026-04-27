@@ -62,7 +62,9 @@ export const PerfilUsuario = () => {
       setCargandoLibros(true)
       setErrorLibros(null)
       try {
-        const response = await libroService.obtenerLibrosUsuarioPerfil(usuario.id)
+        const response = await libroService.obtenerLibrosUsuarioPerfil(
+          usuario.id,
+        )
         if (!activa) return
         setLibros(response)
       } catch (e: unknown) {
@@ -71,6 +73,7 @@ export const PerfilUsuario = () => {
         const err = obtenerMensajeError(e)
         setErrorLibros(err.mensaje || "No se pudieron cargar tus libros.")
       } finally {
+        // eslint-disable-next-line no-unsafe-finally
         if (!activa) return
         setCargandoLibros(false)
       }
@@ -117,10 +120,8 @@ export const PerfilUsuario = () => {
     }
   }
 
-  const cantidadPrestados = esSoloLector
-    ? 0
-    : libros.filter((l) => !l.disponible).length
-  const cantidadLeidos = libros.length
+  const cantidadPrestados = usuario.reservados
+  const cantidadLeidos = usuario.leidos
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 pt-20 animate-in fade-in duration-300">
@@ -148,7 +149,7 @@ export const PerfilUsuario = () => {
               <EstadisticaCard
                 valor={cantidadPrestados}
                 etiqueta="Libros Prestados"
-                className={`min-h-[124px] ${esSoloPublicador ? "lg:h-full" : "lg:min-h-0 lg:h-full"}`}
+                className={`min-h-31 ${esSoloPublicador ? "lg:h-full" : "lg:min-h-0 lg:h-full"}`}
                 valorClassName={esSoloPublicador ? "text-6xl" : "text-5xl"}
                 etiquetaClassName="text-[10px] tracking-[0.18em] text-on-surface-variant/60"
               />
@@ -156,7 +157,7 @@ export const PerfilUsuario = () => {
                 <EstadisticaCard
                   valor={cantidadLeidos}
                   etiqueta="Libros Leídos"
-                  className="min-h-[124px] lg:min-h-0 lg:h-full"
+                  className="min-h-31 lg:min-h-0 lg:h-full"
                   valorClassName="text-5xl"
                   etiquetaClassName="text-[10px] tracking-[0.18em] text-on-surface-variant/60"
                 />
@@ -175,7 +176,7 @@ export const PerfilUsuario = () => {
                 <EstadisticaCard
                   valor={cantidadLeidos}
                   etiqueta="Libros Leídos"
-                  className="h-full min-h-[240px] lg:min-h-0"
+                  className="h-full min-h-60 lg:min-h-0"
                   valorClassName="text-7xl lg:text-8xl"
                   etiquetaClassName="text-[10px] lg:text-xs tracking-[0.2em] text-on-surface-variant/60"
                 />
