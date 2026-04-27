@@ -1,3 +1,5 @@
+import type { S } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js"
+
 export type EstadoLibro =
   | "EXCELENTE"
   | "MUY_BUENO"
@@ -57,8 +59,10 @@ export interface PrestamoDTO {
   autor: string
   estado: EstadoLibro
   propietarioId: number
+  propietarioNombre: string
   imagenUrl: string
   alquiladoPorId: number | null
+  alquiladoPorNombre: string
   fechaDesde: string | null
   fechaHasta: string | null
   rating: number

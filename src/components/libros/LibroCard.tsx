@@ -54,7 +54,7 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
     if (libro.fechaHasta) {
       const diasRestantes = Math.ceil(
         (new Date(libro.fechaHasta).getTime() - new Date().getTime()) /
-          (1000 * 60 * 60 * 24),
+        (1000 * 60 * 60 * 24),
       )
       if (diasRestantes > 0) return `VENCE EN ${diasRestantes}D`
     }
@@ -124,14 +124,13 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
             <div className="flex items-center gap-1.5">
               <div className="w-5 h-5 rounded-full bg-surface-highest flex items-center justify-center text-[9px] font-bold text-primary-light shrink-0">
                 {esPrestamoRecibido
-                  ? (libro.propietarioId ?? "?").toString().charAt(0)
-                  : (libro.alquiladoPorId ?? "?").toString().charAt(0)}
+                  ? (libro.propietarioNombre ?? libro.propietarioId?.toString() ?? "?").charAt(0).toUpperCase()
+                  : (libro.alquiladoPorNombre ?? libro.alquiladoPorId?.toString() ?? "?").charAt(0).toUpperCase()}
               </div>
               <span className="text-xs text-on-surface font-medium">
-                Usuario{" "}
                 {esPrestamoRecibido
-                  ? libro.propietarioId
-                  : libro.alquiladoPorId}
+                  ? (libro.propietarioNombre ?? `Usuario ${libro.propietarioId}`)
+                  : (libro.alquiladoPorNombre ?? `Usuario ${libro.alquiladoPorId}`)}
               </span>
             </div>
           </div>
@@ -163,11 +162,10 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
           onClick={() => !yaCalificado && setIsModalOpen(true)}
           className={`mt-auto w-full py-2 text-[10px] font-bold uppercase tracking-widest rounded transition-all border
           ${esPrestamoRecibido && libro.estaDevuelto() ? "visible" : "invisible pointer-events-none"}
-          ${
-            yaCalificado
+          ${yaCalificado
               ? "bg-success-bg text-success border-success/20 cursor-default"
               : "border-primary/40 text-primary-light hover:bg-primary/10 cursor-pointer"
-          }`}
+            }`}
         >
           {yaCalificado ? "✓ Calificado" : "★ Calificar"}
         </button>
