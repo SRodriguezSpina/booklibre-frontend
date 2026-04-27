@@ -27,6 +27,7 @@ export const Home = () => {
   const [error, setError] = useState<ErrorPersonalizado | null>(null)
   const [animating, setAnimating] = useState(false)
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
+  const [filterKey, setFilterKey] = useState(0)
 
   const userId = authService.obtenerIdUsuarioActual()
 
@@ -79,6 +80,16 @@ export const Home = () => {
     search(query, filters, 0, sort)
   }
 
+  const hasActiveFilters =
+    Object.values(filters).some((v) => v !== false && v !== undefined && v !== "" && v !== 0)
+
+  const handleClearFilters = () => {
+    setFilters(INITIAL_FILTERS)
+    setCurrentPage(1)
+    setFilterKey((k) => k + 1)
+    search(query, INITIAL_FILTERS, 0, sortBy)
+  }
+
   if (error) {
     return (
       <div className="flex flex-col min-h-screen max-w-6xl mx-auto px-4 pt-22 pb-16">
@@ -116,16 +127,17 @@ export const Home = () => {
 
           <div className={`transition-all duration-300 md:block ${isFiltersOpen ? 'block' : 'hidden'}`}>
             <Filters
-              onApplyFilters={(filters: FiltersState) =>
-                handleApplyFilters(filters)
-              }
+              key={filterKey}
+              onApplyFilters={(f: FiltersState) => handleApplyFilters(f)}
+              onClearFilters={handleClearFilters}
+              hasActiveFilters={hasActiveFilters}
             />
           </div>
         </aside>
 
         <div className="flex-1 flex flex-col gap-3">
           <SearchBar
-            onSearch={(query) => handleSearch(query)}
+            onSearch={(q) => handleSearch(q)}
             placeholder="Buscar por título..."
           />
 

@@ -33,7 +33,7 @@ export const SearchBar = ({ onSearch, placeholder }: Props) => {
 
       <button
         onClick={handleSearch}
-        className="absolute right-1 px-4 py-1.5 bg-primary text-background rounded-full text-sm font-bold hover:bg-primary-dark active:scale-95 transition-all"
+        className="absolute right-1 px-4 py-1.5 bg-primary text-background rounded-full text-sm font-bold hover:bg-primary-dark active:scale-95 transition-all cursor-pointer"
       >
         Buscar
       </button>
