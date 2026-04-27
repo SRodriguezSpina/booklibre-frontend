@@ -11,6 +11,8 @@ export type UsuarioData = {
   bibliokarmas: number
   fechaRegistro?: string
   imagenUrl?: string | null
+  reservados: number
+  leidos: number
 }
 
 export type ErrorsUsuario = Partial<Record<keyof UsuarioData, string>>
@@ -29,6 +31,8 @@ export class Usuario implements UsuarioData {
   bibliokarmas: number = 0
   fechaRegistro?: string
   imagenUrl?: string | null
+  reservados: number = 0
+  leidos: number = 0
   errors: ErrorsUsuario = {}
 
   constructor(props?: Partial<UsuarioData>) {
