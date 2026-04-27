@@ -1,6 +1,7 @@
 const TOKEN_KEY = 'token'
 const ID_USUARIO_KEY = 'idUsuario'
 const NOMBRE_USUARIO_KEY = 'nombreUsuario'
+const TIPO_USUARIO_KEY = 'tipoUsuario'
 
 export const tokenService = {
   getToken(): string | null {
@@ -20,6 +21,14 @@ export const tokenService = {
     localStorage.setItem(ID_USUARIO_KEY, id.toString())
   },
 
+  setTipoUsuario(tipo: string) : void {
+    localStorage.setItem(TIPO_USUARIO_KEY, tipo)
+  },
+
+  getTipoUsuario() : string | null {
+    return localStorage.getItem(TIPO_USUARIO_KEY)
+  },
+
   getNombreUsuario(): string | null {
     return localStorage.getItem(NOMBRE_USUARIO_KEY)
   },
@@ -36,5 +45,6 @@ export const tokenService = {
     localStorage.removeItem(TOKEN_KEY)
     localStorage.removeItem(ID_USUARIO_KEY)
     localStorage.removeItem(NOMBRE_USUARIO_KEY)
+    localStorage.removeItem(TIPO_USUARIO_KEY)
   },
 }

@@ -24,7 +24,7 @@ describe('reservaService', () => {
     await reservaService.crearReserva(dtoMock)
 
     expect(mockedApiClient.post).toHaveBeenCalledWith(
-      '/reservas',
+      '/reservas/crear',
       dtoMock
     )
   })

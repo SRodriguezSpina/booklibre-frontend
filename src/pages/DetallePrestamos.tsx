@@ -4,7 +4,7 @@ import { LibroCard } from "../components/libros/LibroCard"
 import { Paginacion } from "../components/ui/Paginacion"
 import { libroService } from "../services/libroService"
 import { authService } from "../services/AuthService"
-import { useOnInit } from "../utils/hooks"
+import { useAuthContext, useOnInit } from "../utils/hooks"
 import { Libro } from "../classes/Libro"
 import type { TipoPrestamo } from "../models/libroModel"
 import { SearchBar } from "../components/ui/SearchBar"
@@ -24,12 +24,23 @@ export const DetallePrestamos = () => {
   const [activeTab, setActiveTab] = useState<TipoPrestamo>("prestados-a-mi")
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [searchQuery, setSearchQuery] = useState<string>("")
+  const [tipoAnterior, setTipoAnterior] = useState<string | null>(null)
+
 
   const usuarioId = authService.obtenerIdUsuarioActual()
+  const { usuario } = useAuthContext()
+  const tipoUsuario = usuario?.tipoUsuario
+  const tipo = (tipoUsuario ?? "").toUpperCase().replace(/\s+/g, "_")
+  const puedeReservar = tipo === "LECTOR" || tipo === "LECTORPUBLICADOR"
+  const puedePublicar = tipo === "PUBLICADOR" || tipo === "LECTORPUBLICADOR"
   const itemsPerPage = 4
   const pestañas = [
-    { id: "prestados-a-mi", etiqueta: "Prestados a mí" },
-    { id: "prestados-por-mi", etiqueta: "Prestados por mí" },
+    ...(puedeReservar
+      ? [{ id: "prestados-a-mi", etiqueta: "Prestados a mí" }]
+      : []),
+    ...(puedePublicar
+      ? [{ id: "prestados-por-mi", etiqueta: "Prestados por mí" }]
+      : []),
   ]
 
   const fetchTodosLosPrestamos = async (tipo: TipoPrestamo = activeTab) => {
@@ -55,7 +66,19 @@ export const DetallePrestamos = () => {
     }
   }
 
+  if (tipoUsuario && tipoUsuario !== tipoAnterior) {
+    setTipoAnterior(tipoUsuario)
+
+    const nuevaTab = pestañas[0]?.id as TipoPrestamo
+
+    setTodosLosLibros([]) // limpia lo viejo
+    setActiveTab(nuevaTab)
+    fetchTodosLosPrestamos(nuevaTab)
+  }
+
   useOnInit(() => {
+    const initialTab = pestañas[0]?.id as TipoPrestamo
+    setActiveTab(initialTab)
     fetchTodosLosPrestamos()
   })
 
