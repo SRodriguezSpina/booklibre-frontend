@@ -12,6 +12,11 @@ export type UsuarioResponse = {
   imagenUrl?: string | null
 }
 
+export type UsuarioUpdateResponse = {
+  usuario: UsuarioResponse
+  token: string
+}
+
 export type UsuarioUpdateRequest = {
   nombre: string
   desc: string

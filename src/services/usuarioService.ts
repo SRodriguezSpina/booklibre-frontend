@@ -1,11 +1,18 @@
 import type { UsuarioData } from '../classes/usuario'
-import type { UsuarioUpdateRequest } from '../models/usuarioModel'
+import type {
+  UsuarioResponse,
+  UsuarioUpdateRequest,
+  UsuarioUpdateResponse,
+} from '../models/usuarioModel'
 import { apiClient } from './apiClient'
+import { tokenService } from './tokenService'
+import { mapUsuarioResponse } from '../utils/usuarioMapper'
 
 class UsuarioService {
+  
   async obtenerUsuario(id: number): Promise<UsuarioData> {
-    const res = await apiClient.get<UsuarioData>(`/usuarios/${id}`)
-    return res.data
+    const res = await apiClient.get<UsuarioResponse>(`/usuarios/${id}`)
+    return mapUsuarioResponse(res.data)
   }
 
   async actualizarUsuario(usuario: UsuarioData): Promise<UsuarioData> {
@@ -18,8 +25,10 @@ class UsuarioService {
       tipoUsuario: usuario.tipoUsuario,
       imagenUrl: usuario.imagenUrl ?? null,
     }
-    const res = await apiClient.put<UsuarioData>(`/usuarios/${usuario.id}`, payload)
-    return res.data
+    const res = await apiClient.put<UsuarioUpdateResponse>(`/usuarios/${usuario.id}`, payload)
+    tokenService.setToken(res.data.token)
+    tokenService.setNombreUsuario(res.data.usuario.nombre)
+    return mapUsuarioResponse(res.data.usuario)
   }
 }
 

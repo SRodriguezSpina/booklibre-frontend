@@ -21,9 +21,15 @@ const usuarioDataMock: UsuarioData = {
   bibliokarmas: 10,
 }
 
+const usuarioUpdateResponseMock = {
+  usuario: usuarioDataMock,
+  token: 'nuevo-token-jwt',
+}
+
 describe('usuarioService — obtenerUsuario', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    localStorage.clear()
   })
 
   it('llama al endpoint correcto y devuelve el data', async () => {
@@ -45,12 +51,17 @@ describe('usuarioService — obtenerUsuario', () => {
 describe('usuarioService — actualizarUsuario', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    localStorage.clear()
   })
 
   it('envía el payload correcto (UsuarioUpdateRequest)', async () => {
     const usuarioActualizado: UsuarioData = { ...usuarioDataMock, nombre: 'Juan 2' }
+    const updateResponse = {
+      usuario: usuarioActualizado,
+      token: 'token-actualizado',
+    }
 
-    mockedApiClient.put.mockResolvedValueOnce({ data: usuarioActualizado } as any)
+    mockedApiClient.put.mockResolvedValueOnce({ data: updateResponse } as any)
 
     const result = await usuarioService.actualizarUsuario(usuarioActualizado)
 
@@ -68,6 +79,8 @@ describe('usuarioService — actualizarUsuario', () => {
     )
 
     expect(result).toEqual(usuarioActualizado)
+    expect(localStorage.getItem('token')).toBe('token-actualizado')
+    expect(localStorage.getItem('nombreUsuario')).toBe('Juan 2')
   })
 
   it('propaga el error si axios falla', async () => {
@@ -79,7 +92,7 @@ describe('usuarioService — actualizarUsuario', () => {
   })
 
   it('normaliza imagenUrl a null y omite campos internos', async () => {
-    mockedApiClient.put.mockResolvedValueOnce({ data: usuarioDataMock } as any)
+    mockedApiClient.put.mockResolvedValueOnce({ data: usuarioUpdateResponseMock } as any)
     const usuarioConCamposInternos = {
       ...usuarioDataMock,
       imagenUrl: undefined,
