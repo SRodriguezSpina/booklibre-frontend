@@ -17,8 +17,10 @@ export class Libro {
   autor: string
   estado: EstadoLibro
   propietarioId: number
+  propietarioNombre?: string
   imagenUrl: string
   alquiladoPorId?: number
+  alquiladoPorNombre?: string
   bibliokarma?: number
   rating: number
   estoyReservado: boolean
@@ -68,8 +70,10 @@ export class Libro {
       autor: json.autor,
       estado: json.estado,
       propietarioId: json.propietarioId,
+      propietarioNombre: json.propietarioNombre ?? undefined,
       imagenUrl: json.imagenUrl,
       alquiladoPorId: json.alquiladoPorId ?? undefined,
+      alquiladoPorNombre: json.alquiladoPorNombre ?? undefined,
       fechaDesde: json.fechaDesde ?? undefined,
       fechaHasta: json.fechaHasta ?? undefined,
       rating: json.rating,
