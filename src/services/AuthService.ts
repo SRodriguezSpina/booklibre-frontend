@@ -12,6 +12,7 @@ class AuthService {
     if (response.data.success && response.data.usuario) {
       tokenService.setIdUsuario(response.data.usuario.id)
       tokenService.setNombreUsuario(response.data.usuario.nombre)
+      tokenService.setTipoUsuario(response.data.usuario.tipoUsuario)
       tokenService.setToken(response.data.token)
     }
     return response.data
@@ -42,6 +43,10 @@ class AuthService {
 
   obtenerNombreUsuarioActual(): string | null {
     return tokenService.getNombreUsuario()
+  }
+
+  obtenerTipoUsuarioActual() : string | null {
+    return tokenService.getTipoUsuario()
   }
 
   estaAutenticado(): boolean {
