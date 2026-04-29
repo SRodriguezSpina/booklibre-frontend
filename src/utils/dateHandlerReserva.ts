@@ -26,3 +26,11 @@ export const formatearFechaVisual = (fechaStr: string): string => {
   if (!fechaStr) return "-";
   return format(parseISO(fechaStr), "d MMM yyyy", { locale: es })
 }
+
+// Formatea una fecha-hora string (ISO datetime) incluyendo horas y minutos.
+export const formatearFechaHoraVisual = (fechaStr: string): string => {
+  if (!fechaStr) return "-";
+  const hasTime = fechaStr.includes("T") && fechaStr.length > 10;
+  const fmt = hasTime ? "d MMM yyyy HH:mm" : "d MMM yyyy";
+  return format(parseISO(fechaStr), fmt, { locale: es });
+}

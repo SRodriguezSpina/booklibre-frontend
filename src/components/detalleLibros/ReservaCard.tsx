@@ -6,7 +6,7 @@ import { Boton } from "../ui/Boton"
 import { formatearFechaVisual, calcularDiferenciaDias } from "../../utils/dateHandlerReserva"
 import { reservaService } from "../../services/reservaService"
 import { Libro } from "../../classes/Libro"
-import { CalendarDays, Package, RotateCcw, Clock, Pencil, CheckCircle2 } from "lucide-react"
+import { CalendarDays, Package, RotateCcw, Clock, Pencil, CheckCircle2, Bug } from "lucide-react"
 import { Calendario } from "../ui/Calendario"
 import { toast } from "react-toastify"
 import { obtenerMensajeError } from "../../utils/errorHandler"
@@ -31,6 +31,9 @@ export const ReservaCard = ({
   const [loading, setLoading] = useState(false)
   const [calendarAbierto, setCalendarAbierto] = useState(true)
   const [reservaConfirmada, setReservaConfirmada] = useState<{ desde: string; hasta: string } | null>(null)
+  const [debugAbierto, setDebugAbierto] = useState(false)
+  const [debugDesde, setDebugDesde] = useState("")
+  const [debugHasta, setDebugHasta] = useState("")
 
   const hoy = new Date()
   hoy.setHours(0, 0, 0, 0)
@@ -70,10 +73,16 @@ export const ReservaCard = ({
     : 0
 
   const handleReservar = async () => {
-    if (!fechaDesde || !fechaHasta) return
+    const fechaDesdeEnvio = debugDesde || fechaDesde
+    const fechaHastaEnvio = debugHasta || fechaHasta
+    if (!fechaDesdeEnvio || !fechaHastaEnvio) return
+    if (fechaHastaEnvio <= fechaDesdeEnvio) {
+      toast.error("La fecha de \"hasta\" debe ser posterior a la fecha de \"desde\"")
+      return
+    }
     setLoading(true)
     try {
-      await reservaService.crearReserva({ libroId: libro.id, usuarioId, fechaDesde, fechaHasta })
+      await reservaService.crearReserva({ libroId: libro.id, usuarioId, fechaDesde: fechaDesdeEnvio, fechaHasta: fechaHastaEnvio })
       setReservaConfirmada({ desde: fechaDesde, hasta: fechaHasta })
       setFechaDesde("")
       setFechaHasta("")
@@ -210,11 +219,58 @@ export const ReservaCard = ({
       )}
 
         <div className="px-5 py-4 flex flex-col gap-2">
+          {/* Debug fecha */}
+          <div className="border border-yellow-500/30 rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setDebugAbierto(v => !v)}
+              className="w-full flex items-center gap-2 px-3 py-2 bg-yellow-500/10 hover:bg-yellow-500/20 transition-colors text-left"
+            >
+              <Bug size={12} className="text-yellow-400 shrink-0" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-yellow-400">Debug</span>
+              <span className="ml-auto text-[10px] text-yellow-400/60">{debugAbierto ? "▲" : "▼"}</span>
+            </button>
+            {debugAbierto && (
+              <div className="px-3 py-3 flex flex-col gap-2 bg-yellow-500/5">
+                <p className="text-[10px] text-yellow-400/70 leading-relaxed">
+                  Sobreescribe las fechas del calendario con valores exactos (fecha + hora).
+                </p>
+                <label className="flex flex-col gap-1">
+                  <span className="text-[10px] font-semibold text-yellow-400/80">Desde</span>
+                  <input
+                    type="datetime-local"
+                    value={debugDesde}
+                    onChange={e => setDebugDesde(e.target.value)}
+                    className="text-xs bg-surface-high border border-yellow-500/30 rounded px-2 py-1 text-secondary-dark focus:outline-none focus:border-yellow-400"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-[10px] font-semibold text-yellow-400/80">Hasta</span>
+                  <input
+                    type="datetime-local"
+                    value={debugHasta}
+                    onChange={e => setDebugHasta(e.target.value)}
+                    className="text-xs bg-surface-high border border-yellow-500/30 rounded px-2 py-1 text-secondary-dark focus:outline-none focus:border-yellow-400"
+                  />
+                </label>
+                {(debugDesde || debugHasta) && (
+                  <button
+                    type="button"
+                    onClick={() => { setDebugDesde(""); setDebugHasta("") }}
+                    className="text-[10px] text-yellow-400/60 hover:text-yellow-400 text-left underline"
+                  >
+                    Limpiar override
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
           <Boton
             tipo="primario"
             className="w-full"
             onClick={handleReservar}
-            deshabilitado={loading || !fechaDesde || !fechaHasta}
+            deshabilitado={loading || (!(fechaDesde && fechaHasta) && !(debugDesde && debugHasta))}
           >
             {loading ? "Procesando..." : "Confirmar Reserva ✓"}
           </Boton>
