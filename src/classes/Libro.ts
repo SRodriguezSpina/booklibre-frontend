@@ -41,6 +41,7 @@ export class Libro {
   disponibilidad?: "DISPONIBLE" | "RESERVADO"
   disponible?: boolean
   libroActivo?: boolean
+  yaCalificadoPorUsuario?: boolean
 
   constructor(data: Partial<Libro>) {
     Object.assign(this, data)
@@ -81,7 +82,8 @@ export class Libro {
       reservas: [],
       disponibilidad: json.disponibilidad ?? "DISPONIBLE",
       disponible: json.disponible ?? false,
-      libroActivo: json.libroActivo
+      libroActivo: json.libroActivo,
+      yaCalificadoPorUsuario: json.yaCalificadoPorUsuario ?? false,
     })
   }
 
@@ -105,7 +107,7 @@ export class Libro {
   }
 
   estaCalificado(): boolean {
-    return this.rating > 0
+    return this.yaCalificadoPorUsuario === true
   }
 
   calcularBibliokarma(

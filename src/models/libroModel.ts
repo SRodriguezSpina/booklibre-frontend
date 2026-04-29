@@ -70,6 +70,7 @@ export interface PrestamoDTO {
   disponibilidad: "DISPONIBLE" | "RESERVADO"
   disponible: boolean
   libroActivo: boolean
+  yaCalificadoPorUsuario?: boolean
 }
 
 export interface LibroHome {
