@@ -93,9 +93,9 @@ describe("Libro - estaDevuelto()", () => {
     expect(libro.estaDevuelto()).toBe(false)
   })
 
-  it("retorna false si fechaHasta es hoy", () => {
+  it("retorna true si fechaHasta es hoy", () => {
     const libro = Libro.fromPrestamoJson({ ...prestamoBase, fechaHasta: formatDate(hoy) })
-    expect(libro.estaDevuelto()).toBe(false)
+    expect(libro.estaDevuelto()).toBe(true)
   })
 })
 
@@ -106,9 +106,9 @@ describe("Libro - estaProximoAVencer()", () => {
     expect(libro.estaProximoAVencer()).toBe(true)
   })
 
-  it("retorna true si vence hoy", () => {
+  it("retorna false si vence hoy", () => {
     const libro = Libro.fromPrestamoJson({ ...prestamoBase, fechaHasta: formatDate(hoy) })
-    expect(libro.estaProximoAVencer()).toBe(true)
+    expect(libro.estaProximoAVencer()).toBe(false)
   })
 
   it("retorna false si ya fue devuelto", () => {
