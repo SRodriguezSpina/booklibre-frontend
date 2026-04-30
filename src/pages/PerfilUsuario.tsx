@@ -101,7 +101,6 @@ export const PerfilUsuario = () => {
     } catch (e: unknown) {
       const err = obtenerMensajeError(e)
       toast.error(err.mensaje || "No se pudo actualizar el perfil.")
-      throw e
     }
   }
 

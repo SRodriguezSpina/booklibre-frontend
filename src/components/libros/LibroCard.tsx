@@ -7,6 +7,7 @@ import { authService } from "../../services/AuthService"
 import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import { obtenerMensajeError } from "../../utils/errorHandler"
+import { formatearFechaHoraVisual } from "../../utils/dateHandlerReserva"
 
 interface LibroCardProps {
   libro: Libro
@@ -141,9 +142,9 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
               Período
             </span>
             <div className="flex items-center gap-2 text-xs text-on-surface font-medium">
-              <span>{libro.fechaDesde}</span>
+              <span>{formatearFechaHoraVisual(libro.fechaDesde ?? "")}</span>
               <span className="text-primary/40">→</span>
-              <span>{libro.fechaHasta || "Sin fecha"}</span>
+              <span>{libro.fechaHasta ? formatearFechaHoraVisual(libro.fechaHasta) : "Sin fecha"}</span>
             </div>
           </div>
 

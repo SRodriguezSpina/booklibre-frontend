@@ -41,6 +41,7 @@ export class Libro {
   disponibilidad?: "DISPONIBLE" | "RESERVADO"
   disponible?: boolean
   libroActivo?: boolean
+  yaCalificadoPorUsuario?: boolean
 
   constructor(data: Partial<Libro>) {
     Object.assign(this, data)
@@ -81,18 +82,15 @@ export class Libro {
       reservas: [],
       disponibilidad: json.disponibilidad ?? "DISPONIBLE",
       disponible: json.disponible ?? false,
-      libroActivo: json.libroActivo
+      libroActivo: json.libroActivo,
+      yaCalificadoPorUsuario: json.yaCalificadoPorUsuario ?? false,
     })
   }
 
   estaDevuelto(): boolean {
     if (!this.fechaHasta) return false
-    const hoy = new Date()
-    // Sumamos 12 horas para evitar problemas de zona horaria (UTC vs Local)
-    const fechaFin = new Date(this.fechaHasta + "T12:00:00")
-    hoy.setHours(0, 0, 0, 0)
-    fechaFin.setHours(0, 0, 0, 0)
-    return fechaFin < hoy
+    const fechaFin = new Date(this.fechaHasta)
+    return fechaFin < new Date()
   }
 
   estoyDisponible(): boolean {
@@ -101,18 +99,15 @@ export class Libro {
 
   estaProximoAVencer(): boolean {
     if (!this.fechaHasta || this.estaDevuelto()) return false
-    const hoy = new Date()
-    hoy.setHours(0, 0, 0, 0)
-    const fechaFin = new Date(this.fechaHasta + "T12:00:00")
-    fechaFin.setHours(0, 0, 0, 0)
-
-    const diffTiempo = fechaFin.getTime() - hoy.getTime()
-    const diffDias = Math.round(diffTiempo / (1000 * 60 * 60 * 24))
+    const ahora = new Date()
+    const fechaFin = new Date(this.fechaHasta)
+    const diffMs = fechaFin.getTime() - ahora.getTime()
+    const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
     return diffDias >= 0 && diffDias <= 3
   }
 
   estaCalificado(): boolean {
-    return this.rating > 0
+    return this.yaCalificadoPorUsuario === true
   }
 
   calcularBibliokarma(
