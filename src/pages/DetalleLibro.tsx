@@ -42,7 +42,6 @@ export const DetalleLibro = () => {
 
   const handleReservaExitosa = async () => {
     setLibro(prev => prev ? new Libro({ ...prev, disponibilidad: "RESERVADO" }) : prev)
-    await fetchLibro()
     await actualizarUsuario()
   }
 

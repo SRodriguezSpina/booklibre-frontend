@@ -83,7 +83,7 @@ export const ReservaCard = ({
     setLoading(true)
     try {
       await reservaService.crearReserva({ libroId: libro.id, usuarioId, fechaDesde: fechaDesdeEnvio, fechaHasta: fechaHastaEnvio })
-      setReservaConfirmada({ desde: fechaDesde, hasta: fechaHasta })
+      setReservaConfirmada({ desde: fechaDesdeEnvio, hasta: fechaHastaEnvio })
       setFechaDesde("")
       setFechaHasta("")
       setCalendarAbierto(true)
