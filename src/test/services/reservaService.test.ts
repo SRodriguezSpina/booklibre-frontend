@@ -25,7 +25,11 @@ describe('reservaService', () => {
 
     expect(mockedApiClient.post).toHaveBeenCalledWith(
       '/reservas/crear',
-      dtoMock
+      {
+        ...dtoMock,
+        fechaDesde: "2026-04-01T00:00:00",
+        fechaHasta: "2026-04-10T00:00:00",
+      }
     )
   })
   it('propaga el error si axios falla', async () => {
