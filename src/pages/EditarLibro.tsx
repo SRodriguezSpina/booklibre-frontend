@@ -32,7 +32,7 @@ async function archivoADataUrl(file: File): Promise<string> {
 export const EditarLibro = () => {
   const navigate = useNavigate()
   const { id } = useParams()
-  const esNuevo = id === "nuevo"
+  const esNuevo = id === undefined || id === "nuevo"
   const rutaCancelar = esNuevo ? "/perfil" : id ? `/libros/${id}` : "/home"
 
   const [values, setValues] = useState<LibroFormValues>(emptyLibroFormValues())

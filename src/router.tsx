@@ -9,6 +9,7 @@ import { PerfilUsuarioLayout } from "./layouts/PerfilUsuarioLayout"
 import { DetalleLibro } from "./pages/DetalleLibro"
 import { VerMasResenias } from "./pages/VerMasResenias"
 import { NotFound } from "./pages/NotFound"
+import { RequireTipoUsuario } from "./components/auth/RequireTipoUsuario"
 
 export function AppRouter() {
   return (
@@ -24,7 +25,28 @@ export function AppRouter() {
 
           <Route path="libros/:id" element={<DetalleLibro />} />
           <Route path="libros/:id/resenias" element={<VerMasResenias />} />
-          <Route path="libros/:id/editar" element={<EditarLibro />} />
+          <Route
+            path="libros/nuevo/editar"
+            element={
+              <RequireTipoUsuario
+                permitidos={["Publicador", "LectorPublicador"]}
+                redirectTo="/perfil"
+              >
+                <EditarLibro />
+              </RequireTipoUsuario>
+            }
+          />
+          <Route
+            path="libros/:id/editar"
+            element={
+              <RequireTipoUsuario
+                permitidos={["Publicador", "LectorPublicador"]}
+                redirectTo="/perfil"
+              >
+                <EditarLibro />
+              </RequireTipoUsuario>
+            }
+          />
           <Route path="perfil" element={<PerfilUsuarioLayout />}>
             <Route index element={<PerfilUsuario />} />
           </Route>
