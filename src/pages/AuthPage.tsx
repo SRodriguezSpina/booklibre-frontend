@@ -16,7 +16,10 @@ const config = {
     footer: (
       <p className="text-center text-sm text-secondary opacity-80">
         ¿No tenés una cuenta?{" "}
-        <Link to="/register" className="text-primary font-semibold hover:underline">
+        <Link
+          to="/register"
+          className="cursor-pointer text-primary font-semibold hover:underline"
+        >
           Registrate
         </Link>
       </p>
@@ -31,7 +34,10 @@ const config = {
     footer: (
       <p className="text-center text-sm text-secondary opacity-80">
         ¿Ya tenés una cuenta?{" "}
-        <Link to="/login" className="text-primary font-semibold hover:underline">
+        <Link
+          to="/login"
+          className="cursor-pointer text-primary font-semibold hover:underline"
+        >
           Iniciá sesión
         </Link>
       </p>
@@ -46,10 +52,11 @@ interface AuthPageProps {
 export const AuthPage = ({ mode }: AuthPageProps) => {
   const model = new Auth()
   const navigate = useNavigate()
-  const { title, subtitle, submitLabel, submittingLabel, fields, footer } = config[mode]
+  const { title, subtitle, submitLabel, submittingLabel, fields, footer } =
+    config[mode]
 
   const [values, setValues] = useState<Record<string, string>>(
-    Object.fromEntries(fields.map((f) => [f.name, ""]))
+    Object.fromEntries(fields.map((f) => [f.name, ""])),
   )
   const [errors, setErrors] = useState<Record<string, string | undefined>>({})
   const [serverError, setServerError] = useState<string | null>(null)
@@ -90,16 +97,21 @@ export const AuthPage = ({ mode }: AuthPageProps) => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md bg-surface rounded-2xl shadow-md border border-accent p-8">
-
         <div className="flex flex-col items-center gap-3 mb-8">
           <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm">
             <img src={navBarLogo} alt="BookLibre" className="w-11 h-11" />
           </div>
           <h1 className="text-2xl font-bold text-secondary-dark">{title}</h1>
-          <p className="text-sm text-secondary opacity-70 text-center">{subtitle}</p>
+          <p className="text-sm text-secondary opacity-70 text-center">
+            {subtitle}
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-5"
+          noValidate
+        >
           {fields.map((field) => (
             <FormField
               key={field.name}
