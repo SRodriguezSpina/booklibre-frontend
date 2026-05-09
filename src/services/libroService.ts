@@ -9,10 +9,7 @@ import type {
 import { apiClient } from "./apiClient"
 
 export const libroService = {
-  async obtenerTodosLosPrestamos(
-    usuarioId: number,
-    tipo: TipoPrestamo,
-  ): Promise<Libro[]> {
+  async obtenerTodosLosPrestamos(usuarioId: number, tipo: TipoPrestamo,): Promise<Libro[]> {
     const tipoReserva = tipo === "prestados-a-mi" ? "HECHAS" : "RECIBIDAS"
     const res = await apiClient.get<PrestamoDTO[]>(`/reservas`, {
       params: {

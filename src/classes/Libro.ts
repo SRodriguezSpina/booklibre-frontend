@@ -9,6 +9,7 @@ import type {
   CalificacionDTO,
 } from "../models/libroModel"
 import { calcularDiferenciaDias } from "../utils/dateHandlerReserva"
+import { parseISO, startOfDay } from "date-fns"
 
 export class Libro {
   id: number
@@ -87,10 +88,15 @@ export class Libro {
     })
   }
 
+  private obtenerFechaInicioDia(fecha?: string): Date | null {
+    if (!fecha) return null
+    return startOfDay(parseISO(fecha))
+  }
+
   estaDevuelto(): boolean {
-    if (!this.fechaHasta) return false
-    const fechaFin = new Date(this.fechaHasta)
-    return fechaFin < new Date()
+    const fechaFin = this.obtenerFechaInicioDia(this.fechaHasta)
+    if (!fechaFin) return false
+    return fechaFin <= startOfDay(new Date())
   }
 
   estoyDisponible(): boolean {
@@ -99,11 +105,12 @@ export class Libro {
 
   estaProximoAVencer(): boolean {
     if (!this.fechaHasta || this.estaDevuelto()) return false
-    const ahora = new Date()
-    const fechaFin = new Date(this.fechaHasta)
+    const ahora = startOfDay(new Date())
+    const fechaFin = this.obtenerFechaInicioDia(this.fechaHasta)
+    if (!fechaFin) return false
     const diffMs = fechaFin.getTime() - ahora.getTime()
     const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
-    return diffDias >= 0 && diffDias <= 3
+    return diffDias >= 1 && diffDias <= 3
   }
 
   estaCalificado(): boolean {

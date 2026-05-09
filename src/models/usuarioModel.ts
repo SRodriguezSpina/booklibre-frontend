@@ -28,3 +28,21 @@ export type UsuarioUpdateRequest = {
   tipoUsuario: string
   imagenUrl?: string | null
 }
+
+export type UsuarioReservasDevueltasResponse = {
+  usuarioId: number
+  usuarioNombre: string
+  cantidadReservasDevueltas: number
+}
+
+export type ReservaAnualUsuarioResponse = {
+  reservaId: number
+  usuarioId: number
+  usuarioNombre: string
+  libroId: number
+  libroTitulo: string
+  libroAutor: string
+  fechaDesde: string
+  fechaHasta: string
+  anioReserva: number
+}
