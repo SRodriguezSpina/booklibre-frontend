@@ -1,0 +1,177 @@
+import { adminService } from "../services/adminService"
+import { ConsultaCard } from "../components/ui/ConsultaCard"
+import type { UsuarioReservasDevueltasResponse, ReservaAnualUsuarioResponse } from "../models/usuarioModel"
+import { useState } from "react"
+
+export const ConsultasAdmin = () => {
+    const [usuariosConDevoluciones, setUsuariosConDevoluciones] = useState<UsuarioReservasDevueltasResponse[]>([])
+    const [loadingDevoluciones, setLoadingDevoluciones] = useState(false)
+    const [errorDevoluciones, setErrorDevoluciones] = useState("")
+    const [usuariosConReservas, setUsuariosConReservas] = useState<UsuarioReservasDevueltasResponse[]>([])
+    const [cantidadReservas, setCantidadReservas] = useState(3)
+    const [loadingReservas, setLoadingReservas] = useState(false)
+    const [errorReservas, setErrorReservas] = useState("")
+    const [usuarioId, setUsuarioId] = useState(1)
+    const [reservasAnuales, setReservasAnuales] = useState<ReservaAnualUsuarioResponse[]>([])
+    const [loadingAnuales, setLoadingAnuales] = useState(false)
+    const [errorAnuales, setErrorAnuales] = useState("")
+
+    const consultarUsuariosConDevoluciones = async () => {
+        try {
+            setLoadingDevoluciones(true)
+            setErrorDevoluciones("")
+
+            const data =
+                await adminService.obtenerUsuariosConMasDe2Devoluciones()
+            setUsuariosConDevoluciones(data)
+
+        } catch {
+            setErrorDevoluciones(
+                "No se pudo realizar la consulta"
+            )
+        } finally {
+            setLoadingDevoluciones(false)
+        }
+    }
+
+    const consultarUsuariosConMasReservas = async () => {
+        try {
+            setLoadingReservas(true)
+            setErrorReservas("")
+
+            const data =
+                await adminService.obtenerUsuariosConMasDeNReservas(
+                    cantidadReservas
+                )
+            setUsuariosConReservas(data)
+
+        } catch {
+            setErrorReservas(
+                "No se pudo realizar la consulta"
+            )
+        } finally {
+            setLoadingReservas(false)
+        }
+    }
+
+    const consultarReservasAnuales = async () => {
+        try {
+            setLoadingAnuales(true)
+            setErrorAnuales("")
+
+            const data =
+                await adminService.obtenerReservasAnualesUsuario(usuarioId)
+            setReservasAnuales(data)
+
+        } catch {
+            setErrorAnuales(
+                "No se pudo realizar la consulta"
+            )
+        } finally {
+            setLoadingAnuales(false)
+        }
+    }
+    return (
+        <div className="max-w-6xl mx-auto space-y-8 pt-20 animate-in fade-in duration-300 pt-25 pb-15">
+            <ConsultaCard
+                titulo="Usuarios con más de 2 reservas hechas"
+                descripcion=""
+
+                loading={loadingDevoluciones}
+                error={errorDevoluciones}
+
+                onConsultar={consultarUsuariosConDevoluciones}
+
+                resultados={usuariosConDevoluciones}
+
+                renderResultado={(usuario) => (
+                    <div className="flex justify-between items-center">
+                        <span className="font-medium">
+                            {usuario.usuarioNombre}
+                        </span>
+
+                        <span className="text-sm text-on-surface-variant">
+                            {usuario.cantidadReservasDevueltas} devoluciones
+                        </span>
+                    </div>
+                )}
+            />
+            <ConsultaCard
+                titulo="Usuarios con más de N reservas hechas"
+                descripcion="Búsqueda bajo parámetro."
+
+                loading={loadingReservas}
+                error={errorReservas}
+
+                onConsultar={consultarUsuariosConMasReservas}
+
+                resultados={usuariosConReservas}
+
+                renderResultado={(usuario) => (
+                    <div className="flex justify-between items-center">
+                        <span className="font-medium">
+                            {usuario.usuarioNombre}
+                        </span>
+
+                        <span className="text-sm text-on-surface-variant">
+                            {usuario.cantidadReservasDevueltas} reservas
+                        </span>
+                    </div>
+                )}
+            >
+
+                <input
+                    type="number"
+                    value={cantidadReservas}
+                    min={1}
+                    onChange={(e) =>
+                        setCantidadReservas(Number(e.target.value))
+                    }
+                    className="w-32 px-3 py-2 rounded-xl border border-accent/20 bg-background text-on-surface outline-none focus:ring-2 focus:ring-primary-light/30" />
+
+            </ConsultaCard>
+            <ConsultaCard
+                titulo="Reservas anuales"
+                descripcion="Muestra las reservas históricas por ID de ssuario."
+
+                loading={loadingAnuales}
+                error={errorAnuales}
+
+                onConsultar={consultarReservasAnuales}
+
+                resultados={reservasAnuales}
+
+                renderResultado={(reserva) => (
+                    <div className="flex flex-col gap-1">
+
+                        <span className="font-semibold">
+                            {reserva.libroTitulo}
+                        </span>
+
+                        <span className="text-sm text-on-surface-variant">
+                            {reserva.libroAutor}
+                        </span>
+
+                        <span className="text-xs text-on-surface-variant">
+                            {reserva.fechaDesde} → {reserva.fechaHasta}
+                        </span>
+
+                    </div>
+                )}
+            >
+
+                <input
+                    type="number"
+                    value={usuarioId}
+                    min={1}
+                    onChange={(e) =>
+                        setUsuarioId(Number(e.target.value))
+                    }
+                    className="w-32 px-3 py-2 rounded-xl border border-accent/20 bg-background"
+                />
+
+            </ConsultaCard>
+
+        </div>
+    )
+}

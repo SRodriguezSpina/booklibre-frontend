@@ -8,6 +8,7 @@ import { PerfilUsuario } from "./pages/PerfilUsuario"
 import { PerfilUsuarioLayout } from "./layouts/PerfilUsuarioLayout"
 import { DetalleLibro } from "./pages/DetalleLibro"
 import { VerMasResenias } from "./pages/VerMasResenias"
+import { ConsultasAdmin } from "./pages/ConsultasAdmin.tsx"
 import { NotFound } from "./pages/NotFound"
 import { RequireTipoUsuario } from "./components/auth/RequireTipoUsuario"
 
@@ -50,6 +51,8 @@ export function AppRouter() {
           <Route path="perfil" element={<PerfilUsuarioLayout />}>
             <Route index element={<PerfilUsuario />} />
           </Route>
+
+          <Route path="consultas" element={<ConsultasAdmin />} />
 
           <Route path="*" element={<NotFound />} />
         </Route>

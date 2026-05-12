@@ -5,6 +5,7 @@ import { authService } from "../../services/AuthService"
 import { useState } from "react"
 import { Avatar } from "./Avatar"
 import { useAuthContext } from "../../utils/hooks"
+import { obtenerRolesDesdeToken } from "../../utils/jwt"
 
 interface NavItemProps {
   text: string
@@ -42,6 +43,10 @@ export const NavbarSuperior = () => {
   const bibliokarmas = usuario?.bibliokarmas ?? 0
   const navigate = useNavigate()
 
+  const token = localStorage.getItem("token") ?? ""
+  const roles = obtenerRolesDesdeToken(token)
+  const esAdmin = roles.includes("ROLE_ADMIN")
+
   const items: NavItemProps[] = [
     { text: "Inicio", to: "/home" },
     ...(estaLogueado
@@ -49,6 +54,9 @@ export const NavbarSuperior = () => {
           { text: "Mis Préstamos", to: "/mis-prestamos" },
           { text: "Perfil", to: "/perfil" },
         ]
+      : []),
+    ...(esAdmin
+      ? [{text: "Consultas", to: "/consultas" }]
       : []),
   ]
 
