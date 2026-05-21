@@ -1,0 +1,76 @@
+@import "tailwindcss";
+@theme {
+  /* Colores base dark premium */
+  --color-primary-light: #f7bd48;
+  --color-primary: #ba880f;
+  --color-primary-dark: #9a6e0a;
+
+  --color-secondary-light: #d3c4af;
+  --color-secondary: #c8c8b0;
+  --color-secondary-dark: #ede0dc;
+
+  --color-background: #181210;
+  --color-surface: #251e1c;
+  --color-surface-high: #2f2826;
+  --color-surface-highest: #3b3331;
+
+  --color-accent: #4f4535;
+
+  /* Semánticos */
+  --color-on-surface: #ede0dc;
+  --color-on-surface-variant: #d3c4af;
+  --color-outline: #9c8f7b;
+  --color-outline-variant: #4f4535;
+
+  /* Estados de badges */
+  --color-success: #10b981;
+  --color-success-bg: #064e3b;
+  --color-danger: #ef4444;
+  --color-danger-bg: #450a0a;
+  --color-warning: #f59e0b;
+  --color-warning-bg: #451a03;
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes modal-out {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+}
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.modal-enter {
+  animation: modal-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.backdrop-enter {
+  animation: backdrop-in 0.2s ease forwards;
+}
+.modal-out {
+  animation: modal-out 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+body {
+  font-family: "Manrope", sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+}
