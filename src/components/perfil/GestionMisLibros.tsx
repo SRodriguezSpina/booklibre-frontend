@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { Plus } from "lucide-react"
 import { Tabs } from "../ui"
-import type { LibroUsuarioItemDTO } from "../../models/libroModel"
 import { TablaLibros } from "./TablaLibros"
 import { Paginacion } from "../ui/Paginacion"
 import { useGestionMisLibros } from "../../utils/misLibros/useGestionMisLibros"
@@ -12,22 +11,18 @@ import {
 } from "../../utils/misLibros/gestionMisLibros"
 
 export type PropsGestionMisLibros = {
-  libros: LibroUsuarioItemDTO[]
+  usuarioId: number | null
+  habilitado: boolean
   onAgregar: () => void
   onEliminar?: (libroId: number) => void | Promise<void>
-  cargando?: boolean
-  error?: string | null
-  onReintentar?: () => void
   clicksPorLibro?: Map<number, number>
 }
 
 export const GestionMisLibros = ({
-  libros,
+  usuarioId,
+  habilitado,
   onAgregar,
   onEliminar,
-  cargando = false,
-  error = null,
-  onReintentar,
   clicksPorLibro,
 }: PropsGestionMisLibros) => {
   const {
@@ -35,7 +30,6 @@ export const GestionMisLibros = ({
     cambiarOrden,
     campoOrden,
     filtro,
-    librosFiltrados,
     librosPagina,
     paginaAjustada,
     porPagina,
@@ -44,15 +38,21 @@ export const GestionMisLibros = ({
     sentidoOrden,
     setPagina,
     totalPaginas,
-  } = useGestionMisLibros(libros)
+    totalElements,
+    cargando,
+    error,
+    recargar,
+  } = useGestionMisLibros(usuarioId, habilitado)
   const [animating, setAnimating] = useState(false)
 
-  const solicitarEliminar = (id: number) => {
+  const solicitarEliminar = async (id: number) => {
     if (!onEliminar) return
     const ok = window.confirm(
       "¿Eliminar este libro? Esta acción no se puede deshacer.",
     )
-    if (ok) void onEliminar(id)
+    if (!ok) return
+    await onEliminar(id)
+    recargar()
   }
 
   const handleCambiarFiltro = (id: string) => {
@@ -79,8 +79,7 @@ export const GestionMisLibros = ({
     }, 150)
   }
 
-  const mostrarPaginacion =
-    !cargando && !error && libros.length > 0 && librosFiltrados.length > 0
+  const mostrarPaginacion = !cargando && !error && totalElements > 0
 
   return (
     <div className="h-full relative">
@@ -138,16 +137,14 @@ export const GestionMisLibros = ({
               <p className="text-on-surface-variant/50 text-sm mt-1 max-w-md">
                 {error}
               </p>
-              {onReintentar && (
-                <button
-                  onClick={onReintentar}
-                  className="mt-4 px-4 py-2 text-xs font-bold uppercase tracking-wider border border-accent/20 text-on-surface-variant hover:text-on-surface rounded transition-all"
-                >
-                  Reintentar
-                </button>
-              )}
+              <button
+                onClick={recargar}
+                className="mt-4 px-4 py-2 text-xs font-bold uppercase tracking-wider border border-accent/20 text-on-surface-variant hover:text-on-surface rounded transition-all"
+              >
+                Reintentar
+              </button>
             </div>
-          ) : libros.length === 0 ? (
+          ) : totalElements === 0 && filtro === "todos" ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="w-14 h-14 bg-surface-high rounded flex items-center justify-center mb-4 text-2xl">
                 📚
@@ -159,7 +156,7 @@ export const GestionMisLibros = ({
                 ¡Agregá tu primer libro a la colección!
               </p>
             </div>
-          ) : librosFiltrados.length === 0 ? (
+          ) : librosPagina.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="text-on-surface font-bold text-lg">
                 No se encontraron resultados

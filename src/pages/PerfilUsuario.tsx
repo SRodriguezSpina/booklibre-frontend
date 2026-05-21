@@ -3,7 +3,6 @@ import { libroService } from "../services/libroService"
 import type {
   ClickLogDTO,
   LibroMasClickeadoResponse,
-  LibroUsuarioItemDTO,
 } from "../models/libroModel"
 import { useEffect, useMemo, useState } from "react"
 import type { ContextoPerfilUsuario } from "../layouts/PerfilUsuarioLayout"
@@ -23,9 +22,6 @@ export const PerfilUsuario = () => {
   const { usuario, setUsuario } = useOutletContext<ContextoPerfilUsuario>()
   const { setUsuarioContext } = useAuthContext()
   const navigate = useNavigate()
-  const [libros, setLibros] = useState<LibroUsuarioItemDTO[]>([])
-  const [cargandoLibros, setCargandoLibros] = useState(false)
-  const [errorLibros, setErrorLibros] = useState<string | null>(null)
   const [clicks, setClicks] = useState<ClickLogDTO[]>([])
   const [cargandoClicks, setCargandoClicks] = useState(false)
   const [errorClicks, setErrorClicks] = useState<string | null>(null)
@@ -43,66 +39,6 @@ export const PerfilUsuario = () => {
 
   const esSoloLector = usuario.tipoUsuario === "Lector"
   const esSoloPublicador = usuario.tipoUsuario === "Publicador"
-
-  const cargarLibros = async () => {
-    if (usuario.tipoUsuario === "Lector") {
-      setErrorLibros(null)
-      setCargandoLibros(false)
-      return
-    }
-
-    setCargandoLibros(true)
-    setErrorLibros(null)
-    try {
-      const response = await libroService.obtenerLibrosUsuarioPerfil(usuario.id)
-      setLibros(response)
-    } catch (e: unknown) {
-      setLibros([])
-      const err = obtenerMensajeError(e)
-      setErrorLibros(err.mensaje || "No se pudieron cargar tus libros.")
-    } finally {
-      setCargandoLibros(false)
-    }
-  }
-
-  useEffect(() => {
-    let activa = true
-
-    const cargarLibrosSegunTipo = async () => {
-      if (usuario.tipoUsuario === "Lector") {
-        if (!activa) return
-        setErrorLibros(null)
-        setCargandoLibros(false)
-        return
-      }
-
-      if (!activa) return
-      setCargandoLibros(true)
-      setErrorLibros(null)
-      try {
-        const response = await libroService.obtenerLibrosUsuarioPerfil(
-          usuario.id,
-        )
-        if (!activa) return
-        setLibros(response)
-      } catch (e: unknown) {
-        if (!activa) return
-        setLibros([])
-        const err = obtenerMensajeError(e)
-        setErrorLibros(err.mensaje || "No se pudieron cargar tus libros.")
-      } finally {
-        // eslint-disable-next-line no-unsafe-finally
-        if (!activa) return
-        setCargandoLibros(false)
-      }
-    }
-
-    void cargarLibrosSegunTipo()
-
-    return () => {
-      activa = false
-    }
-  }, [usuario.id, usuario.tipoUsuario])
 
   const cargarClicks = async () => {
     if (usuario.tipoUsuario === "Lector") {
@@ -225,7 +161,6 @@ export const PerfilUsuario = () => {
     try {
       await libroService.eliminarLibro(libroId, usuario.id)
       toast.success("Libro eliminado.")
-      await cargarLibros()
     } catch (e: unknown) {
       const err = obtenerMensajeError(e)
       toast.error(err.mensaje || "No se pudo eliminar el libro.")
@@ -303,12 +238,10 @@ export const PerfilUsuario = () => {
             style={{ animationDelay: "160ms" }}
           >
             <GestionMisLibros
-              libros={libros}
+              usuarioId={usuario.id}
+              habilitado={!esSoloLector}
               onAgregar={manejarAgregarLibro}
               onEliminar={manejarEliminarLibro}
-              cargando={cargandoLibros}
-              error={errorLibros}
-              onReintentar={() => void cargarLibros()}
               clicksPorLibro={clicksPorLibro}
             />
           </div>

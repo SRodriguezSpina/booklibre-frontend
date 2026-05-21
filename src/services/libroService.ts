@@ -9,6 +9,32 @@ import type {
 } from "../models/libroModel"
 import { apiClient } from "./apiClient"
 
+export type FiltroLibrosPerfil = "todos" | "disponibles" | "prestados"
+export type OrdenarPorLibrosPerfil = "titulo" | "estado" | "fecha"
+export type DireccionOrden = "ascendente" | "descendente"
+
+export type LibrosUsuarioPaginaParams = {
+  page: number
+  size: number
+  filtro: FiltroLibrosPerfil
+  ordenarPor: OrdenarPorLibrosPerfil
+  direccion: DireccionOrden
+}
+
+export type LibrosUsuarioPaginaResponse = {
+  content: LibroUsuarioItemDTO[]
+  page: number
+  totalPages: number
+  totalElements: number
+}
+
+type LibrosUsuarioPaginaResponseRaw = {
+  content: Array<LibroUsuarioItemDTO & { disponible: boolean | string }>
+  page: number
+  totalPages: number
+  totalElements: number
+}
+
 export const libroService = {
   async obtenerTodosLosPrestamos(usuarioId: number, tipo: TipoPrestamo,): Promise<Libro[]> {
     const tipoReserva = tipo === "prestados-a-mi" ? "HECHAS" : "RECIBIDAS"
@@ -50,16 +76,30 @@ export const libroService = {
 
   async obtenerLibrosUsuarioPerfil(
     usuarioId: number,
-  ): Promise<LibroUsuarioItemDTO[]> {
-    const res = await apiClient.get<LibroUsuarioItemDTO[]>(
+    params: Partial<LibrosUsuarioPaginaParams> = {},
+  ): Promise<LibrosUsuarioPaginaResponse> {
+    const res = await apiClient.get<LibrosUsuarioPaginaResponseRaw>(
       `/usuarios/${usuarioId}/libros`,
+      {
+        params: {
+          page: 0,
+          size: 10,
+          filtro: "todos",
+          ordenarPor: "titulo",
+          direccion: "ascendente",
+          ...params,
+        },
+      },
     )
-    return res.data.map((libro) => ({
-      ...libro,
-      disponible:
-        libro.disponible === true ||
-        String(libro.disponible).toLowerCase() === "true",
-    }))
+    return {
+      ...res.data,
+      content: res.data.content.map((libro) => ({
+        ...libro,
+        disponible:
+          libro.disponible === true ||
+          String(libro.disponible).toLowerCase() === "true",
+      })),
+    }
   },
 
   async getLibroById(id: number): Promise<Libro> {
