@@ -2,6 +2,7 @@ import { Libro } from "../classes/Libro"
 import type {
   CalificacionDTO,
   LibroDTO,
+  LibroMasClickeadoResponse,
   LibroUsuarioItemDTO,
   PrestamoDTO,
   TipoPrestamo,
@@ -125,5 +126,14 @@ export const libroService = {
       valor,
       comentario,
     })
+  },
+
+  async getLibroMasClickeado(): Promise<
+    LibroMasClickeadoResponse | { mensaje: string }
+  > {
+    const res = await apiClient.get<LibroMasClickeadoResponse | { mensaje: string }>(
+      `/libros/mas-clickeado`,
+    )
+    return res.data
   },
 }

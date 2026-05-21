@@ -127,3 +127,16 @@ export const TIPO_LABEL: Record<string, string> = {
   ConDedicatoria: "Con dedicatoria",
   Coleccionable: "Coleccionable",
 }
+
+export type ClickLogDTO = {
+  libroId: number
+  libroTitulo: string
+  nombreUsuario: string
+  fechaHora: string
+}
+
+export type LibroMasClickeadoResponse = {
+  id: number
+  libroTitulo: string
+  total: number
+}

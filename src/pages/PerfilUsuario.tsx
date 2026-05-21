@@ -1,13 +1,18 @@
 import { useNavigate, useOutletContext } from "react-router-dom"
 import { libroService } from "../services/libroService"
-import type { LibroUsuarioItemDTO } from "../models/libroModel"
-import { useEffect, useState } from "react"
+import type {
+  ClickLogDTO,
+  LibroMasClickeadoResponse,
+  LibroUsuarioItemDTO,
+} from "../models/libroModel"
+import { useEffect, useMemo, useState } from "react"
 import type { ContextoPerfilUsuario } from "../layouts/PerfilUsuarioLayout"
 import { Usuario } from "../classes/usuario"
 import { PerfilResumen } from "../components/perfil/PerfilResumen"
 import { MisDatosCard } from "../components/perfil/MisDatosCard"
 import { EstadisticaCard } from "../components/perfil/EstadisticaCard"
 import { GestionMisLibros } from "../components/perfil/GestionMisLibros"
+import { HistorialClicksCard } from "../components/perfil/HistorialClicksCard"
 import { ModalEditarPerfil } from "../components/perfil/ModalEditarPerfil"
 import { usuarioService } from "../services/usuarioService"
 import { toast } from "react-toastify"
@@ -21,7 +26,20 @@ export const PerfilUsuario = () => {
   const [libros, setLibros] = useState<LibroUsuarioItemDTO[]>([])
   const [cargandoLibros, setCargandoLibros] = useState(false)
   const [errorLibros, setErrorLibros] = useState<string | null>(null)
+  const [clicks, setClicks] = useState<ClickLogDTO[]>([])
+  const [cargandoClicks, setCargandoClicks] = useState(false)
+  const [errorClicks, setErrorClicks] = useState<string | null>(null)
+  const [libroMasClickeado, setLibroMasClickeado] =
+    useState<LibroMasClickeadoResponse | null>(null)
   const [modalEditarAbierto, setModalEditarAbierto] = useState(false)
+
+  const clicksPorLibro = useMemo(() => {
+    const mapa = new Map<number, number>()
+    for (const click of clicks) {
+      mapa.set(click.libroId, (mapa.get(click.libroId) ?? 0) + 1)
+    }
+    return mapa
+  }, [clicks])
 
   const esSoloLector = usuario.tipoUsuario === "Lector"
   const esSoloPublicador = usuario.tipoUsuario === "Publicador"
@@ -80,6 +98,101 @@ export const PerfilUsuario = () => {
     }
 
     void cargarLibrosSegunTipo()
+
+    return () => {
+      activa = false
+    }
+  }, [usuario.id, usuario.tipoUsuario])
+
+  const cargarClicks = async () => {
+    if (usuario.tipoUsuario === "Lector") {
+      setClicks([])
+      setErrorClicks(null)
+      setCargandoClicks(false)
+      return
+    }
+
+    setCargandoClicks(true)
+    setErrorClicks(null)
+    try {
+      const response = await usuarioService.obtenerClicksDePublicador(usuario.id)
+      setClicks(response)
+    } catch (e: unknown) {
+      setClicks([])
+      const err = obtenerMensajeError(e)
+      setErrorClicks(err.mensaje || "No se pudo cargar el historial de clicks.")
+    } finally {
+      setCargandoClicks(false)
+    }
+  }
+
+  useEffect(() => {
+    let activa = true
+
+    const cargarClicksSegunTipo = async () => {
+      if (usuario.tipoUsuario === "Lector") {
+        if (!activa) return
+        setClicks([])
+        setErrorClicks(null)
+        setCargandoClicks(false)
+        return
+      }
+
+      if (!activa) return
+      setCargandoClicks(true)
+      setErrorClicks(null)
+      try {
+        const response = await usuarioService.obtenerClicksDePublicador(
+          usuario.id,
+        )
+        if (!activa) return
+        setClicks(response)
+      } catch (e: unknown) {
+        if (!activa) return
+        setClicks([])
+        const err = obtenerMensajeError(e)
+        setErrorClicks(
+          err.mensaje || "No se pudo cargar el historial de clicks.",
+        )
+      } finally {
+        // eslint-disable-next-line no-unsafe-finally
+        if (!activa) return
+        setCargandoClicks(false)
+      }
+    }
+
+    void cargarClicksSegunTipo()
+
+    return () => {
+      activa = false
+    }
+  }, [usuario.id, usuario.tipoUsuario])
+
+  useEffect(() => {
+    let activa = true
+
+    const cargarLibroMasClickeado = async () => {
+      if (usuario.tipoUsuario === "Lector") {
+        if (!activa) return
+        setLibroMasClickeado(null)
+        return
+      }
+
+      try {
+        const response = await libroService.getLibroMasClickeado()
+        if (!activa) return
+        if ("id" in response) {
+          setLibroMasClickeado(response)
+        } else {
+          setLibroMasClickeado(null)
+        }
+      } catch {
+        if (!activa) return
+        setLibroMasClickeado(null)
+      }
+    }
+
+    void cargarLibroMasClickeado()
 
     return () => {
       activa = false
@@ -196,10 +309,49 @@ export const PerfilUsuario = () => {
               cargando={cargandoLibros}
               error={errorLibros}
               onReintentar={() => void cargarLibros()}
+              clicksPorLibro={clicksPorLibro}
             />
           </div>
         )}
       </div>
+
+      {!esSoloLector && libroMasClickeado && (
+        <div
+          className="animate-in fade-in duration-300"
+          style={{ animationDelay: "180ms" }}
+        >
+          <div className="bg-surface rounded border border-accent/15 shadow-[0_8px_24px_rgba(0,0,0,0.3)] px-5 py-4 flex items-center gap-3 transition-transform duration-300 hover:-translate-y-0.5">
+            <span className="text-2xl" aria-hidden="true">
+              📖
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50">
+                Tu libro más clickeado
+              </div>
+              <div className="text-on-surface font-bold truncate">
+                {libroMasClickeado.libroTitulo}
+                <span className="ml-2 text-sm text-on-surface-variant/60 font-medium tabular-nums">
+                  ({libroMasClickeado.total} visitas)
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!esSoloLector && (
+        <div
+          className="animate-in fade-in duration-300"
+          style={{ animationDelay: "200ms" }}
+        >
+          <HistorialClicksCard
+            clicks={clicks}
+            cargando={cargandoClicks}
+            error={errorClicks}
+            onReintentar={() => void cargarClicks()}
+          />
+        </div>
+      )}
 
       {modalEditarAbierto && (
         <ModalEditarPerfil

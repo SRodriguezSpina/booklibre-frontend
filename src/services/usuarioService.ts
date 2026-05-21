@@ -4,12 +4,13 @@ import type {
   UsuarioUpdateRequest,
   UsuarioUpdateResponse,
 } from '../models/usuarioModel'
+import type { ClickLogDTO } from '../models/libroModel'
 import { apiClient } from './apiClient'
 import { tokenService } from './tokenService'
 import { mapUsuarioResponse } from '../utils/usuarioMapper'
 
 class UsuarioService {
-  
+
   async obtenerUsuario(id: number): Promise<UsuarioData> {
     const res = await apiClient.get<UsuarioResponse>(`/usuarios/${id}`)
     return mapUsuarioResponse(res.data)
@@ -29,6 +30,11 @@ class UsuarioService {
     tokenService.setToken(res.data.token)
     tokenService.setNombreUsuario(res.data.usuario.nombre)
     return mapUsuarioResponse(res.data.usuario)
+  }
+
+  async obtenerClicksDePublicador(usuarioId: number): Promise<ClickLogDTO[]> {
+    const res = await apiClient.get<ClickLogDTO[]>(`/usuarios/${usuarioId}/clicks`)
+    return res.data
   }
 }
 
