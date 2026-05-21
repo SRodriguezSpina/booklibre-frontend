@@ -14,6 +14,7 @@ export type PropsGestionMisLibros = {
   cargando?: boolean
   error?: string | null
   onReintentar?: () => void
+  clicksPorLibro?: Map<number, number>
 }
 
 export const GestionMisLibros = ({
@@ -23,6 +24,7 @@ export const GestionMisLibros = ({
   cargando = false,
   error = null,
   onReintentar,
+  clicksPorLibro,
 }: PropsGestionMisLibros) => {
   const {
     alCambiarFiltro,
@@ -177,6 +179,7 @@ export const GestionMisLibros = ({
                   sentidoOrden={sentidoOrden}
                   alCambiarOrden={handleCambiarOrden}
                   alEliminar={solicitarEliminar}
+                  clicksPorLibro={clicksPorLibro}
                 />
               </div>
             </div>

@@ -17,6 +17,7 @@ export type PropsTablaLibros = {
   sentidoOrden: SentidoOrden
   alCambiarOrden: (campo: CampoOrdenMisLibros) => void
   alEliminar: (libroId: number) => void
+  clicksPorLibro?: Map<number, number>
 }
 
 export const TablaLibros = ({
@@ -25,6 +26,7 @@ export const TablaLibros = ({
   sentidoOrden,
   alCambiarOrden,
   alEliminar,
+  clicksPorLibro,
 }: PropsTablaLibros) => {
   const navigate = useNavigate()
 
@@ -55,6 +57,9 @@ export const TablaLibros = ({
                 </button>
               </th>
             ))}
+            <th className="py-4 text-center text-[9px] font-bold tracking-widest text-on-surface-variant/50 uppercase">
+              Clicks
+            </th>
             <th className="py-4 text-right pr-4 text-[9px] font-bold tracking-widest text-on-surface-variant/50 uppercase">
               Acciones
             </th>
@@ -111,6 +116,9 @@ export const TablaLibros = ({
                 </td>
                 <td className="py-4 text-xs text-on-surface-variant/50 font-medium">
                   {formatearFechaAgregadoLibro(libro.fechaAgregado)}
+                </td>
+                <td className="py-4 text-center text-sm font-semibold text-on-surface tabular-nums">
+                  {clicksPorLibro?.get(libro.id) ?? 0}
                 </td>
                 <td className="py-4">
                   <div className="flex justify-end gap-2 pr-4">
