@@ -1,6 +1,6 @@
 import { useNavigate, useOutletContext } from "react-router-dom"
 import { libroService } from "../services/libroService"
-import type { LibroUsuarioItemDTO } from "../models/libroModel"
+import type { ClickLogDTO, LibroUsuarioItemDTO } from "../models/libroModel"
 import { useEffect, useState } from "react"
 import type { ContextoPerfilUsuario } from "../layouts/PerfilUsuarioLayout"
 import { Usuario } from "../classes/usuario"
@@ -8,6 +8,7 @@ import { PerfilResumen } from "../components/perfil/PerfilResumen"
 import { MisDatosCard } from "../components/perfil/MisDatosCard"
 import { EstadisticaCard } from "../components/perfil/EstadisticaCard"
 import { GestionMisLibros } from "../components/perfil/GestionMisLibros"
+import { HistorialClicksCard } from "../components/perfil/HistorialClicksCard"
 import { ModalEditarPerfil } from "../components/perfil/ModalEditarPerfil"
 import { usuarioService } from "../services/usuarioService"
 import { toast } from "react-toastify"
@@ -21,6 +22,9 @@ export const PerfilUsuario = () => {
   const [libros, setLibros] = useState<LibroUsuarioItemDTO[]>([])
   const [cargandoLibros, setCargandoLibros] = useState(false)
   const [errorLibros, setErrorLibros] = useState<string | null>(null)
+  const [clicks, setClicks] = useState<ClickLogDTO[]>([])
+  const [cargandoClicks, setCargandoClicks] = useState(false)
+  const [errorClicks, setErrorClicks] = useState<string | null>(null)
   const [modalEditarAbierto, setModalEditarAbierto] = useState(false)
 
   const esSoloLector = usuario.tipoUsuario === "Lector"
@@ -80,6 +84,70 @@ export const PerfilUsuario = () => {
     }
 
     void cargarLibrosSegunTipo()
+
+    return () => {
+      activa = false
+    }
+  }, [usuario.id, usuario.tipoUsuario])
+
+  const cargarClicks = async () => {
+    if (usuario.tipoUsuario === "Lector") {
+      setClicks([])
+      setErrorClicks(null)
+      setCargandoClicks(false)
+      return
+    }
+
+    setCargandoClicks(true)
+    setErrorClicks(null)
+    try {
+      const response = await usuarioService.obtenerClicksDePublicador(usuario.id)
+      setClicks(response)
+    } catch (e: unknown) {
+      setClicks([])
+      const err = obtenerMensajeError(e)
+      setErrorClicks(err.mensaje || "No se pudo cargar el historial de clicks.")
+    } finally {
+      setCargandoClicks(false)
+    }
+  }
+
+  useEffect(() => {
+    let activa = true
+
+    const cargarClicksSegunTipo = async () => {
+      if (usuario.tipoUsuario === "Lector") {
+        if (!activa) return
+        setClicks([])
+        setErrorClicks(null)
+        setCargandoClicks(false)
+        return
+      }
+
+      if (!activa) return
+      setCargandoClicks(true)
+      setErrorClicks(null)
+      try {
+        const response = await usuarioService.obtenerClicksDePublicador(
+          usuario.id,
+        )
+        if (!activa) return
+        setClicks(response)
+      } catch (e: unknown) {
+        if (!activa) return
+        setClicks([])
+        const err = obtenerMensajeError(e)
+        setErrorClicks(
+          err.mensaje || "No se pudo cargar el historial de clicks.",
+        )
+      } finally {
+        // eslint-disable-next-line no-unsafe-finally
+        if (!activa) return
+        setCargandoClicks(false)
+      }
+    }
+
+    void cargarClicksSegunTipo()
 
     return () => {
       activa = false
@@ -200,6 +268,20 @@ export const PerfilUsuario = () => {
           </div>
         )}
       </div>
+
+      {!esSoloLector && (
+        <div
+          className="animate-in fade-in duration-300"
+          style={{ animationDelay: "200ms" }}
+        >
+          <HistorialClicksCard
+            clicks={clicks}
+            cargando={cargandoClicks}
+            error={errorClicks}
+            onReintentar={() => void cargarClicks()}
+          />
+        </div>
+      )}
 
       {modalEditarAbierto && (
         <ModalEditarPerfil
