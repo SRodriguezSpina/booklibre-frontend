@@ -9,6 +9,7 @@ import {
   POR_PAGINA_MIS_LIBROS,
   type CampoOrdenMisLibros,
   type FiltroMisLibros,
+  type OpcionPorPagina,
   type SentidoOrden,
 } from './gestionMisLibros'
 
@@ -18,16 +19,17 @@ export function useGestionMisLibros(libros: LibroUsuarioItemDTO[]) {
   const [pagina, setPagina] = useState(1)
   const [campoOrden, setCampoOrden] = useState<CampoOrdenMisLibros>('titulo')
   const [sentidoOrden, setSentidoOrden] = useState<SentidoOrden>('ascendente')
+  const [porPagina, setPorPaginaInterna] = useState<OpcionPorPagina>(POR_PAGINA_MIS_LIBROS)
 
   const librosFiltrados = useMemo(() => filtrarMisLibros(libros, filtro), [libros, filtro])
 
-  const librosOrdenados = useMemo(() => 
+  const librosOrdenados = useMemo(() =>
     ordenarMisLibros(librosFiltrados, campoOrden, sentidoOrden), [librosFiltrados, campoOrden, sentidoOrden])
 
-  const { totalPaginas, paginaAjustada, inicio, fin, librosPagina } = useMemo(() => 
-    paginarMisLibros(librosOrdenados, pagina, POR_PAGINA_MIS_LIBROS), [librosOrdenados, pagina])
+  const { totalPaginas, paginaAjustada, inicio, fin, librosPagina } = useMemo(() =>
+    paginarMisLibros(librosOrdenados, pagina, porPagina), [librosOrdenados, pagina, porPagina])
 
-  const rangoEtiqueta = useMemo(() => 
+  const rangoEtiqueta = useMemo(() =>
     rangoEtiquetaPaginacion(inicio, fin, librosOrdenados.length), [inicio, fin, librosOrdenados.length])
 
   const cambiarOrden = useCallback((campo: CampoOrdenMisLibros) => {
@@ -42,10 +44,17 @@ export function useGestionMisLibros(libros: LibroUsuarioItemDTO[]) {
     setPagina(1)
   }, [])
 
+  const setPorPagina = useCallback((valor: OpcionPorPagina) => {
+    setPorPaginaInterna(valor)
+    setPagina(1)
+  }, [])
+
   return {
     filtro,
     pagina,
     setPagina,
+    porPagina,
+    setPorPagina,
     campoOrden,
     sentidoOrden,
     cambiarOrden,

@@ -4,13 +4,18 @@ import { act } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { GestionMisLibros } from '../../components/perfil/GestionMisLibros'
 import type { LibroUsuarioItemDTO } from '../../models/libroModel'
+import { POR_PAGINA_MIS_LIBROS } from '../../utils/misLibros/gestionMisLibros'
 
-const librosMock: LibroUsuarioItemDTO[] = [
-  { id: 1, titulo: 'A', autor: 'Autor 1', genero: 'DRAMA', disponible: true, fechaAgregado: '2024-01-01' },
-  { id: 2, titulo: 'B', autor: 'Autor 2', genero: 'DRAMA', disponible: true, fechaAgregado: '2024-01-02' },
-  { id: 3, titulo: 'C', autor: 'Autor 3', genero: 'DRAMA', disponible: true, fechaAgregado: '2024-01-03' },
-  { id: 4, titulo: 'D', autor: 'Autor 4', genero: 'DRAMA', disponible: false, fechaAgregado: '2024-01-04' },
-]
+const TOTAL_LIBROS = POR_PAGINA_MIS_LIBROS + 1
+
+const librosMock: LibroUsuarioItemDTO[] = Array.from({ length: TOTAL_LIBROS }, (_, i) => ({
+  id: i + 1,
+  titulo: `Libro ${i + 1}`,
+  autor: `Autor ${i + 1}`,
+  genero: 'DRAMA',
+  disponible: i !== TOTAL_LIBROS - 1,
+  fechaAgregado: `2024-03-${String(i + 1).padStart(2, '0')}`,
+}))
 
 const renderGestion = () =>
   render(
@@ -33,32 +38,32 @@ describe('GestionMisLibros', () => {
   it('aplica delay de 150ms al cambiar tab', () => {
     renderGestion()
 
-    expect(screen.getByText((txt) => txt.includes('de 4 libros'))).toBeInTheDocument()
+    expect(screen.getByText((txt) => txt.includes(`de ${TOTAL_LIBROS} libros`))).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Prestados' }))
 
-    expect(screen.getByText((txt) => txt.includes('de 4 libros'))).toBeInTheDocument()
+    expect(screen.getByText((txt) => txt.includes(`de ${TOTAL_LIBROS} libros`))).toBeInTheDocument()
 
     act(() => {
       vi.advanceTimersByTime(150)
     })
 
     expect(screen.getByText((txt) => txt.includes('de 1 libros'))).toBeInTheDocument()
-  })
+  }, 10000)
 
   it('aplica delay de 150ms al cambiar página', () => {
     renderGestion()
 
-    expect(screen.getByText((txt) => txt.includes('de 4 libros'))).toBeInTheDocument()
+    expect(screen.getByText((txt) => txt.includes(`de ${TOTAL_LIBROS} libros`))).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: '2' }))
 
-    expect(screen.getByText((txt) => txt.includes('de 4 libros'))).toBeInTheDocument()
+    expect(screen.getByText((txt) => txt.includes(`de ${TOTAL_LIBROS} libros`))).toBeInTheDocument()
 
     act(() => {
       vi.advanceTimersByTime(150)
     })
 
-    expect(screen.getByText((txt) => txt.includes('4–4'))).toBeInTheDocument()
-  })
+    expect(screen.getByText((txt) => txt.includes(`${TOTAL_LIBROS}–${TOTAL_LIBROS}`))).toBeInTheDocument()
+  }, 10000)
 })

@@ -5,7 +5,11 @@ import type { LibroUsuarioItemDTO } from "../../models/libroModel"
 import { TablaLibros } from "./TablaLibros"
 import { Paginacion } from "../ui/Paginacion"
 import { useGestionMisLibros } from "../../utils/misLibros/useGestionMisLibros"
-import { pestañasMisLibros } from "../../utils/misLibros/gestionMisLibros"
+import {
+  pestañasMisLibros,
+  OPCIONES_POR_PAGINA,
+  type OpcionPorPagina,
+} from "../../utils/misLibros/gestionMisLibros"
 
 export type PropsGestionMisLibros = {
   libros: LibroUsuarioItemDTO[]
@@ -34,6 +38,8 @@ export const GestionMisLibros = ({
     librosFiltrados,
     librosPagina,
     paginaAjustada,
+    porPagina,
+    setPorPagina,
     rangoEtiqueta,
     sentidoOrden,
     setPagina,
@@ -189,9 +195,29 @@ export const GestionMisLibros = ({
 
       {mostrarPaginacion && (
         <div className="absolute top-full left-0 right-0 pt-4">
-          <div className="text-xs text-on-surface-variant/40 font-medium">
-            Mostrando {rangoEtiqueta.desde}–{rangoEtiqueta.hasta} de{" "}
-            {rangoEtiqueta.total} libros
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-xs text-on-surface-variant/40 font-medium">
+              Mostrando {rangoEtiqueta.desde}–{rangoEtiqueta.hasta} de{" "}
+              {rangoEtiqueta.total} libros
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-on-surface-variant/40">
+                Por página
+              </span>
+              <select
+                value={porPagina}
+                onChange={(e) =>
+                  setPorPagina(Number(e.target.value) as OpcionPorPagina)
+                }
+                className="cursor-pointer text-xs font-semibold bg-surface border border-accent/20 text-on-surface-variant rounded px-2 py-1 hover:border-accent/40 transition-colors focus:outline-none focus:ring-1 focus:ring-primary/40"
+              >
+                {OPCIONES_POR_PAGINA.map((op) => (
+                  <option key={op} value={op}>
+                    {op}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <Paginacion
             pagina={paginaAjustada}
