@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { GENERO_LABEL, IDIOMA_LABEL, ESTADO_LABEL, TIPO_LABEL } from '../../models/libroModel'
 import { Star } from 'lucide-react'
@@ -21,10 +22,24 @@ type LibroCardProps = {
 }
 
 export const LibroCardHome = ({ id, imagenUrl, genero, titulo, autor, calificacion, isbn, idioma, tipo, bibliokarma, estado, duenio }: LibroCardProps) => {
+    const [imgFailed, setImgFailed] = useState(false)
+
     return (
         <Link to={`/libros/${id}`} className='group flex flex-col bg-surface rounded overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.3)] border border-accent/10 hover:-translate-y-1 transition-all duration-300'>
-            <div className='w-full h-40 sm:h-56 lg:h-96 overflow-hidden'>
-                <img src={imagenUrl} className='w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-500' />
+            <div className='w-full h-40 sm:h-56 lg:h-96 overflow-hidden bg-surface-highest'>
+                {imagenUrl && !imgFailed ? (
+                    <img
+                        src={imagenUrl}
+                        alt={`Portada de ${titulo}`}
+                        onError={() => setImgFailed(true)}
+                        className='w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-500'
+                    />
+                ) : (
+                    <div className='w-full h-full flex flex-col items-center justify-center gap-2 text-on-surface-variant/20'>
+                        <span className='text-5xl'>📖</span>
+                        <span className='text-[10px] uppercase tracking-widest font-bold'>Sin portada</span>
+                    </div>
+                )}
             </div>
 
             <div className='flex flex-col gap-1 px-4 pt-3 min-h-[72px]'>
