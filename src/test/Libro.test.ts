@@ -26,12 +26,17 @@ const prestamoBase: PrestamoDTO = {
   autor: "George Orwell",
   estado: "EXCELENTE",
   propietarioId: 3,
+  propietarioNombre: "Ana",
   imagenUrl: "",
   alquiladoPorId: 1,
+  alquiladoPorNombre: "Juan",
   fechaDesde: formatDate(hace5Dias),
   fechaHasta: formatDate(en5Dias),
   rating: 0,
   bibliokarma: 1550,
+  disponibilidad: "RESERVADO",
+  disponible: false,
+  libroActivo: true,
 }
 
 describe("Libro - fromPrestamoJson", () => {

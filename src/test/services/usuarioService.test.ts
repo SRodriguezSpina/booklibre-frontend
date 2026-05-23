@@ -19,6 +19,8 @@ const usuarioDataMock: UsuarioData = {
   ciudad: 'Rosario',
   tipoUsuario: 'Lector',
   bibliokarmas: 10,
+  reservados: 0,
+  leidos: 0,
 }
 
 const usuarioUpdateResponseMock = {
