@@ -35,7 +35,7 @@ export const ModalCalificacion = ({
       onClick={handleClose} // click fuera cierra
     >
       <div
-        className={`${closing ? "modal-out" : "modal-enter"} bg-surface rounded border border-accent/20 shadow-[0_24px_48px_rgba(0,0,0,0.5)] w-full max-w-md overflow-hidden`}
+        className={`${closing ? "modal-out" : "modal-enter"} bg-surface rounded-xl border border-accent/20 shadow-[0_24px_48px_rgba(0,0,0,0.5)] w-full max-w-md overflow-hidden`}
         onClick={(e) => e.stopPropagation()} // evita cerrar al clickear adentro
       >
         <div className="p-6">

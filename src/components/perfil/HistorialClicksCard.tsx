@@ -26,7 +26,7 @@ export const HistorialClicksCard = ({
   onReintentar,
 }: PropsHistorialClicksCard) => {
   return (
-    <div className="bg-surface rounded border border-accent/15 shadow-[0_8px_24px_rgba(0,0,0,0.3)] overflow-hidden transition-transform duration-300 hover:-translate-y-0.5">
+    <div className="bg-surface rounded-xl border border-accent/15 shadow-[0_8px_24px_rgba(0,0,0,0.3)] overflow-hidden transition-transform duration-300 hover:-translate-y-0.5">
       <div className="px-6 pt-6 pb-4 border-b border-accent/10">
         <h2 className="text-2xl font-serif font-bold text-on-surface">
           Historial de clicks

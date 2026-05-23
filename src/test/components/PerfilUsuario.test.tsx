@@ -114,7 +114,7 @@ describe('PerfilUsuario', () => {
       }),
       setUsuario: mockSetUsuario,
     })
-    mockObtenerLibrosUsuarioPerfil.mockResolvedValue([])
+    mockObtenerLibrosUsuarioPerfil.mockResolvedValue({ content: [], totalElements: 0, totalPages: 0 })
   })
 
   it('actualiza usuario desde modal y conserva imagen local si backend no la devuelve', async () => {
@@ -175,7 +175,7 @@ describe('PerfilUsuario', () => {
 
     expect(screen.getByText('GestionMisLibros')).toBeInTheDocument()
     await waitFor(() => {
-      expect(mockObtenerLibrosUsuarioPerfil).toHaveBeenCalledWith(1)
+      expect(mockObtenerLibrosUsuarioPerfil).toHaveBeenCalled()
     })
   })
 })

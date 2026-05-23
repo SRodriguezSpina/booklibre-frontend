@@ -1,11 +1,12 @@
 import { NavLink, useNavigate } from "react-router-dom"
-import { TrendingUp, LogOut, Menu, X } from "lucide-react"
+import { TrendingUp, LogOut, Menu, X, Sun, Moon } from "lucide-react"
 import navBarLogo from "../../assets/icons/booklibre-logo.svg"
 import { authService } from "../../services/AuthService"
 import { useState } from "react"
 import { Avatar } from "./Avatar"
 import { useAuthContext } from "../../utils/hooks"
 import { obtenerRolesDesdeToken } from "../../utils/jwt"
+import { useTheme } from "../../context/ThemeContext"
 
 interface NavItemProps {
   text: string
@@ -20,9 +21,9 @@ export const NavItem = ({ text, to, onClick }: NavItemProps) => {
         to={to}
         onClick={onClick}
         className={({ isActive }) =>
-          `text-[11px] font-bold uppercase tracking-[0.05em] transition-colors duration-200 ${
+          `text-[11px] font-bold uppercase tracking-[0.08em] transition-colors duration-200 ${
             isActive
-              ? "text-primary-light border-b-2 border-primary-light pb-1"
+              ? "text-primary-light border-b-2 border-primary-light pb-0.5"
               : "text-on-surface-variant hover:text-on-surface"
           }`
         }
@@ -35,8 +36,8 @@ export const NavItem = ({ text, to, onClick }: NavItemProps) => {
 
 export const NavbarSuperior = () => {
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false)
+  const { theme, toggleTheme } = useTheme()
 
-  // Consumimos el usuario global
   const { usuario } = useAuthContext()
   const estaLogueado = !!usuario && !!usuario.id
   const nombre = usuario?.nombre ?? "Usuario"
@@ -55,9 +56,7 @@ export const NavbarSuperior = () => {
           { text: "Perfil", to: "/perfil" },
         ]
       : []),
-    ...(esAdmin
-      ? [{text: "Consultas", to: "/consultas" }]
-      : []),
+    ...(esAdmin ? [{ text: "Consultas", to: "/consultas" }] : []),
   ]
 
   const handleLogout = () => {
@@ -67,41 +66,60 @@ export const NavbarSuperior = () => {
 
   const cerrarMenu = () => setMenuMovilAbierto(false)
 
+  const ThemeToggle = () => (
+    <button
+      onClick={toggleTheme}
+      aria-label={
+        theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"
+      }
+      className="cursor-pointer p-2 rounded-lg border border-accent/30 text-on-surface-variant hover:text-primary-light hover:border-primary-light/40 hover:bg-primary-light/5 transition-all duration-200"
+    >
+      {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
+    </button>
+  )
+
   return (
-    <nav className="bg-background/80 backdrop-blur-md fixed top-0 z-50 w-full border-b border-accent/15 shadow-[0_16px_32px_-12px_rgba(0,0,0,0.4)]">
-      <div className="flex justify-between items-center w-full px-4 md:px-8 py-4 max-w-7xl mx-auto">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
+    <nav className="bg-background/80 backdrop-blur-md fixed top-0 z-50 w-full border-b border-accent/20 shadow-[0_1px_0_0_rgba(255,255,255,0.03)]">
+      <div className="flex justify-between items-center w-full px-6 md:px-10 py-3.5">
+        {/* Logo + nav links */}
+        <div className="flex items-center gap-8">
+          <div className="flex items-center gap-2.5">
             <img src={navBarLogo} alt="BookLibre" className="w-6 h-6" />
             <span className="text-xl font-serif font-bold tracking-tight text-primary-light">
               BookLibre
             </span>
           </div>
-          <ul className="hidden md:flex gap-6 list-none items-center">
+          <ul className="hidden md:flex gap-7 list-none items-center">
             {items.map((item) => (
               <NavItem key={item.to} text={item.text} to={item.to} />
             ))}
           </ul>
         </div>
 
-        <div className="hidden md:flex items-center gap-4">
+        {/* Acciones desktop */}
+        <div className="hidden md:flex items-center gap-3">
+          <ThemeToggle />
+
           {estaLogueado ? (
             <>
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-surface rounded border border-accent/20">
-                <TrendingUp size={14} className="text-primary-light" />
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-surface rounded-lg border border-accent/20">
+                <TrendingUp size={13} className="text-primary-light" />
                 <span className="text-primary-light text-sm font-bold">
                   {bibliokarmas}
+                </span>
+                <span className="text-[10px] text-on-surface-variant/50 font-medium">
+                  BK
                 </span>
               </div>
               <Avatar
                 src={usuario?.imagenUrl ?? null}
                 alt={nombre}
                 tamaño="chico"
-                className="!w-9 !h-9 !rounded-lg !text-sm"
+                className="!w-8 !h-8 !rounded-lg !text-sm"
               />
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant hover:text-on-surface border border-accent/30 rounded px-3 py-1.5 hover:bg-surface transition-colors"
+                className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant hover:text-danger border border-accent/30 rounded-lg px-3 py-1.5 hover:bg-danger-bg/30 hover:border-danger/30 transition-all"
               >
                 <LogOut size={13} />
                 Salir
@@ -110,18 +128,20 @@ export const NavbarSuperior = () => {
           ) : (
             <button
               onClick={() => navigate("/login")}
-              className="cursor-pointer flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-primary-light hover:text-primary-light border border-primary-light rounded px-3 py-1.5 hover:bg-primary-light/10 transition-colors"
+              className="cursor-pointer flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-background bg-primary-light hover:bg-primary rounded-lg px-4 py-2 transition-all"
             >
               Iniciar Sesión
             </button>
           )}
         </div>
 
-        <div className="flex md:hidden items-center gap-3">
+        {/* Acciones móvil */}
+        <div className="flex md:hidden items-center gap-2.5">
+          <ThemeToggle />
           {estaLogueado ? (
             <>
-              <div className="flex items-center gap-2 px-2.5 py-1 bg-surface rounded border border-accent/20">
-                <TrendingUp size={13} className="text-primary-light" />
+              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-surface rounded-lg border border-accent/20">
+                <TrendingUp size={12} className="text-primary-light" />
                 <span className="text-primary-light text-xs font-bold">
                   {bibliokarmas}
                 </span>
@@ -134,25 +154,26 @@ export const NavbarSuperior = () => {
               />
               <button
                 onClick={() => setMenuMovilAbierto((v) => !v)}
-                className="p-1.5 rounded border border-accent/30 text-on-surface-variant hover:text-on-surface hover:bg-surface transition-colors"
+                className="p-1.5 rounded-lg border border-accent/30 text-on-surface-variant hover:text-on-surface hover:bg-surface transition-colors"
                 aria-label="Abrir menú"
               >
-                {menuMovilAbierto ? <X size={18} /> : <Menu size={18} />}
+                {menuMovilAbierto ? <X size={17} /> : <Menu size={17} />}
               </button>
             </>
           ) : (
             <button
               onClick={() => navigate("/login")}
-              className="text-[11px] font-bold uppercase tracking-wider text-primary-light hover:text-primary-light border border-primary-light rounded px-3 py-1.5 hover:bg-primary-light/10 transition-colors"
+              className="text-[11px] font-bold uppercase tracking-wider text-background bg-primary-light hover:bg-primary rounded-lg px-3 py-1.5 transition-all"
             >
-              Iniciar Sesión
+              Ingresar
             </button>
           )}
         </div>
       </div>
 
+      {/* Menú móvil desplegable */}
       {estaLogueado && menuMovilAbierto && (
-        <div className="md:hidden border-t border-accent/15 bg-background/95 backdrop-blur-md px-4 py-4 flex flex-col gap-4">
+        <div className="md:hidden border-t border-accent/15 bg-background/95 backdrop-blur-md px-6 py-5 flex flex-col gap-5">
           <ul className="flex flex-col gap-4 list-none">
             {items.map((item) => (
               <NavItem
@@ -166,10 +187,10 @@ export const NavbarSuperior = () => {
           <div className="border-t border-accent/15 pt-4">
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-colors"
+              className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant hover:text-danger transition-colors"
             >
               <LogOut size={14} />
-              {estaLogueado ? "Cerrar sesión" : "Iniciar sesión"}
+              Cerrar sesión
             </button>
           </div>
         </div>

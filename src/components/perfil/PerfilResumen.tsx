@@ -8,7 +8,7 @@ export type PropsPerfilResumen = {
 }
 export const PerfilResumen = ({ usuario, onEditar }: PropsPerfilResumen) => {
   return (
-    <section className="group bg-surface rounded border border-accent/15 shadow-[0_8px_32px_rgba(0,0,0,0.4)] px-6 md:px-8 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 transition-transform duration-300 hover:-translate-y-0.5">
+    <section className="group bg-surface rounded-xl border border-accent/15 shadow-[0_8px_32px_rgba(0,0,0,0.4)] px-6 md:px-8 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 transition-transform duration-300 hover:-translate-y-0.5">
       <div className="flex items-center gap-4 md:gap-5 min-w-0">
         <div className="shrink-0 transition-transform duration-300 group-hover:scale-[1.03]">
           <Avatar

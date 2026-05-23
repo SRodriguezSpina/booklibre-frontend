@@ -115,7 +115,7 @@ export const ReservaCard = ({
 
   return (
     <Card className="flex flex-col gap-0 overflow-hidden p-0">
-      <div className="px-5 pt-5 pb-4 border-b border-gray-100/10">
+      <div className="px-5 pt-5 pb-4 border-b border-accent/10">
         <CardHeader
           titulo={reservaConfirmada ? "Reserva Confirmada" : "Tu Reserva"}
           icono={
@@ -136,7 +136,7 @@ export const ReservaCard = ({
             ¡El libro está reservado para vos!
           </p>
           <div className="w-full flex flex-col gap-0">
-            <div className="flex items-center justify-between py-2.5 border-b border-gray-100/10">
+            <div className="flex items-center justify-between py-2.5 border-b border-accent/10">
               <div className="flex items-center gap-2 text-secondary/60">
                 <Package size={13} />
                 <span className="text-xs font-semibold">Retiro</span>
@@ -164,7 +164,7 @@ export const ReservaCard = ({
         <>
 
       {hayFechasSeleccionadas && !calendarAbierto && (
-        <div className="px-5 py-4 border-b border-gray-100/10">
+        <div className="px-5 py-4 border-b border-accent/10">
           <div className="flex items-center justify-between mb-3">
             <p className="text-[10px] font-bold uppercase tracking-widest text-secondary/50">
               Fechas Seleccionadas
@@ -185,7 +185,7 @@ export const ReservaCard = ({
             </span>
           </div>
           <div className="flex flex-col gap-0">
-            <div className="flex items-center justify-between py-2.5 border-b border-gray-100/10">
+            <div className="flex items-center justify-between py-2.5 border-b border-accent/10">
               <div className="flex items-center gap-2 text-secondary/60">
                 <Package size={13} />
                 <span className="text-xs font-semibold">Recogido</span>
@@ -194,7 +194,7 @@ export const ReservaCard = ({
                 {formatearFechaVisual(fechaDesde)}
               </span>
             </div>
-            <div className="flex items-center justify-between py-2.5 border-b border-gray-100/10">
+            <div className="flex items-center justify-between py-2.5 border-b border-accent/10">
               <div className="flex items-center gap-2 text-secondary/60">
                 <RotateCcw size={13} />
                 <span className="text-xs font-semibold">Devolución</span>
@@ -217,7 +217,7 @@ export const ReservaCard = ({
       )}
 
       {calendarAbierto && (
-        <div className="border-b border-gray-100/10">
+        <div className="border-b border-accent/10">
           <Calendario
             rangeSeleccionado={rangeSeleccionado}
             onSelect={handleSelect}

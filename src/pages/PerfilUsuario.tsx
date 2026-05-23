@@ -18,14 +18,12 @@ import { usuarioService } from "../services/usuarioService"
 import { toast } from "react-toastify"
 import { obtenerMensajeError } from "../utils/errorHandler"
 import { useAuthContext } from "../utils/hooks"
+import { useGestionMisLibros } from "../utils/misLibros/useGestionMisLibros"
 
 export const PerfilUsuario = () => {
   const { usuario, setUsuario } = useOutletContext<ContextoPerfilUsuario>()
   const { setUsuarioContext } = useAuthContext()
   const navigate = useNavigate()
-  const [libros, setLibros] = useState<LibroUsuarioItemDTO[]>([])
-  const [cargandoLibros, setCargandoLibros] = useState(false)
-  const [errorLibros, setErrorLibros] = useState<string | null>(null)
   const [clicks, setClicks] = useState<ClickLogDTO[]>([])
   const [cargandoClicks, setCargandoClicks] = useState(false)
   const [errorClicks, setErrorClicks] = useState<string | null>(null)
@@ -44,65 +42,7 @@ export const PerfilUsuario = () => {
   const esSoloLector = usuario.tipoUsuario === "Lector"
   const esSoloPublicador = usuario.tipoUsuario === "Publicador"
 
-  const cargarLibros = async () => {
-    if (usuario.tipoUsuario === "Lector") {
-      setErrorLibros(null)
-      setCargandoLibros(false)
-      return
-    }
-
-    setCargandoLibros(true)
-    setErrorLibros(null)
-    try {
-      const response = await libroService.obtenerLibrosUsuarioPerfil(usuario.id)
-      setLibros(response)
-    } catch (e: unknown) {
-      setLibros([])
-      const err = obtenerMensajeError(e)
-      setErrorLibros(err.mensaje || "No se pudieron cargar tus libros.")
-    } finally {
-      setCargandoLibros(false)
-    }
-  }
-
-  useEffect(() => {
-    let activa = true
-
-    const cargarLibrosSegunTipo = async () => {
-      if (usuario.tipoUsuario === "Lector") {
-        if (!activa) return
-        setErrorLibros(null)
-        setCargandoLibros(false)
-        return
-      }
-
-      if (!activa) return
-      setCargandoLibros(true)
-      setErrorLibros(null)
-      try {
-        const response = await libroService.obtenerLibrosUsuarioPerfil(
-          usuario.id,
-        )
-        if (!activa) return
-        setLibros(response)
-      } catch (e: unknown) {
-        if (!activa) return
-        setLibros([])
-        const err = obtenerMensajeError(e)
-        setErrorLibros(err.mensaje || "No se pudieron cargar tus libros.")
-      } finally {
-        // eslint-disable-next-line no-unsafe-finally
-        if (!activa) return
-        setCargandoLibros(false)
-      }
-    }
-
-    void cargarLibrosSegunTipo()
-
-    return () => {
-      activa = false
-    }
-  }, [usuario.id, usuario.tipoUsuario])
+  const gestionLibros = useGestionMisLibros({ usuarioId: usuario.id, enabled: !esSoloLector })
 
   const cargarClicks = async () => {
     if (usuario.tipoUsuario === "Lector") {
@@ -225,10 +165,10 @@ export const PerfilUsuario = () => {
     try {
       await libroService.eliminarLibro(libroId, usuario.id)
       toast.success("Libro eliminado.")
-      await cargarLibros()
     } catch (e: unknown) {
       const err = obtenerMensajeError(e)
       toast.error(err.mensaje || "No se pudo eliminar el libro.")
+      throw e
     }
   }
 
@@ -236,7 +176,7 @@ export const PerfilUsuario = () => {
   const cantidadLeidos = usuario.leidos
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 pt-20 animate-in fade-in duration-300">
+    <div className="space-y-6 animate-in fade-in duration-300">
       <div
         className="animate-in fade-in duration-300"
         style={{ animationDelay: "60ms" }}
@@ -303,12 +243,9 @@ export const PerfilUsuario = () => {
             style={{ animationDelay: "160ms" }}
           >
             <GestionMisLibros
-              libros={libros}
+              gestion={gestionLibros}
               onAgregar={manejarAgregarLibro}
               onEliminar={manejarEliminarLibro}
-              cargando={cargandoLibros}
-              error={errorLibros}
-              onReintentar={() => void cargarLibros()}
               clicksPorLibro={clicksPorLibro}
             />
           </div>
@@ -320,7 +257,7 @@ export const PerfilUsuario = () => {
           className="animate-in fade-in duration-300"
           style={{ animationDelay: "180ms" }}
         >
-          <div className="bg-surface rounded border border-accent/15 shadow-[0_8px_24px_rgba(0,0,0,0.3)] px-5 py-4 flex items-center gap-3 transition-transform duration-300 hover:-translate-y-0.5">
+          <div className="bg-surface rounded-xl border border-accent/15 shadow-[0_8px_24px_rgba(0,0,0,0.3)] px-5 py-4 flex items-center gap-3 transition-transform duration-300 hover:-translate-y-0.5">
             <span className="text-2xl" aria-hidden="true">
               📖
             </span>

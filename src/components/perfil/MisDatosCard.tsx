@@ -10,7 +10,7 @@ const etiquetaTipo = (t: Usuario["tipoUsuario"]) =>
 
 export const MisDatosCard = ({ usuario }: PropsMisDatosCard) => {
   return (
-    <div className="truncate text-sm text-on-surface-variant bg-surface rounded border border-accent/15 shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:-translate-y-1 transition-transform duration-300">
+    <div className="truncate text-sm text-on-surface-variant bg-surface rounded-xl border border-accent/15 shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:-translate-y-1 transition-transform duration-300">
       <div className="flex items-center gap-3 px-5 pt-5 pb-3 border-b border-accent/10">
         <div className="h-8 w-8 rounded bg-primary/10 flex items-center justify-center">
           <User className="h-4 w-4 text-primary-light" />
