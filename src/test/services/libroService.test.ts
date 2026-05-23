@@ -541,15 +541,20 @@ describe("libroService - obtenerLibrosUsuarioPerfil", () => {
   })
 
   it("llama al endpoint correcto con el usuarioId", async () => {
-    mockedApiClient.get.mockResolvedValueOnce({ data: [libroUsuarioItemMock] } as any)
+    mockedApiClient.get
+      .mockResolvedValueOnce({ data: { content: [libroUsuarioItemMock], totalElements: 1 } } as any)
+      .mockResolvedValueOnce({ data: { content: [libroUsuarioItemMock] } } as any)
 
     await libroService.obtenerLibrosUsuarioPerfil(1)
 
-    expect(mockedApiClient.get).toHaveBeenCalledWith("/usuarios/1/libros")
+    expect(mockedApiClient.get).toHaveBeenCalledWith("/usuarios/1/libros", { params: { page: 0, size: 1 } })
+    expect(mockedApiClient.get).toHaveBeenCalledWith("/usuarios/1/libros", { params: { page: 0, size: 1 } })
   })
 
   it("devuelve los LibroUsuarioItemDTO sin transformar", async () => {
-    mockedApiClient.get.mockResolvedValueOnce({ data: [libroUsuarioItemMock] } as any)
+    mockedApiClient.get
+      .mockResolvedValueOnce({ data: { content: [libroUsuarioItemMock], totalElements: 1 } } as any)
+      .mockResolvedValueOnce({ data: { content: [libroUsuarioItemMock] } } as any)
 
     const result = await libroService.obtenerLibrosUsuarioPerfil(1)
 
@@ -559,7 +564,7 @@ describe("libroService - obtenerLibrosUsuarioPerfil", () => {
   })
 
   it("devuelve array vacío si el usuario no tiene libros", async () => {
-    mockedApiClient.get.mockResolvedValueOnce({ data: [] } as any)
+    mockedApiClient.get.mockResolvedValueOnce({ data: { content: [], totalElements: 0 } } as any)
 
     const result = await libroService.obtenerLibrosUsuarioPerfil(1)
 
@@ -568,7 +573,9 @@ describe("libroService - obtenerLibrosUsuarioPerfil", () => {
 
   it("preserva el campo disponible: false", async () => {
     const noDisponible = { ...libroUsuarioItemMock, disponible: false }
-    mockedApiClient.get.mockResolvedValueOnce({ data: [noDisponible] } as any)
+    mockedApiClient.get
+      .mockResolvedValueOnce({ data: { content: [noDisponible], totalElements: 1 } } as any)
+      .mockResolvedValueOnce({ data: { content: [noDisponible] } } as any)
 
     const result = await libroService.obtenerLibrosUsuarioPerfil(1)
 
@@ -577,7 +584,9 @@ describe("libroService - obtenerLibrosUsuarioPerfil", () => {
 
   it("preserva fechaAgregado nulo", async () => {
     const sinFecha = { ...libroUsuarioItemMock, fechaAgregado: null }
-    mockedApiClient.get.mockResolvedValueOnce({ data: [sinFecha] } as any)
+    mockedApiClient.get
+      .mockResolvedValueOnce({ data: { content: [sinFecha], totalElements: 1 } } as any)
+      .mockResolvedValueOnce({ data: { content: [sinFecha] } } as any)
 
     const result = await libroService.obtenerLibrosUsuarioPerfil(1)
 

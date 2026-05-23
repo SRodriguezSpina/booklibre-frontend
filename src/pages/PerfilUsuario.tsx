@@ -299,7 +299,7 @@ export const PerfilUsuario = () => {
 
         {!esSoloLector && (
           <div
-            className="lg:col-span-8 animate-in fade-in duration-300 h-full"
+            className="lg:col-span-8 animate-in fade-in duration-300"
             style={{ animationDelay: "160ms" }}
           >
             <GestionMisLibros
