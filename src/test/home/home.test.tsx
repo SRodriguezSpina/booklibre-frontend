@@ -140,7 +140,7 @@ describe('Home', () => {
 
         expect(mockedHomeService.search).toHaveBeenCalledTimes(2)
         expect(mockedHomeService.search).toHaveBeenLastCalledWith(
-            '', expect.anything(), 0, 6, null, 'autor'
+            '', expect.anything(), 0, 10, null, 'autor'
         )
     })
 })

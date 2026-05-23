@@ -14,6 +14,7 @@ import {
   obtenerMensajeError,
   type ErrorPersonalizado,
 } from "../utils/errorHandler"
+import { BookOpen } from "lucide-react"
 
 export const DetallePrestamos = () => {
   const navigate = useNavigate()
@@ -26,41 +27,30 @@ export const DetallePrestamos = () => {
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [tipoAnterior, setTipoAnterior] = useState<string | null>(null)
 
-
   const usuarioId = authService.obtenerIdUsuarioActual()
   const { usuario } = useAuthContext()
   const tipoUsuario = usuario?.tipoUsuario
   const tipo = (tipoUsuario ?? "").toUpperCase().replace(/\s+/g, "_")
   const puedeReservar = tipo === "LECTOR" || tipo === "LECTORPUBLICADOR"
   const puedePublicar = tipo === "PUBLICADOR" || tipo === "LECTORPUBLICADOR"
-  const itemsPerPage = 4
+  const itemsPerPage = 5
   const pestañas = [
-    ...(puedeReservar
-      ? [{ id: "prestados-a-mi", etiqueta: "Prestados a mí" }]
-      : []),
-    ...(puedePublicar
-      ? [{ id: "prestados-por-mi", etiqueta: "Prestados por mí" }]
-      : []),
+    ...(puedeReservar ? [{ id: "prestados-a-mi", etiqueta: "Prestados a mí" }] : []),
+    ...(puedePublicar ? [{ id: "prestados-por-mi", etiqueta: "Prestados por mí" }] : []),
   ]
 
   const fetchTodosLosPrestamos = async (tipo: TipoPrestamo = activeTab) => {
     if (!usuarioId) {
-      setError({
-        estado: 401,
-        mensaje:
-          "No estás logueado. Por favor iniciá sesión para ver tus préstamos.",
-      })
+      setError({ estado: 401, mensaje: "No estás logueado. Por favor iniciá sesión para ver tus préstamos." })
       return
     }
-
     setLoading(true)
     setError(null)
     try {
       const data = await libroService.obtenerTodosLosPrestamos(usuarioId, tipo)
       setTodosLosLibros(data)
     } catch (e: unknown) {
-      const err = obtenerMensajeError(e)
-      setError(err)
+      setError(obtenerMensajeError(e))
     } finally {
       setLoading(false)
     }
@@ -68,10 +58,8 @@ export const DetallePrestamos = () => {
 
   if (tipoUsuario && tipoUsuario !== tipoAnterior) {
     setTipoAnterior(tipoUsuario)
-
     const nuevaTab = pestañas[0]?.id as TipoPrestamo
-
-    setTodosLosLibros([]) // limpia lo viejo
+    setTodosLosLibros([])
     setActiveTab(nuevaTab)
     fetchTodosLosPrestamos(nuevaTab)
   }
@@ -121,20 +109,16 @@ export const DetallePrestamos = () => {
     fetchTodosLosPrestamos(nuevoTipo)
   }
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(librosFiltrados.length / itemsPerPage),
-  )
+  const totalPages = Math.max(1, Math.ceil(librosFiltrados.length / itemsPerPage))
   const librosAMostrar = librosFiltrados.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   )
 
-  // ── Error state ───────────────────────────────────────────────────────────
   if (error) {
     const es401 = error.estado === 401
     return (
-      <div className="flex flex-col min-h-screen max-w-7xl mx-auto px-4 md:px-8 pt-24 pb-16">
+      <div className="px-6 md:px-10 pt-24 pb-16">
         <ErrorCard
           error={error}
           alReintentar={!es401 ? fetchTodosLosPrestamos : undefined}
@@ -144,50 +128,58 @@ export const DetallePrestamos = () => {
     )
   }
 
-  // ── Happy path ────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col max-w-7xl mx-auto px-4 md:px-8 pt-24 pb-16">
-      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-2">
-          <h1 className="text-4xl md:text-5xl font-serif text-on-surface">
-            Mis Préstamos
-          </h1>
-          <p className="text-on-surface-variant text-sm max-w-md">
-            Gestiona los intercambios y devoluciones de tu colección.
-          </p>
+    <div className="min-h-screen">
+      {/* ── Hero header ─── */}
+      <div className="px-6 md:px-10 pt-24 pb-6 border-b border-accent/10">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <BookOpen size={16} className="text-primary" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary/80">
+                Biblioteca
+              </span>
+            </div>
+            <h1 className="text-3xl md:text-4xl font-serif font-bold text-on-surface leading-tight">
+              Mis Préstamos
+            </h1>
+            <p className="text-sm text-on-surface-variant/70 mt-2">
+              Gestioná los intercambios y devoluciones de tu colección.
+            </p>
+          </div>
+          <div className="w-full md:w-96">
+            <SearchBar placeholder="Buscar por título o autor..." onSearch={handleSearch} />
+          </div>
         </div>
-        <div className="w-full md:w-96">
-          <SearchBar
-            placeholder="Buscar por título o autor..."
-            onSearch={handleSearch}
-          />
-        </div>
-      </header>
-      <Tabs
-        pestañas={pestañas}
-        idActivo={activeTab}
-        alCambiar={handleTabChange}
-        className="mb-10"
-      />
-      <main className="flex flex-col flex-1 gap-6 pb-10">
+      </div>
+
+      {/* ── Tabs + contenido ─── */}
+      <div className="px-6 md:px-10 py-6">
+        <Tabs
+          pestañas={pestañas}
+          idActivo={activeTab}
+          alCambiar={handleTabChange}
+          className="mb-8"
+        />
+
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <div className="flex flex-col items-center justify-center py-32 gap-4">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-light" />
-            <span className="text-on-surface-variant font-medium">
-              Cargando tus libros...
-            </span>
+            <span className="text-on-surface-variant font-medium">Cargando tus libros...</span>
           </div>
         ) : librosFiltrados.length === 0 ? (
-          <div className="text-center py-20 bg-surface rounded border border-accent/20">
-            <p className="text-on-surface-variant opacity-60">
+          <div className="flex flex-col items-center justify-center py-32 rounded-xl border border-accent/20 bg-surface/50">
+            <BookOpen size={40} className="text-on-surface-variant/20 mb-3" />
+            <p className="text-on-surface-variant/50 text-sm font-medium">
               No se encontraron libros en esta categoría.
             </p>
           </div>
         ) : (
           <>
             <div
-              className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 items-stretch transition-all duration-150
-                ${animating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"}`}
+              className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 items-stretch transition-all duration-150 ${
+                animating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"
+              }`}
             >
               {librosAMostrar.map((libro) => (
                 <LibroCard key={libro.id} libro={libro} tipoVista={activeTab} />
@@ -200,7 +192,7 @@ export const DetallePrestamos = () => {
             />
           </>
         )}
-      </main>
+      </div>
     </div>
   )
 }

@@ -1,93 +1,113 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { GENERO_LABEL, IDIOMA_LABEL, ESTADO_LABEL, TIPO_LABEL } from '../../models/libroModel'
-import { Star } from 'lucide-react'
+import { Star, BookOpen } from 'lucide-react'
 
 type LibroCardProps = {
-    id: number
-    imagenUrl: string
-    // --
-    genero: string
-    titulo: string
-    autor: string
-    calificacion: number
-    // --
-    isbn: string
-    idioma: string
-    tipo: string
-    bibliokarma: number
-    estado: string
-    // --
-    duenio: string
+  id: number
+  imagenUrl: string
+  genero: string
+  titulo: string
+  autor: string
+  calificacion: number
+  isbn: string
+  idioma: string
+  tipo: string
+  bibliokarma: number
+  estado: string
+  duenio: string
 }
 
-export const LibroCardHome = ({ id, imagenUrl, genero, titulo, autor, calificacion, isbn, idioma, tipo, bibliokarma, estado, duenio }: LibroCardProps) => {
-    const [imgFailed, setImgFailed] = useState(false)
-
-    return (
-        <Link to={`/libros/${id}`} className='group flex flex-col bg-surface rounded overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.3)] border border-accent/10 hover:-translate-y-1 transition-all duration-300'>
-            <div className='w-full h-40 sm:h-56 lg:h-96 overflow-hidden bg-surface-highest'>
-                {imagenUrl && !imgFailed ? (
-                    <img
-                        src={imagenUrl}
-                        alt={`Portada de ${titulo}`}
-                        onError={() => setImgFailed(true)}
-                        className='w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-500'
-                    />
-                ) : (
-                    <div className='w-full h-full flex flex-col items-center justify-center gap-2 text-on-surface-variant/20'>
-                        <span className='text-5xl'>📖</span>
-                        <span className='text-[10px] uppercase tracking-widest font-bold'>Sin portada</span>
-                    </div>
-                )}
-            </div>
-
-            <div className='flex flex-col gap-1 px-4 pt-3 min-h-[72px]'>
-                <div className='flex justify-between items-center'>
-                    <span className='text-xs font-semibold text-primary'>{GENERO_LABEL[genero] ?? genero}</span>
-                    <div className='flex items-center gap-1 text-xs text-secondary-light'>
-                        <Star size={12} className='fill-yellow-400 text-yellow-400' />
-                        <span>{calificacion}</span>
-                    </div>
-                </div>
-                <h3 className='text-sm font-bold text-secondary-dark leading-tight line-clamp-2'>{titulo}</h3>
-                <span className='text-xs text-secondary-light'>{autor}</span>
-            </div>
-
-            <div className='grid grid-cols-2 gap-x-3 gap-y-1 px-4 pt-3 text-xs text-secondary'>
-                <div>
-                    <p className='text-secondary-light uppercase tracking-wide text-[10px]'>ISBN</p>
-                    <p className='font-medium truncate'>{isbn}</p>
-                </div>
-                <div>
-                    <p className='text-secondary-light uppercase tracking-wide text-[10px]'>Idioma</p>
-                    <p className='font-medium'>{IDIOMA_LABEL[idioma] ?? idioma}</p>
-                </div>
-                <div>
-                    <p className='text-secondary-light uppercase tracking-wide text-[10px]'>Tipo</p>
-                    <p className='font-medium'>{TIPO_LABEL[tipo] ?? tipo}</p>
-                </div>
-                <div>
-                    <p className='text-secondary-light uppercase tracking-wide text-[10px]'>Biblokarma</p>
-                    <p className='font-medium text-primary'>+{bibliokarma}</p>
-                </div>
-            </div>
-
-            <div className='mt-auto'>
-                <div className='px-4 pt-2 pb-2'>
-                    <p className='text-secondary-light uppercase tracking-wide text-[10px]'>Estado</p>
-                    <span className='inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-accent text-primary-dark'>
-                        {ESTADO_LABEL[estado] ?? estado}
-                    </span>
-                </div>
-                <div className='flex items-center gap-2 px-4 py-3 border-t border-accent'>
-                    <div className='w-6 h-6 rounded-full bg-primary-light flex items-center justify-center text-white text-[10px] font-bold'>
-                        {duenio.charAt(0).toUpperCase()}
-                    </div>
-                    <span className='text-xs text-secondary-light'>@{duenio}</span>
-                </div>
-            </div>
-        </Link>
-    )
+const estadoColor: Record<string, string> = {
+  DISPONIBLE:    "bg-success-bg text-success border-success/20",
+  PRESTADO:      "bg-warning-bg text-warning border-warning/20",
+  NO_DISPONIBLE: "bg-danger-bg  text-danger  border-danger/20",
 }
+
+export const LibroCardHome = ({
+  id, imagenUrl, genero, titulo, autor, calificacion,
+  isbn, idioma, tipo, bibliokarma, estado, duenio,
+}: LibroCardProps) => {
+  const [imgFailed, setImgFailed] = useState(false)
+  const estadoCls = estadoColor[estado] ?? "bg-surface-highest text-on-surface-variant border-accent/20"
+
+  return (
+    <Link
+      to={`/libros/${id}`}
+      className="group flex flex-col bg-surface rounded-xl overflow-hidden border border-accent/10 hover:border-accent/30 shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:-translate-y-1.5 transition-all duration-300"
+    >
+      {/* Portada */}
+      <div className="relative w-full aspect-[2/3] overflow-hidden bg-surface-highest">
+        {imagenUrl && !imgFailed ? (
+          <img
+            src={imagenUrl}
+            alt={`Portada de ${titulo}`}
+            onError={() => setImgFailed(true)}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-on-surface-variant/15">
+            <BookOpen size={36} strokeWidth={1} />
+            <span className="text-[9px] uppercase tracking-widest font-bold">Sin portada</span>
+          </div>
+        )}
+
+        {/* Badge estado (sobre la imagen) */}
+        <div className="absolute top-2.5 left-2.5">
+          <span className={`inline-flex items-center text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border backdrop-blur-sm ${estadoCls}`}>
+            {ESTADO_LABEL[estado] ?? estado}
+          </span>
+        </div>
+
+        {/* Rating overlay */}
+        <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-black/50 backdrop-blur-sm rounded-full px-2 py-0.5">
+          <Star size={9} className="fill-yellow-400 text-yellow-400" />
+          <span className="text-[10px] font-bold text-white">{calificacion}</span>
+        </div>
+
+        {/* Gradient overlay al hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      </div>
+
+      {/* Info principal */}
+      <div className="flex flex-col gap-0.5 px-3.5 pt-3">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-primary/80">
+          {GENERO_LABEL[genero] ?? genero}
+        </span>
+        <h3 className="text-sm font-bold text-on-surface leading-snug line-clamp-2 mt-0.5">
+          {titulo}
+        </h3>
+        <span className="text-[11px] text-on-surface-variant/70">{autor}</span>
+      </div>
+
+      {/* Metadata grid */}
+      <div className="grid grid-cols-2 gap-x-2 gap-y-2 px-3.5 pt-3 pb-3 mt-auto">
+        <div>
+          <p className="text-[9px] text-on-surface-variant/40 uppercase tracking-wider mb-0.5">Idioma</p>
+          <p className="text-[11px] font-semibold text-on-surface truncate">{IDIOMA_LABEL[idioma] ?? idioma}</p>
+        </div>
+        <div>
+          <p className="text-[9px] text-on-surface-variant/40 uppercase tracking-wider mb-0.5">Tipo</p>
+          <p className="text-[11px] font-semibold text-on-surface truncate">{TIPO_LABEL[tipo] ?? tipo}</p>
+        </div>
+        <div className="col-span-2">
+          <p className="text-[9px] text-on-surface-variant/40 uppercase tracking-wider mb-0.5">ISBN</p>
+          <p className="text-[11px] font-semibold text-on-surface truncate">{isbn}</p>
+        </div>
+      </div>
+
+      {/* Footer: dueño + bibliokarma */}
+      <div className="flex items-center justify-between px-3.5 py-2.5 border-t border-accent/10 bg-surface-high/40">
+        <div className="flex items-center gap-1.5">
+          <div className="w-5 h-5 rounded-full bg-primary/20 text-primary text-[9px] font-bold flex items-center justify-center">
+            {duenio.charAt(0).toUpperCase()}
+          </div>
+          <span className="text-[10px] text-on-surface-variant/60 truncate max-w-[80px]">@{duenio}</span>
+        </div>
+        <span className="text-[10px] font-bold text-primary-light">+{bibliokarma} BK</span>
+      </div>
+    </Link>
+  )
+}
+
 export default LibroCardHome

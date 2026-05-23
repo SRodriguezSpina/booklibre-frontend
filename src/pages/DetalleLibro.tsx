@@ -68,7 +68,7 @@ export const DetalleLibro = () => {
 
   return (
     <main className="min-h-screen bg-background text-secondary-dark">
-      <div className="max-w-screen-xl mx-auto px-6 lg:px-10 pt-24 pb-16">
+      <div className="px-6 lg:px-10 pt-24 pb-16">
 
         {/* Breadcrumb */}
         <Link
@@ -154,7 +154,7 @@ export const DetalleLibro = () => {
                 />
               ) : (
                 <Card className="flex flex-col gap-0 overflow-hidden p-0">
-                  <div className="px-5 pt-5 pb-4 border-b border-gray-100/10 flex items-center gap-2">
+                  <div className="px-5 pt-5 pb-4 border-b border-accent/10 flex items-center gap-2">
                     <Lock size={18} className="text-danger/70" />
                     <span className="text-lg font-bold text-secondary-dark">No disponible</span>
                   </div>

@@ -545,65 +545,80 @@ describe("libroService - obtenerLibrosUsuarioPerfil", () => {
     vi.clearAllMocks()
   })
 
-  it("llama al endpoint correcto con el usuarioId", async () => {
-    mockedApiClient.get
-      .mockResolvedValueOnce({ data: { content: [libroUsuarioItemMock], totalElements: 1 } } as any)
-      .mockResolvedValueOnce({ data: { content: [libroUsuarioItemMock] } } as any)
+  it("llama al endpoint correcto con el usuarioId y params de paginación", async () => {
+    mockedApiClient.get.mockResolvedValueOnce({
+      data: { content: [libroUsuarioItemMock], totalElements: 1, totalPages: 1 },
+    } as any)
 
-    await libroService.obtenerLibrosUsuarioPerfil(1)
+    await libroService.obtenerLibrosUsuarioPerfil(1, 0, 3, "todos", "titulo", "ascendente")
 
-    expect(mockedApiClient.get).toHaveBeenCalledWith("/usuarios/1/libros", { params: { page: 0, size: 1 } })
-    expect(mockedApiClient.get).toHaveBeenCalledWith("/usuarios/1/libros", { params: { page: 0, size: 1 } })
+    expect(mockedApiClient.get).toHaveBeenCalledWith(
+      "/usuarios/1/libros",
+      expect.objectContaining({
+        params: expect.objectContaining({
+          page: 0,
+          size: 3,
+          filtro: "todos",
+          ordenarPor: "titulo",
+          direccion: "ascendente",
+        }),
+      }),
+    )
   })
 
-  it("devuelve los LibroUsuarioItemDTO sin transformar", async () => {
-    mockedApiClient.get
-      .mockResolvedValueOnce({ data: { content: [libroUsuarioItemMock], totalElements: 1 } } as any)
-      .mockResolvedValueOnce({ data: { content: [libroUsuarioItemMock] } } as any)
+  it("devuelve los LibroUsuarioItemDTO transformados y la info de paginación", async () => {
+    mockedApiClient.get.mockResolvedValueOnce({
+      data: { content: [libroUsuarioItemMock], totalElements: 1, totalPages: 1 },
+    } as any)
 
-    const result = await libroService.obtenerLibrosUsuarioPerfil(1)
+    const result = await libroService.obtenerLibrosUsuarioPerfil(1, 0, 3, "todos", "titulo", "ascendente")
 
-    expect(result).toHaveLength(1)
-    expect(result[0].titulo).toBe("Clean Code")
-    expect(result[0].disponible).toBe(true)
+    expect(result.content).toHaveLength(1)
+    expect(result.content[0].titulo).toBe("Clean Code")
+    expect(result.content[0].disponible).toBe(true)
+    expect(result.totalElements).toBe(1)
+    expect(result.totalPages).toBe(1)
   })
 
-  it("devuelve array vacío si el usuario no tiene libros", async () => {
-    mockedApiClient.get.mockResolvedValueOnce({ data: { content: [], totalElements: 0 } } as any)
+  it("devuelve content vacío si el usuario no tiene libros", async () => {
+    mockedApiClient.get.mockResolvedValueOnce({
+      data: { content: [], totalElements: 0, totalPages: 0 },
+    } as any)
 
-    const result = await libroService.obtenerLibrosUsuarioPerfil(1)
+    const result = await libroService.obtenerLibrosUsuarioPerfil(1, 0, 3, "todos", "titulo", "ascendente")
 
-    expect(result).toHaveLength(0)
+    expect(result.content).toHaveLength(0)
+    expect(result.totalElements).toBe(0)
   })
 
   it("preserva el campo disponible: false", async () => {
     const noDisponible = { ...libroUsuarioItemMock, disponible: false }
-    mockedApiClient.get
-      .mockResolvedValueOnce({ data: { content: [noDisponible], totalElements: 1 } } as any)
-      .mockResolvedValueOnce({ data: { content: [noDisponible] } } as any)
+    mockedApiClient.get.mockResolvedValueOnce({
+      data: { content: [noDisponible], totalElements: 1, totalPages: 1 },
+    } as any)
 
-    const result = await libroService.obtenerLibrosUsuarioPerfil(1)
+    const result = await libroService.obtenerLibrosUsuarioPerfil(1, 0, 3, "todos", "titulo", "ascendente")
 
-    expect(result[0].disponible).toBe(false)
+    expect(result.content[0].disponible).toBe(false)
   })
 
   it("preserva fechaAgregado nulo", async () => {
     const sinFecha = { ...libroUsuarioItemMock, fechaAgregado: null }
-    mockedApiClient.get
-      .mockResolvedValueOnce({ data: { content: [sinFecha], totalElements: 1 } } as any)
-      .mockResolvedValueOnce({ data: { content: [sinFecha] } } as any)
+    mockedApiClient.get.mockResolvedValueOnce({
+      data: { content: [sinFecha], totalElements: 1, totalPages: 1 },
+    } as any)
 
-    const result = await libroService.obtenerLibrosUsuarioPerfil(1)
+    const result = await libroService.obtenerLibrosUsuarioPerfil(1, 0, 3, "todos", "titulo", "ascendente")
 
-    expect(result[0].fechaAgregado).toBeNull()
+    expect(result.content[0].fechaAgregado).toBeNull()
   })
 
   it("propaga el error si axios falla", async () => {
     mockedApiClient.get.mockRejectedValueOnce(new Error("Unauthorized"))
 
-    await expect(libroService.obtenerLibrosUsuarioPerfil(1)).rejects.toThrow(
-      "Unauthorized",
-    )
+    await expect(
+      libroService.obtenerLibrosUsuarioPerfil(1, 0, 3, "todos", "titulo", "ascendente"),
+    ).rejects.toThrow("Unauthorized")
   })
 })
 

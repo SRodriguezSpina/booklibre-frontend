@@ -80,7 +80,7 @@ export const VerMasResenias = () => {
       </div>
 
       {calificaciones.length === 0 ? (
-        <div className="text-center py-20 bg-surface rounded border border-accent/20">
+        <div className="text-center py-20 bg-surface rounded-xl border border-accent/20">
           <p className="text-on-surface-variant opacity-60">
             Este libro aún no tiene reseñas.
           </p>

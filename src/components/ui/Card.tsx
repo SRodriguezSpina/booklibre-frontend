@@ -5,10 +5,11 @@ export type PropsCard = {
   className?: string
 }
 
+/** Contenedor premium consistente en toda la app */
 export function Card({ children, className = '' }: PropsCard) {
   return (
     <div
-      className={`rounded-3xl border border-gray-200/80 bg-surface p-5 shadow-[0_18px_40px_rgba(15,23,42,0.06)] ${className}`}
+      className={`rounded-xl border border-accent/15 bg-surface shadow-[0_8px_32px_rgba(0,0,0,0.2)] ${className}`}
     >
       {children}
     </div>
@@ -23,10 +24,9 @@ export type PropsCardHeader = {
 
 export function CardHeader({ titulo, icono, className = '' }: PropsCardHeader) {
   return (
-    <div className={`flex items-center gap-2 mb-4 font-semibold text-secondary ${className}`}>
+    <div className={`flex items-center gap-2 font-bold text-on-surface ${className}`}>
       {icono}
       <span>{titulo}</span>
     </div>
   )
 }
-

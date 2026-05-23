@@ -8,13 +8,13 @@ import { Filters, INITIAL_FILTERS } from "../components/home/Filters"
 import type { FiltersState } from "../components/home/Filters"
 import type { LibroHome } from "../models/libroModel"
 import { LibroCardHome } from "../components/home/LibroCardHome"
-
 import { useOnInit } from "../utils/hooks.ts"
 import { SortBy } from "../components/home/SortBy.tsx"
 import { obtenerMensajeError, type ErrorPersonalizado } from "../utils/errorHandler.ts"
 import { ErrorCard } from "../components/ui/ErrorCard"
+import { BookOpen, SlidersHorizontal, X } from "lucide-react"
 
-const ITEMS_POR_PAGINA = 6
+const ITEMS_POR_PAGINA = 10
 
 export const Home = () => {
   const [query, setQuery] = useState("")
@@ -36,19 +36,11 @@ export const Home = () => {
     setLoading(true)
     setError(null)
     try {
-      const data = await homeService.search(
-        q,
-        f,
-        page,
-        ITEMS_POR_PAGINA,
-        userId,
-        sort
-      )
+      const data = await homeService.search(q, f, page, ITEMS_POR_PAGINA, userId, sort)
       setBooks(data.content)
       setTotalPaginas(data.totalPages)
     } catch (e: unknown) {
-      const err = obtenerMensajeError(e)
-      setError(err)
+      setError(obtenerMensajeError(e))
     } finally {
       setLoading(false)
       setTimeout(() => setAnimating(false), 150)
@@ -67,6 +59,7 @@ export const Home = () => {
     setFilters(f)
     setCurrentPage(1)
     search(query, f, 0)
+    setIsFiltersOpen(false)
   }
 
   const handlePageChange = (page: number) => {
@@ -80,8 +73,9 @@ export const Home = () => {
     search(query, filters, 0, sort)
   }
 
-  const hasActiveFilters =
-    Object.values(filters).some((v) => v !== false && v !== undefined && v !== "" && v !== 0)
+  const hasActiveFilters = Object.values(filters).some(
+    (v) => v !== false && v !== undefined && v !== "" && v !== 0
+  )
 
   const handleClearFilters = () => {
     setFilters(INITIAL_FILTERS)
@@ -92,7 +86,7 @@ export const Home = () => {
 
   if (error) {
     return (
-      <div className="flex flex-col min-h-screen max-w-6xl mx-auto px-4 pt-22 pb-16">
+      <div className="px-6 md:px-10 pt-24 pb-16">
         <ErrorCard
           error={error}
           alReintentar={() => search(query, filters, currentPage - 1, sortBy)}
@@ -102,61 +96,106 @@ export const Home = () => {
   }
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-6 pt-22">
-      <h1 className="text-2xl font-bold text-secondary-dark mb-1">
-        Encuentra tu próxima lectura
-      </h1>
-      <p className="text-sm text-secondary-light mb-6">
-        Explorá miles de libros disponibles para préstamo en nuestra
-        comunidad.
-      </p>
-
-      <div className="flex flex-col md:flex-row gap-6 md:gap-10">
-        <aside className="w-full md:w-56 shrink-0">
-          <button 
-            type="button"
-            className="md:hidden w-full flex items-center justify-between bg-surface border border-accent/20 rounded px-5 py-3.5 mb-2 text-secondary-dark font-semibold shadow-sm active:scale-[0.98] transition-all"
-            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-          >
-            <span className="flex items-center gap-2 text-sm">
-              <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
-              {isFiltersOpen ? 'Ocultar Filtros' : 'Mostrar Filtros'}
-            </span>
-            <svg className={`w-4 h-4 text-secondary-light transition-transform duration-300 ${isFiltersOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-          </button>
-
-          <div className={`transition-all duration-300 md:block ${isFiltersOpen ? 'block' : 'hidden'}`}>
-            <Filters
-              key={filterKey}
-              onApplyFilters={(f: FiltersState) => handleApplyFilters(f)}
-              onClearFilters={handleClearFilters}
-              hasActiveFilters={hasActiveFilters}
-            />
+    <main className="min-h-screen">
+      {/* ── Hero header ─────────────────────────────────────── */}
+      <div className="px-6 md:px-10 pt-24 pb-6 border-b border-accent/10">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <BookOpen size={16} className="text-primary" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary/80">
+                Catálogo
+              </span>
+            </div>
+            <h1 className="text-3xl md:text-4xl font-serif font-bold text-on-surface leading-tight">
+              Encuentra tu próxima<br className="hidden md:block" /> lectura
+            </h1>
+            <p className="text-sm text-on-surface-variant/70 mt-2">
+              Explorá libros disponibles para préstamo en nuestra comunidad.
+            </p>
           </div>
+
+          {/* Buscador en header (desktop) */}
+          <div className="w-full md:w-96">
+            <SearchBar onSearch={handleSearch} placeholder="Buscar por título..." />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Cuerpo principal ────────────────────────────────── */}
+      <div className="flex px-6 md:px-10 py-6 gap-6">
+
+        {/* ── Sidebar filtros ─── */}
+        <aside className="hidden lg:flex flex-col gap-0 w-64 shrink-0">
+          <Filters
+            key={filterKey}
+            onApplyFilters={handleApplyFilters}
+            onClearFilters={handleClearFilters}
+            hasActiveFilters={hasActiveFilters}
+          />
         </aside>
 
-        <div className="flex-1 flex flex-col gap-3">
-          <SearchBar
-            onSearch={(q) => handleSearch(q)}
-            placeholder="Buscar por título..."
-          />
+        {/* ── Contenido principal ─── */}
+        <div className="flex-1 flex flex-col gap-4 min-w-0">
 
-          <div className="flex justify-end">
+          {/* Toolbar: filtros móvil + sort */}
+          <div className="flex items-center justify-between gap-3">
+            {/* Botón filtros (móvil) */}
+            <button
+              type="button"
+              onClick={() => setIsFiltersOpen(true)}
+              className={`lg:hidden flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-all ${
+                hasActiveFilters
+                  ? "border-primary/50 bg-primary/10 text-primary"
+                  : "border-accent/30 bg-surface text-on-surface-variant hover:text-on-surface hover:border-accent/50"
+              }`}
+            >
+              <SlidersHorizontal size={14} />
+              Filtros
+              {hasActiveFilters && (
+                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              )}
+            </button>
+
+            {/* Resultados count */}
+            <span className="hidden md:block text-xs text-on-surface-variant/50">
+              {loading ? "Buscando..." : `${books.length} resultado${books.length !== 1 ? "s" : ""} · Pág. ${currentPage}/${totalPaginas}`}
+            </span>
+
             <SortBy value={sortBy} onChange={handleSortChange} />
           </div>
 
+          {/* Grid de libros */}
           {loading ? (
-            <Spinner />
+            <div className="flex-1 flex items-center justify-center py-32">
+              <Spinner />
+            </div>
           ) : books.length === 0 ? (
-            <div data-testid="empty-state" className="text-center py-20 bg-surface rounded border border-accent/20">
-              <p className="text-on-surface-variant opacity-60">
+            <div
+              data-testid="empty-state"
+              className="flex flex-col items-center justify-center py-32 rounded-xl border border-accent/20 bg-surface/50"
+            >
+              <BookOpen size={40} className="text-on-surface-variant/20 mb-3" />
+              <p className="text-on-surface-variant/50 text-sm font-medium">
                 No se encontraron libros.
               </p>
+              {hasActiveFilters && (
+                <button
+                  onClick={handleClearFilters}
+                  className="mt-4 text-xs font-semibold text-primary hover:text-primary-light transition-colors"
+                >
+                  Limpiar filtros
+                </button>
+              )}
             </div>
           ) : (
             <>
-              <div data-testid="libros-grid"
-                className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 transition-all duration-150 ${animating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"}`}>
+              <div
+                data-testid="libros-grid"
+                className={`grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 transition-all duration-200 ${
+                  animating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"
+                }`}
+              >
                 {books.map((book) => (
                   <LibroCardHome key={book.id} {...book} />
                 ))}
@@ -170,6 +209,40 @@ export const Home = () => {
           )}
         </div>
       </div>
+
+      {/* ── Drawer de filtros en móvil ─────────────────────── */}
+      {isFiltersOpen && (
+        <div className="fixed inset-0 z-50 flex lg:hidden">
+          {/* overlay */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setIsFiltersOpen(false)}
+          />
+          {/* panel */}
+          <div className="relative ml-auto h-full w-80 bg-surface shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-accent/15">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal size={15} className="text-primary" />
+                <span className="font-bold text-sm text-on-surface">Filtros</span>
+              </div>
+              <button
+                onClick={() => setIsFiltersOpen(false)}
+                className="p-1.5 rounded-lg hover:bg-surface-high text-on-surface-variant hover:text-on-surface transition-colors"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-5 py-4">
+              <Filters
+                key={filterKey}
+                onApplyFilters={handleApplyFilters}
+                onClearFilters={handleClearFilters}
+                hasActiveFilters={hasActiveFilters}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 }

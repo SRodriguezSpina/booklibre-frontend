@@ -82,7 +82,7 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
   }
 
   return (
-    <div className="relative bg-surface rounded border border-accent/10 shadow-[0_8px_24px_rgba(0,0,0,0.3)] flex flex-col h-full group hover:-translate-y-1 transition-transform duration-300">
+    <div className="relative bg-surface rounded-xl border border-accent/10 hover:border-accent/30 shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex flex-col h-full group hover:-translate-y-1.5 transition-all duration-300">
       <div
         onClick={goToDetail}
         className="relative overflow-hidden cursor-pointer rounded-t"

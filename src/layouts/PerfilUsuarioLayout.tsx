@@ -54,7 +54,7 @@ export const PerfilUsuarioLayout = () => {
   const setUsuarioActualizado = (u: Usuario) => setUsuario(u)
 
   return (
-    <div className="bg-background min-h-[calc(100vh-4rem)] px-4 py-8 md:px-8">
+    <div className="bg-background min-h-[calc(100vh-4rem)] px-6 md:px-10 py-6 pt-20">
       <Outlet
         context={
           {

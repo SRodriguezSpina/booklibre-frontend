@@ -18,7 +18,7 @@ describe('Filters', () => {
     fireEvent.change(minInput, { target: { value: '500' } })
     fireEvent.change(maxInput, { target: { value: '100' } })
 
-    fireEvent.click(screen.getByText('Aplicar Filtros'))
+    fireEvent.click(screen.getByText('Aplicar filtros'))
 
     expect(screen.getByText('El mínimo debe ser menor al máximo')).toBeInTheDocument()
     expect(mockApply).not.toHaveBeenCalled()
@@ -31,7 +31,7 @@ describe('Filters', () => {
     const dramaButton = screen.getByText('Drama')
     fireEvent.click(dramaButton)
 
-    fireEvent.click(screen.getByText('Aplicar Filtros'))
+    fireEvent.click(screen.getByText('Aplicar filtros'))
 
     expect(mockApply).toHaveBeenCalledWith(expect.objectContaining({
       drama: true,
