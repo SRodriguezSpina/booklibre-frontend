@@ -83,9 +83,8 @@ export const GestionMisLibros = ({
     !cargando && !error && libros.length > 0 && librosFiltrados.length > 0
 
   return (
-    <div className="h-full relative">
-      <div className="bg-surface rounded border border-accent/15 shadow-[0_8px_24px_rgba(0,0,0,0.3)] overflow-hidden transition-transform duration-300 hover:-translate-y-0.5 h-full">
-        <div className="px-6 pt-6 pb-4 border-b border-accent/10 flex items-center justify-between gap-3">
+    <div className="bg-surface rounded border border-accent/15 shadow-[0_8px_24px_rgba(0,0,0,0.3)] overflow-hidden transition-transform duration-300 hover:-translate-y-0.5 flex flex-col">
+      <div className="px-6 pt-6 pb-4 border-b border-accent/10 flex items-center justify-between gap-3">
           <h2 className="text-2xl font-serif font-bold text-on-surface">
             Gestión de Mis Libros
           </h2>
@@ -105,7 +104,7 @@ export const GestionMisLibros = ({
           />
         </div>
 
-        <div className="px-6 pb-6 pt-2">
+        <div className="px-6 pb-6 pt-2 flex-1">
           {cargando ? (
             <div className="py-10 px-2 space-y-5" aria-label="Cargando libros">
               <div className="flex items-center justify-between gap-4">
@@ -191,10 +190,9 @@ export const GestionMisLibros = ({
             </div>
           )}
         </div>
-      </div>
 
       {mostrarPaginacion && (
-        <div className="absolute top-full left-0 right-0 pt-4">
+        <div className="px-6 py-4 border-t border-accent/10">
           <div className="flex items-center justify-between gap-4">
             <span className="text-xs text-on-surface-variant/40 font-medium">
               Mostrando {rangoEtiqueta.desde}–{rangoEtiqueta.hasta} de{" "}

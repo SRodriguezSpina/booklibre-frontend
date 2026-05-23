@@ -51,10 +51,17 @@ export const libroService = {
   async obtenerLibrosUsuarioPerfil(
     usuarioId: number,
   ): Promise<LibroUsuarioItemDTO[]> {
-    const res = await apiClient.get<LibroUsuarioItemDTO[]>(
+    const first = await apiClient.get<{
+      content: LibroUsuarioItemDTO[]
+      totalElements: number
+    }>(`/usuarios/${usuarioId}/libros`, { params: { page: 0, size: 1 } })
+    const total = first.data.totalElements
+    if (total === 0) return []
+    const res = await apiClient.get<{ content: LibroUsuarioItemDTO[] }>(
       `/usuarios/${usuarioId}/libros`,
+      { params: { page: 0, size: total } },
     )
-    return res.data.map((libro) => ({
+    return res.data.content.map((libro) => ({
       ...libro,
       disponible:
         libro.disponible === true ||
