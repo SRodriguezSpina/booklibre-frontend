@@ -1,5 +1,3 @@
-import type { S } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js"
-
 export type EstadoLibro =
   | "EXCELENTE"
   | "MUY_BUENO"

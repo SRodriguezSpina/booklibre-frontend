@@ -5,9 +5,9 @@ export type FiltroMisLibros = 'todos' | 'disponibles' | 'prestados'
 export type CampoOrdenMisLibros = 'titulo' | 'estado' | 'fecha'
 export type SentidoOrden = 'ascendente' | 'descendente'
 
-export const POR_PAGINA_MIS_LIBROS = 10
+export const POR_PAGINA_MIS_LIBROS = 3
 
-export const OPCIONES_POR_PAGINA = [5, 10, 25, 50] as const
+export const OPCIONES_POR_PAGINA = [3, 5, 10] as const
 export type OpcionPorPagina = (typeof OPCIONES_POR_PAGINA)[number]
 
 export const pestañasMisLibros: Pestaña[] = [

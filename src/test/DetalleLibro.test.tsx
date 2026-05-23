@@ -23,7 +23,9 @@ describe('DetalleLibro', () => {
     celular: '1122334455',
     ciudad: 'San Martin',
     tipoUsuario: 'Lector',
-    bibliokarmas: 500
+    bibliokarmas: 500,
+    reservados: 0,
+    leidos: 0,
   }
 
   beforeEach(() => {

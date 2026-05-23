@@ -43,12 +43,17 @@ const prestamoDTOMock: PrestamoDTO = {
   autor: "George Orwell",
   estado: "EXCELENTE",
   propietarioId: 3,
+  propietarioNombre: "Ana",
   imagenUrl: "",
   alquiladoPorId: 1,
+  alquiladoPorNombre: "Juan",
   fechaDesde: "2026-03-01",
   fechaHasta: "2026-03-20",
   rating: 0,
   bibliokarma: 1550,
+  disponibilidad: "RESERVADO",
+  disponible: false,
+  libroActivo: true,
 }
 
 const prestamoDTOMock2: PrestamoDTO = {
@@ -612,7 +617,7 @@ describe("libroService - obtenerPrestamosFiltrados", () => {
       data: [prestamoDTOMock, prestamoDTOMock2],
     } as any)
 
-    const result = await libroService.obtenerPrestamosFiltrados(1)
+    const result = await libroService.obtenerPrestamosFiltrados(1, "prestados-a-mi")
 
     expect(result).toHaveLength(2)
   })
@@ -697,7 +702,7 @@ describe("libroService - obtenerPrestamosFiltrados", () => {
   it("propaga el error si axios falla", async () => {
     mockedApiClient.get.mockRejectedValueOnce(new Error("Network Error"))
 
-    await expect(libroService.obtenerPrestamosFiltrados(1)).rejects.toThrow(
+    await expect(libroService.obtenerPrestamosFiltrados(1, "prestados-a-mi")).rejects.toThrow(
       "Network Error",
     )
   })
