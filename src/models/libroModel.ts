@@ -49,6 +49,7 @@ export interface LibroDTO {
   alquiladoPorId?: number
   bibliokarma?: number
   reservas: RangoReservaDTO[]
+  miReservaFechaHasta?: string
   cantidadCalificaciones?: number
   ultimasCalificaciones: CalificacionDTO[]
 }

@@ -14,7 +14,7 @@ import { obtenerMensajeError } from "../../utils/errorHandler"
 interface ReservaCardProps {
   libro: Libro
   usuarioId: number
-  onReservaExitosa: () => void
+  onReservaExitosa: (desde: string, hasta: string) => void
   fechaDesde: string
   setFechaDesde: (fecha: string) => void
   fechaHasta: string
@@ -37,8 +37,16 @@ export const ReservaCard = ({
 
   const hoy = new Date()
   hoy.setHours(0, 0, 0, 0)
+  const minDia = new Date(hoy)
+  minDia.setDate(minDia.getDate() + 1)
 
-  const diasDeshabilitados = [{ before: hoy }]
+  const diasDeshabilitados = [
+    { before: minDia },
+    ...libro.reservas.map(r => ({
+      from: new Date(r.fechaDesde + "T12:00:00"),
+      to: new Date(r.fechaHasta + "T12:00:00"),
+    })),
+  ]
 
   const rangeSeleccionado: DateRange | undefined = fechaDesde
     ? { from: strToDate(fechaDesde), to: fechaHasta ? strToDate(fechaHasta) : undefined }
@@ -88,7 +96,7 @@ export const ReservaCard = ({
       setFechaHasta("")
       setCalendarAbierto(true)
       toast.success("¡Reserva confirmada con éxito!")
-      onReservaExitosa()
+      onReservaExitosa(fechaDesdeEnvio, fechaHastaEnvio)
     } catch (error) {
       const err = obtenerMensajeError(error)
       toast.error(err.mensaje || "No se pudo confirmar la reserva. Intentá de nuevo.")

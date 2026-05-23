@@ -43,6 +43,7 @@ export class Libro {
   disponible?: boolean
   libroActivo?: boolean
   yaCalificadoPorUsuario?: boolean
+  miReservaFechaHasta?: string
 
   constructor(data: Partial<Libro>) {
     Object.assign(this, data)

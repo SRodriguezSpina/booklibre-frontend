@@ -1,6 +1,5 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link, useParams } from "react-router-dom"
-import { useOnInit } from "../utils/hooks"
 import { libroService } from "../services/libroService"
 import { Libro } from "../classes/Libro"
 import { ReseniasLibro } from "../components/detalleLibros/ReseniasLibro"
@@ -19,16 +18,16 @@ export const DetalleLibro = () => {
   const [fechaDesde, setFechaDesde] = useState<string>("")
   const [fechaHasta, setFechaHasta] = useState<string>("")
 
-  const { usuario, actualizarUsuario } = useAuthContext()
-  const usuarioId = usuario?.id || 1
+  const { usuario, cargandoUsuario, actualizarUsuario } = useAuthContext()
+  const usuarioId = usuario?.id ?? 0
   const bibliokarmasUsuario = usuario?.bibliokarmas || 0
   const esElegible = !!usuarioId && usuario?.tipoUsuario !== "Publicador" && libro?.propietarioId !== usuarioId
-  const puedeReservar = esElegible && libro?.disponibilidad === "DISPONIBLE"
+  const puedeReservar = esElegible && !libro?.estoyReservado
 
   const fetchLibro = async () => {
     try {
       if (id) {
-        const data = await libroService.getLibroById(Number(id))
+        const data = await libroService.getLibroById(Number(id), usuarioId)
         setLibro(data)
       }
     } catch (error) {
@@ -38,10 +37,23 @@ export const DetalleLibro = () => {
     }
   }
 
-  useOnInit(() => { fetchLibro() })
+  useEffect(() => {
+    if (!cargandoUsuario) {
+      fetchLibro()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, cargandoUsuario])
 
-  const handleReservaExitosa = async () => {
-    setLibro(prev => prev ? new Libro({ ...prev, disponibilidad: "RESERVADO" }) : prev)
+  const handleReservaExitosa = async (desde: string, hasta: string) => {
+    setLibro(prev => {
+      if (!prev) return prev
+      return new Libro({
+        ...prev,
+        estoyReservado: true,
+        miReservaFechaHasta: hasta,
+        reservas: [...(prev.reservas ?? []), { fechaDesde: desde, fechaHasta: hasta }],
+      })
+    })
     await actualizarUsuario()
   }
 
@@ -50,8 +62,6 @@ export const DetalleLibro = () => {
   if (libro && fechaDesde && fechaHasta && fechaHasta >= fechaDesde) {
     karmaCalculado = libro.calcularBibliokarma(fechaDesde, fechaHasta, bibliokarmasUsuario)
   }
-
-  const activeReserva = libro?.reservas?.[0]
 
   if (loading) return <div className="p-10 text-center text-primary">Cargando...</div>
   if (!libro) return <div className="p-10 text-center text-red-500">Libro no encontrado</div>
@@ -92,7 +102,7 @@ export const DetalleLibro = () => {
               )}
             </div>
             <div className="flex flex-col items-center gap-2 pt-1">
-              {libro.disponibilidad === "DISPONIBLE" ? (
+              {!libro.estoyReservado ? (
                 <span className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-success-bg text-success border border-success/20">
                   <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
                   Disponible
@@ -103,10 +113,10 @@ export const DetalleLibro = () => {
                     <span className="w-1.5 h-1.5 rounded-full bg-danger" />
                     No Disponible
                   </span>
-                  {activeReserva?.fechaHasta && (
+                  {libro.miReservaFechaHasta && (
                     <p className="text-xs text-secondary/50 text-center leading-relaxed">
-                      Disponible a partir del<br />
-                      <span className="font-semibold text-secondary/70">{formatearFechaVisual(activeReserva.fechaHasta)}</span>
+                      Tu reserva vence el<br />
+                      <span className="font-semibold text-secondary/70">{formatearFechaVisual(libro.miReservaFechaHasta)}</span>
                     </p>
                   )}
                 </>
@@ -153,14 +163,14 @@ export const DetalleLibro = () => {
                       <Lock size={24} className="text-danger" />
                     </div>
                     <p className="text-sm text-secondary/70 leading-relaxed">
-                      Este libro ya está prestado a otro lector en este momento.
+                      Ya tenés una reserva activa para este libro.
                     </p>
-                    {activeReserva?.fechaHasta && (
+                    {libro.miReservaFechaHasta && (
                       <div className="flex items-center gap-2 bg-primary/10 rounded-lg px-4 py-3">
                         <CalendarDays size={14} className="text-primary shrink-0" />
                         <p className="text-xs font-semibold text-secondary-dark">
-                          Disponible a partir del{" "}
-                          <span className="text-primary">{formatearFechaVisual(activeReserva.fechaHasta)}</span>
+                          Tu reserva vence el{" "}
+                          <span className="text-primary">{formatearFechaVisual(libro.miReservaFechaHasta)}</span>
                         </p>
                       </div>
                     )}

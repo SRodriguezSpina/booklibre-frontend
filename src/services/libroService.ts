@@ -69,8 +69,10 @@ export const libroService = {
     }))
   },
 
-  async getLibroById(id: number): Promise<Libro> {
-    const res = await apiClient.get<LibroDTO>(`/libros/${id}`)
+  async getLibroById(id: number, usuarioId?: number): Promise<Libro> {
+    const res = await apiClient.get<LibroDTO>(`/libros/${id}`, {
+      params: usuarioId ? { usuarioId } : undefined,
+    })
     return Libro.fromJson(res.data)
   },
 
