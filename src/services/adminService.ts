@@ -1,3 +1,4 @@
+import type { CantidadColeccionablesResponse } from "../models/libroModel"
 import type { ReservaAnualUsuarioResponse, UsuarioReservasDevueltasResponse } from "../models/usuarioModel"
 import { apiClient } from "./apiClient"
 
@@ -29,5 +30,12 @@ export const adminService = {
             `/libros/reservas-cumplidas`
         )
         return res.data
-    }
+    },
+
+    async obtenerLibrosColeccionables(): Promise<CantidadColeccionablesResponse> {
+    const res = await apiClient.get(
+        `/libros/coleccionables/count`
+    )
+    return res.data
+}
 }
