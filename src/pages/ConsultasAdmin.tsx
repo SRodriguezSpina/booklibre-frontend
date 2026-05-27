@@ -1,21 +1,28 @@
 import { adminService } from "../services/adminService"
 import { ConsultaCard } from "../components/ui/ConsultaCard"
 import type { UsuarioReservasDevueltasResponse, ReservaAnualUsuarioResponse } from "../models/usuarioModel"
+import type { CantidadColeccionablesResponse } from "../models/libroModel"
 import { useState } from "react"
 
 export const ConsultasAdmin = () => {
     const [usuariosConDevoluciones, setUsuariosConDevoluciones] = useState<UsuarioReservasDevueltasResponse[]>([])
     const [loadingDevoluciones, setLoadingDevoluciones] = useState(false)
     const [errorDevoluciones, setErrorDevoluciones] = useState("")
+    //
     const [usuariosConReservas, setUsuariosConReservas] = useState<UsuarioReservasDevueltasResponse[]>([])
     const [cantidadReservas, setCantidadReservas] = useState(3)
     const [loadingReservas, setLoadingReservas] = useState(false)
     const [errorReservas, setErrorReservas] = useState("")
+    //
     const [usuarioId, setUsuarioId] = useState(1)
     const [reservasAnuales, setReservasAnuales] = useState<ReservaAnualUsuarioResponse[]>([])
     const [loadingAnuales, setLoadingAnuales] = useState(false)
     const [errorAnuales, setErrorAnuales] = useState("")
-
+    //
+    const [loadingColeccionables, setLoadingColeccionables] = useState(false)
+    const [errorColeccionables, setErrorColeccionables] = useState("")
+    const [cantidadColeccionables, setCantidadColeccionables] = useState<CantidadColeccionablesResponse | null>(null)
+    //
     const [librosCumplidas, setLibrosCumplidas] = useState<any[]>([])
     const [loadingCumplidas, setLoadingCumplidas] = useState(false)
     const [errorCumplidas, setErrorCumplidas] = useState("")
@@ -73,6 +80,21 @@ export const ConsultasAdmin = () => {
             )
         } finally {
             setLoadingAnuales(false)
+        }
+    }
+
+    const consultarLibrosColeccionables = async () => {
+        try {
+            setLoadingColeccionables(true)
+            setErrorColeccionables("")
+
+            const data = await adminService.obtenerLibrosColeccionables()
+
+            setCantidadColeccionables(data)
+        } catch {
+            setErrorColeccionables("No se pudo realizar la consulta")
+        } finally {
+            setLoadingColeccionables(false)
         }
     }
 
@@ -191,6 +213,20 @@ export const ConsultasAdmin = () => {
 
             </ConsultaCard>
 
+            <ConsultaCard<CantidadColeccionablesResponse>
+                titulo="Cantidad de libros 'Coleccionables'"
+                descripcion=""
+                loading={loadingColeccionables}
+                error={errorColeccionables}
+                onConsultar={consultarLibrosColeccionables}
+                resultados={cantidadColeccionables ? [cantidadColeccionables] : []}
+                renderResultado={(resultado) => (
+                    <div>
+                        Cantidad: {resultado.cantidad}
+                    </div>
+                )}
+            />
+
             <ConsultaCard
                 titulo="Libros con todas las reservas cumplidas"
                 descripcion="Muestra los libros cuyas reservas ya han sido cumplidas."
@@ -209,6 +245,6 @@ export const ConsultasAdmin = () => {
                     </div>
                 )}
             />
-        </div>
+        </div >
     )
 }
