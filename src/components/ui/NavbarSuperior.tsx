@@ -44,9 +44,8 @@ export const NavbarSuperior = () => {
   const bibliokarmas = usuario?.bibliokarmas ?? 0
   const navigate = useNavigate()
 
-  const token = localStorage.getItem("token") ?? ""
-  const roles = obtenerRolesDesdeToken(token)
-  const esAdmin = roles.includes("ROLE_ADMIN")
+  const tipoUsuario = usuario?.tipoUsuario ?? localStorage.getItem("tipoUsuario") ?? ""
+  const esAdmin = tipoUsuario.toUpperCase() === "ADMIN"
 
   const items: NavItemProps[] = [
     { text: "Inicio", to: "/home" },
