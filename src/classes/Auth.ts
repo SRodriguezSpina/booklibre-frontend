@@ -72,7 +72,6 @@ export class Auth {
       nombre: this.nombre,
       email: this.email,
       password: this.password,
-      confirmarPassword: this.confirmarPassword,
     }
   }
 }
