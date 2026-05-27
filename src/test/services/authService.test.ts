@@ -106,7 +106,7 @@ describe('AuthService - registro', () => {
     expect(result).toEqual(responseMock)
   })
 
-  it('no guarda idUsuario en localStorage al registrarse', async () => {
+  it('guarda idUsuario en localStorage al registrarse', async () => {
     mockedApiClient.post.mockResolvedValueOnce({
       data: { success: true, usuario: usuarioMock }
     })
@@ -117,7 +117,7 @@ describe('AuthService - registro', () => {
       password: '123456',
     })
 
-    expect(localStorage.getItem('idUsuario')).toBeNull()
+    expect(localStorage.getItem('idUsuario')).toBe('1')
   })
 
   it('llama al endpoint correcto', async () => {

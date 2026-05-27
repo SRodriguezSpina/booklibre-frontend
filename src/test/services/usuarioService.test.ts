@@ -25,7 +25,6 @@ const usuarioDataMock: UsuarioData = {
 
 const usuarioUpdateResponseMock = {
   usuario: usuarioDataMock,
-  token: 'nuevo-token-jwt',
 }
 
 describe('usuarioService — obtenerUsuario', () => {
@@ -60,7 +59,6 @@ describe('usuarioService — actualizarUsuario', () => {
     const usuarioActualizado: UsuarioData = { ...usuarioDataMock, nombre: 'Juan 2' }
     const updateResponse = {
       usuario: usuarioActualizado,
-      token: 'token-actualizado',
     }
 
     mockedApiClient.put.mockResolvedValueOnce({ data: updateResponse } as any)
@@ -81,7 +79,6 @@ describe('usuarioService — actualizarUsuario', () => {
     )
 
     expect(result).toEqual(usuarioActualizado)
-    expect(localStorage.getItem('token')).toBe('token-actualizado')
     expect(localStorage.getItem('nombreUsuario')).toBe('Juan 2')
   })
 
