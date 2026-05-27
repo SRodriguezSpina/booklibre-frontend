@@ -1,12 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import axios from 'axios'
-
-vi.mock('axios')
-const mockedAxios = vi.mocked(axios, true)
-
+import { apiClient } from '../../services/apiClient'
 import { authService } from '../../services/AuthService'
 
-const TOKEN_MOCK = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqdWFuQG1haWwuY29tIn0.abc'
+vi.mock('../../services/apiClient')
+const mockedApiClient = vi.mocked(apiClient, true)
 
 const usuarioMock = {
   id: 1,
@@ -27,8 +25,8 @@ describe('AuthService - login', () => {
   })
 
   it('guarda idUsuario en localStorage tras login exitoso', async () => {
-    mockedAxios.post.mockResolvedValueOnce({
-      data: { success: true, message: 'Login exitoso', token: TOKEN_MOCK, usuario: usuarioMock }
+    mockedApiClient.post.mockResolvedValueOnce({
+      data: { success: true, message: 'Login exitoso', usuario: usuarioMock }
     })
 
     await authService.login({ email: 'juan@mail.com', password: '123' })
@@ -37,8 +35,8 @@ describe('AuthService - login', () => {
   })
 
   it('guarda nombreUsuario en localStorage tras login exitoso', async () => {
-    mockedAxios.post.mockResolvedValueOnce({
-      data: { success: true, message: 'Login exitoso', token: TOKEN_MOCK, usuario: usuarioMock }
+    mockedApiClient.post.mockResolvedValueOnce({
+      data: { success: true, message: 'Login exitoso', usuario: usuarioMock }
     })
 
     await authService.login({ email: 'juan@mail.com', password: '123' })
@@ -46,19 +44,9 @@ describe('AuthService - login', () => {
     expect(localStorage.getItem('nombreUsuario')).toBe('Juan Pérez')
   })
 
-  it('guarda token en localStorage tras login exitoso', async () => {
-    mockedAxios.post.mockResolvedValueOnce({
-      data: { success: true, message: 'Login exitoso', token: TOKEN_MOCK, usuario: usuarioMock }
-    })
-
-    await authService.login({ email: 'juan@mail.com', password: '123' })
-
-    expect(localStorage.getItem('token')).toBe(TOKEN_MOCK)
-  })
-
   it('retorna los datos del response correctamente', async () => {
-    const responseMock = { success: true, message: 'Login exitoso', token: TOKEN_MOCK, usuario: usuarioMock }
-    mockedAxios.post.mockResolvedValueOnce({ data: responseMock })
+    const responseMock = { success: true, message: 'Login exitoso', usuario: usuarioMock }
+    mockedApiClient.post.mockResolvedValueOnce({ data: responseMock })
 
     const result = await authService.login({ email: 'juan@mail.com', password: '123' })
 
@@ -66,19 +54,18 @@ describe('AuthService - login', () => {
   })
 
   it('no guarda nada en localStorage si success es false', async () => {
-    mockedAxios.post.mockResolvedValueOnce({
-      data: { success: false, message: 'Credenciales inválidas', token: '', usuario: null }
+    mockedApiClient.post.mockResolvedValueOnce({
+      data: { success: false, message: 'Credenciales inválidas', usuario: null }
     })
 
     await authService.login({ email: 'juan@mail.com', password: 'wrong' })
 
     expect(localStorage.getItem('idUsuario')).toBeNull()
     expect(localStorage.getItem('nombreUsuario')).toBeNull()
-    expect(localStorage.getItem('token')).toBeNull()
   })
 
   it('lanza el error si axios falla', async () => {
-    mockedAxios.post.mockRejectedValueOnce(new Error('Network Error'))
+    mockedApiClient.post.mockRejectedValueOnce(new Error('Network Error'))
 
     await expect(
       authService.login({ email: 'juan@mail.com', password: '123' })
@@ -86,13 +73,13 @@ describe('AuthService - login', () => {
   })
 
   it('llama al endpoint correcto', async () => {
-    mockedAxios.post.mockResolvedValueOnce({
-      data: { success: true, token: TOKEN_MOCK, usuario: usuarioMock }
+    mockedApiClient.post.mockResolvedValueOnce({
+      data: { success: true, usuario: usuarioMock }
     })
 
     await authService.login({ email: 'juan@mail.com', password: '123' })
 
-    expect(mockedAxios.post).toHaveBeenCalledWith(
+    expect(mockedApiClient.post).toHaveBeenCalledWith(
       expect.stringContaining('/login'),
       { email: 'juan@mail.com', password: '123' }
     )
@@ -107,58 +94,41 @@ describe('AuthService - registro', () => {
   })
 
   it('retorna el response del servidor', async () => {
-    const responseMock = { success: true, message: 'Registro exitoso', token: TOKEN_MOCK, usuario: usuarioMock }
-    mockedAxios.post.mockResolvedValueOnce({ data: responseMock })
+    const responseMock = { success: true, message: 'Registro exitoso', usuario: usuarioMock }
+    mockedApiClient.post.mockResolvedValueOnce({ data: responseMock })
 
     const result = await authService.registro({
       nombre: 'Juan',
       email: 'juan@mail.com',
       password: '123456',
-      confirmarPassword: '123456',
     })
 
     expect(result).toEqual(responseMock)
   })
 
-  it('guarda token en localStorage si el backend lo devuelve al registrarse', async () => {
-    mockedAxios.post.mockResolvedValueOnce({
-      data: { success: true, token: TOKEN_MOCK, usuario: usuarioMock }
-    })
-
-    await authService.registro({
-      nombre: 'Juan',
-      email: 'juan@mail.com',
-      password: '123456',
-      confirmarPassword: '123456',
-    })
-
-    expect(localStorage.getItem('token')).toBe(TOKEN_MOCK)
-  })
-
   it('no guarda idUsuario en localStorage al registrarse', async () => {
-    mockedAxios.post.mockResolvedValueOnce({
-      data: { success: true, token: TOKEN_MOCK, usuario: usuarioMock }
+    mockedApiClient.post.mockResolvedValueOnce({
+      data: { success: true, usuario: usuarioMock }
     })
 
     await authService.registro({
       nombre: 'Juan',
       email: 'juan@mail.com',
       password: '123456',
-      confirmarPassword: '123456',
     })
 
     expect(localStorage.getItem('idUsuario')).toBeNull()
   })
 
   it('llama al endpoint correcto', async () => {
-    mockedAxios.post.mockResolvedValueOnce({ data: { success: true, token: TOKEN_MOCK } })
+    mockedApiClient.post.mockResolvedValueOnce({ data: { success: true } })
 
     await authService.registro({
       nombre: 'Juan', email: 'juan@mail.com',
-      password: '123456', confirmarPassword: '123456',
+      password: '123456',
     })
 
-    expect(mockedAxios.post).toHaveBeenCalledWith(
+    expect(mockedApiClient.post).toHaveBeenCalledWith(
       expect.stringContaining('/register'),
       expect.objectContaining({ email: 'juan@mail.com' })
     )
@@ -167,26 +137,17 @@ describe('AuthService - registro', () => {
 
 describe('AuthService - logout', () => {
 
-  it('elimina idUsuario del localStorage', () => {
+  it('llama al logout API de forma asyncrona y limpia el storage', async () => {
+    mockedApiClient.post.mockResolvedValueOnce({ data: {} })
     localStorage.setItem('idUsuario', '1')
-    authService.logout()
+    await authService.logout()
+    expect(mockedApiClient.post).toHaveBeenCalledWith(expect.stringContaining('/logout'))
     expect(localStorage.getItem('idUsuario')).toBeNull()
   })
 
-  it('elimina nombreUsuario del localStorage', () => {
-    localStorage.setItem('nombreUsuario', 'Juan')
-    authService.logout()
-    expect(localStorage.getItem('nombreUsuario')).toBeNull()
-  })
-
-  it('elimina token del localStorage', () => {
-    localStorage.setItem('token', TOKEN_MOCK)
-    authService.logout()
-    expect(localStorage.getItem('token')).toBeNull()
-  })
-
-  it('no falla si localStorage ya estaba vacío', () => {
-    expect(() => authService.logout()).not.toThrow()
+  it('no falla si localStorage ya estaba vacío', async () => {
+    mockedApiClient.post.mockResolvedValueOnce({ data: {} })
+    await expect(authService.logout()).resolves.not.toThrow()
   })
 })
 
@@ -219,15 +180,6 @@ describe('AuthService - helpers de sesión', () => {
 
   it('estaAutenticado retorna false si no hay id en localStorage', () => {
     expect(authService.estaAutenticado()).toBe(false)
-  })
-
-  it('obtenerToken retorna el token si existe', () => {
-    localStorage.setItem('token', TOKEN_MOCK)
-    expect(authService.obtenerToken()).toBe(TOKEN_MOCK)
-  })
-
-  it('obtenerToken retorna null si no hay token', () => {
-    expect(authService.obtenerToken()).toBeNull()
   })
 })
 

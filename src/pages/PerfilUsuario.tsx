@@ -3,7 +3,6 @@ import { libroService } from "../services/libroService"
 import type {
   ClickLogDTO,
   LibroMasClickeadoResponse,
-  LibroUsuarioItemDTO,
 } from "../models/libroModel"
 import { useEffect, useMemo, useState } from "react"
 import type { ContextoPerfilUsuario } from "../layouts/PerfilUsuarioLayout"

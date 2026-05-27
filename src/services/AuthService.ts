@@ -1,40 +1,44 @@
 import axios from "axios"
 import type { RegisterData, LoginData, AuthResponseUsuario } from "../types/UsuarioTypes"
-import { API_BASE_URL, AUTH_PATH } from "../env"
+import { AUTH_PATH } from "../env"
 import { tokenService } from "./tokenService"
+import { apiClient } from "./apiClient"
 
 class AuthService {
   async login(data: LoginData): Promise<AuthResponseUsuario> {
-    const response = await axios.post<AuthResponseUsuario>(
-      `${API_BASE_URL}${AUTH_PATH('login')}`,
+    const response = await apiClient.post<AuthResponseUsuario>(
+      AUTH_PATH('login'),
       data,
     )
     if (response.data.success && response.data.usuario) {
       tokenService.setIdUsuario(response.data.usuario.id)
       tokenService.setNombreUsuario(response.data.usuario.nombre)
       tokenService.setTipoUsuario(response.data.usuario.tipoUsuario)
-      tokenService.setToken(response.data.token)
     }
     return response.data
   }
 
   async registro(data: RegisterData): Promise<AuthResponseUsuario> {
-    const response = await axios.post<AuthResponseUsuario>(
-      `${API_BASE_URL}${AUTH_PATH('register')}`,
+    const response = await apiClient.post<AuthResponseUsuario>(
+      AUTH_PATH('register'),
       data,
     )
-    if (response.data.token) {
-      tokenService.setToken(response.data.token)
+    if (response.data.success && response.data.usuario) {
+      tokenService.setIdUsuario(response.data.usuario.id)
+      tokenService.setNombreUsuario(response.data.usuario.nombre)
+      tokenService.setTipoUsuario(response.data.usuario.tipoUsuario)
     }
     return response.data
   }
 
-  logout(): void {
-    tokenService.clearAll()
-  }
-
-  obtenerToken(): string | null {
-    return tokenService.getToken()
+  async logout(): Promise<void> {
+    try {
+      await apiClient.post(AUTH_PATH('logout'))
+    } catch (e) {
+      console.error("Error al cerrar sesión", e)
+    } finally {
+      tokenService.clearAll()
+    }
   }
 
   obtenerIdUsuarioActual(): number | null {

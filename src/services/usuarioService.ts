@@ -27,7 +27,6 @@ class UsuarioService {
       imagenUrl: usuario.imagenUrl ?? null,
     }
     const res = await apiClient.put<UsuarioUpdateResponse>(`/usuarios/${usuario.id}`, payload)
-    tokenService.setToken(res.data.token)
     tokenService.setNombreUsuario(res.data.usuario.nombre)
     return mapUsuarioResponse(res.data.usuario)
   }
