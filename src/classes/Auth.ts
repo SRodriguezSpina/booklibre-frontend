@@ -7,7 +7,10 @@ export type FieldConfig = {
   label: string
   type?: string
   placeholder?: string
-  isPassword?: boolean //para generar o no el boton de mostrar
+  isPassword?: boolean
+  autocomplete?: string
+  inputMode?: "email" | "text" | "search" | "tel" | "url" | "none" | "numeric" | "decimal"
+  spellCheck?: boolean
 }
 
 export class Auth {
@@ -20,21 +23,63 @@ export class Auth {
   confirmarPassword: string = ""
 
   static loginFields: FieldConfig[] = [
-    { name: "email", label: "Email", placeholder: "Tu email" },
-    { name: "password", label: "Contraseña", placeholder: "Tu contraseña", isPassword: true },
+    {
+      name: "email",
+      label: "Email",
+      type: "email",
+      placeholder: "tu@email.com…",
+      autocomplete: "email",
+      inputMode: "email",
+      spellCheck: false,
+    },
+    {
+      name: "password",
+      label: "Contraseña",
+      placeholder: "Tu contraseña…",
+      isPassword: true,
+      autocomplete: "current-password",
+      spellCheck: false,
+    },
   ]
 
   static registerFields: FieldConfig[] = [
-    { name: "nombre",   label: "Nombre",   placeholder: "Tu nombre" },
-    { name: "email",    label: "Email",    type: "email", placeholder: "tu@email.com" },
-    { name: "password", label: "Contraseña", placeholder: "Mínimo 6 caracteres", isPassword: true },
-    { name: "confirmarPassword", label: "Repetí tu contraseña", placeholder: "Repetí la contraseña", isPassword: true },
+    {
+      name: "nombre",
+      label: "Nombre",
+      placeholder: "Tu nombre…",
+      autocomplete: "name",
+    },
+    {
+      name: "email",
+      label: "Email",
+      type: "email",
+      placeholder: "tu@email.com…",
+      autocomplete: "email",
+      inputMode: "email",
+      spellCheck: false,
+    },
+    {
+      name: "password",
+      label: "Contraseña",
+      placeholder: "Mínimo 6 caracteres…",
+      isPassword: true,
+      autocomplete: "new-password",
+      spellCheck: false,
+    },
+    {
+      name: "confirmarPassword",
+      label: "Repetí tu contraseña",
+      placeholder: "Repetí la contraseña…",
+      isPassword: true,
+      autocomplete: "new-password",
+      spellCheck: false,
+    },
   ]
 
   validateLogin(): Record<string, string | undefined> {
     return {
-      email:  !this.email.trim() ? "El email es obligatorio"    : undefined,
-      password: !this.password       ? "La contraseña es obligatoria" : undefined,
+      email: !this.email.trim() ? "El email es obligatorio" : undefined,
+      password: !this.password ? "La contraseña es obligatoria" : undefined,
     }
   }
 
@@ -42,20 +87,22 @@ export class Auth {
     const password = this.password.trim()
     const confirmar = this.confirmarPassword.trim()
     return {
-      nombre:   !this.nombre.trim()
-        ? "El nombre es obligatorio" : undefined,
-      email:    !this.email.trim()
+      nombre: !this.nombre.trim() ? "El nombre es obligatorio" : undefined,
+      email: !this.email.trim()
         ? "El email es obligatorio"
         : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)
-        ? "Ingresá un email válido" : undefined,
+          ? "Ingresá un email válido"
+          : undefined,
       password: !password
         ? "La contraseña es obligatoria"
         : password.length < 6
-        ? "Mínimo 6 caracteres" : undefined,
+          ? "Mínimo 6 caracteres"
+          : undefined,
       confirmarPassword: !confirmar
         ? "Repetí tu contraseña"
         : confirmar !== password
-        ? "Las contraseñas no coinciden" : undefined,
+          ? "Las contraseñas no coinciden"
+          : undefined,
     }
   }
 
