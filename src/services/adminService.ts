@@ -22,5 +22,12 @@ export const adminService = {
         )
 
         return res.data
+    },
+
+    async obtenerLibrosConReservasCumplidas(): Promise<any[]> {
+        const res = await apiClient.get(
+            `/libros/reservas-cumplidas`
+        )
+        return res.data
     }
 }

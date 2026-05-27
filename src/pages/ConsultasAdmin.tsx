@@ -16,6 +16,10 @@ export const ConsultasAdmin = () => {
     const [loadingAnuales, setLoadingAnuales] = useState(false)
     const [errorAnuales, setErrorAnuales] = useState("")
 
+    const [librosCumplidas, setLibrosCumplidas] = useState<any[]>([])
+    const [loadingCumplidas, setLoadingCumplidas] = useState(false)
+    const [errorCumplidas, setErrorCumplidas] = useState("")
+
     const consultarUsuariosConDevoluciones = async () => {
         try {
             setLoadingDevoluciones(true)
@@ -71,6 +75,21 @@ export const ConsultasAdmin = () => {
             setLoadingAnuales(false)
         }
     }
+
+    const consultarLibrosCumplidas = async () => {
+        try {
+            setLoadingCumplidas(true)
+            setErrorCumplidas("")
+
+            const data = await adminService.obtenerLibrosConReservasCumplidas()
+            setLibrosCumplidas(data)
+        } catch {
+            setErrorCumplidas("No se pudo realizar la consulta")
+        } finally {
+            setLoadingCumplidas(false)
+        }
+    }
+
     return (
         <div className="max-w-6xl mx-auto space-y-8 pt-20 animate-in fade-in duration-300 pt-25 pb-15">
             <ConsultaCard
@@ -172,6 +191,24 @@ export const ConsultasAdmin = () => {
 
             </ConsultaCard>
 
+            <ConsultaCard
+                titulo="Libros con todas las reservas cumplidas"
+                descripcion="Muestra los libros cuyas reservas ya han sido cumplidas."
+                loading={loadingCumplidas}
+                error={errorCumplidas}
+                onConsultar={consultarLibrosCumplidas}
+                resultados={librosCumplidas}
+                renderResultado={(libro) => (
+                    <div className="flex flex-col gap-1">
+                        <span className="font-semibold">
+                            {libro.titulo}
+                        </span>
+                        <span className="text-sm text-on-surface-variant">
+                            {libro.autor}
+                        </span>
+                    </div>
+                )}
+            />
         </div>
     )
 }
