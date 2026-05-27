@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom"
+import { NavLink, useLocation, useNavigate } from "react-router-dom"
 import { TrendingUp, LogOut, Menu, X, Sun, Moon } from "lucide-react"
 import navBarLogo from "../../assets/icons/booklibre-logo.svg"
 import { authService } from "../../services/AuthService"
@@ -43,6 +43,9 @@ export const NavbarSuperior = () => {
   const nombre = usuario?.nombre ?? "Usuario"
   const bibliokarmas = usuario?.bibliokarmas ?? 0
   const navigate = useNavigate()
+  const location = useLocation()
+  const enPaginaAuth =
+    location.pathname === "/login" || location.pathname === "/register"
 
   const token = localStorage.getItem("token") ?? ""
   const roles = obtenerRolesDesdeToken(token)
@@ -72,9 +75,13 @@ export const NavbarSuperior = () => {
       aria-label={
         theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"
       }
-      className="cursor-pointer p-2 rounded-lg border border-accent/30 text-on-surface-variant hover:text-primary-light hover:border-primary-light/40 hover:bg-primary-light/5 transition-all duration-200"
+      className="cursor-pointer p-2 rounded-lg border border-accent/30 text-on-surface-variant hover:text-primary-light hover:border-primary-light/40 hover:bg-primary-light/5 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
     >
-      {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
+      {theme === "dark" ? (
+        <Sun size={15} aria-hidden />
+      ) : (
+        <Moon size={15} aria-hidden />
+      )}
     </button>
   )
 
@@ -85,7 +92,10 @@ export const NavbarSuperior = () => {
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2.5">
             <img src={navBarLogo} alt="BookLibre" className="w-6 h-6" />
-            <span className="text-xl font-serif font-bold tracking-tight text-primary-light">
+            <span
+              translate="no"
+              className="text-xl font-serif font-bold tracking-tight text-primary-light dark:text-primary-light [html[data-theme='light']_&]:text-primary-dark"
+            >
               BookLibre
             </span>
           </div>
@@ -119,19 +129,21 @@ export const NavbarSuperior = () => {
               />
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant hover:text-danger border border-accent/30 rounded-lg px-3 py-1.5 hover:bg-danger-bg/30 hover:border-danger/30 transition-all"
+                className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant hover:text-danger border border-accent/30 rounded-lg px-3 py-1.5 hover:bg-danger-bg/30 hover:border-danger/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/40"
               >
-                <LogOut size={13} />
+                <LogOut size={13} aria-hidden />
                 Salir
               </button>
             </>
           ) : (
-            <button
-              onClick={() => navigate("/login")}
-              className="cursor-pointer flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-background bg-primary-light hover:bg-primary rounded-lg px-4 py-2 transition-all"
-            >
-              Iniciar Sesión
-            </button>
+            !enPaginaAuth && (
+              <button
+                onClick={() => navigate("/login")}
+                className="cursor-pointer flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-background bg-primary-light hover:bg-primary rounded-lg px-4 py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                Iniciar Sesión
+              </button>
+            )
           )}
         </div>
 
@@ -161,12 +173,14 @@ export const NavbarSuperior = () => {
               </button>
             </>
           ) : (
-            <button
-              onClick={() => navigate("/login")}
-              className="text-[11px] font-bold uppercase tracking-wider text-background bg-primary-light hover:bg-primary rounded-lg px-3 py-1.5 transition-all"
-            >
-              Ingresar
-            </button>
+            !enPaginaAuth && (
+              <button
+                onClick={() => navigate("/login")}
+                className="text-[11px] font-bold uppercase tracking-wider text-background bg-primary-light hover:bg-primary rounded-lg px-3 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                Ingresar
+              </button>
+            )
           )}
         </div>
       </div>
@@ -189,7 +203,7 @@ export const NavbarSuperior = () => {
               onClick={handleLogout}
               className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant hover:text-danger transition-colors"
             >
-              <LogOut size={14} />
+              <LogOut size={14} aria-hidden />
               Cerrar sesión
             </button>
           </div>
