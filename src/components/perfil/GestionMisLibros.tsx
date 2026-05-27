@@ -1,4 +1,5 @@
 import { useState } from "react"
+import type { LibroUsuarioItemDTO } from "../../models/libroModel"
 import { Plus } from "lucide-react"
 import { Tabs } from "../ui"
 import { TablaLibros } from "./TablaLibros"

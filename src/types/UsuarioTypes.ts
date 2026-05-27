@@ -3,8 +3,7 @@ import type { UsuarioResponse } from "../models/usuarioModel"
 export type RegisterData = {
     nombre: string,
     email: string,
-    password: string,
-    confirmarPassword: string
+    password: string
 }
 
 export type LoginData = {
@@ -15,6 +14,5 @@ export type LoginData = {
 export type AuthResponseUsuario = {
     success: boolean,
     message: string,
-    token: string,
     usuario: UsuarioResponse
 }
