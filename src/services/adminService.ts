@@ -44,5 +44,12 @@ export const adminService = {
             `/libros/mejor-calificados`
         )
         return res.data
+    },
+
+    async obtenerLibrosConReservasActivas(minReservas: number = 3): Promise<any[]> {
+        const res = await apiClient.get(
+            `/libros/reservas-activas`, { params: { minReservas } }
+        )
+        return res.data
     }
 }

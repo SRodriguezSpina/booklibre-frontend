@@ -30,6 +30,10 @@ export const ConsultasAdmin = () => {
     const [librosMejores, setLibrosMejores] = useState<any[]>([])
     const [loadingMejores, setLoadingMejores] = useState(false)
     const [errorMejores, setErrorMejores] = useState("")
+    //
+    const [librosReservasActivas, setLibrosReservasActivas] = useState<any[]>([])
+    const [loadingReservasActivas, setLoadingReservasActivas] = useState(false)
+    const [errorReservasActivas, setErrorReservasActivas] = useState("")
 
     const consultarUsuariosConDevoluciones = async () => {
         try {
@@ -127,6 +131,20 @@ export const ConsultasAdmin = () => {
             setErrorMejores("No se pudo realizar la consulta")
         } finally {
             setLoadingMejores(false)
+        }
+    }
+
+    const consultarLibrosReservasActivas = async () => {
+        try {
+            setLoadingReservasActivas(true)
+            setErrorReservasActivas("")
+
+            const data = await adminService.obtenerLibrosConReservasActivas(3)
+            setLibrosReservasActivas(data)
+        } catch {
+            setErrorReservasActivas("No se pudo realizar la consulta")
+        } finally {
+            setLoadingReservasActivas(false)
         }
     }
 
@@ -283,6 +301,27 @@ export const ConsultasAdmin = () => {
                         </div>
                         <div className="flex items-center gap-1 text-yellow-400 font-bold bg-yellow-400/10 px-3 py-1 rounded-full border border-yellow-400/20">
                             ⭐ {libro.calificacion}
+                        </div>
+                    </div>
+                )}
+            />
+
+            <ConsultaCard
+                titulo="Libros con Reservas Activas"
+                descripcion="Saber qué libros tienen al menos 3 reservas activas."
+                loading={loadingReservasActivas}
+                error={errorReservasActivas}
+                onConsultar={consultarLibrosReservasActivas}
+                resultados={librosReservasActivas}
+                renderResultado={(libro) => (
+                    <div className="flex justify-between items-center gap-4">
+                        <div className="flex flex-col gap-1">
+                            <span className="font-semibold">
+                                {libro.titulo}
+                            </span>
+                            <span className="text-sm text-on-surface-variant">
+                                {libro.autor}
+                            </span>
                         </div>
                     </div>
                 )}
