@@ -1,4 +1,4 @@
-export type TipoUsuario = "Lector" | "Publicador" | "LectorPublicador"
+export type TipoUsuario = "Lector" | "Publicador" | "LectorPublicador" | "ADMIN"
 
 export type UsuarioResponse = {
   id: number

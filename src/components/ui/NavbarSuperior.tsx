@@ -47,9 +47,8 @@ export const NavbarSuperior = () => {
   const enPaginaAuth =
     location.pathname === "/login" || location.pathname === "/register"
 
-  const token = localStorage.getItem("token") ?? ""
-  const roles = obtenerRolesDesdeToken(token)
-  const esAdmin = roles.includes("ROLE_ADMIN")
+  const tipoUsuario = usuario?.tipoUsuario ?? localStorage.getItem("tipoUsuario") ?? ""
+  const esAdmin = tipoUsuario.toUpperCase() === "ADMIN"
 
   const items: NavItemProps[] = [
     { text: "Inicio", to: "/home" },
