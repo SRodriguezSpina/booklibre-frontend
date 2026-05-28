@@ -34,7 +34,7 @@ export const DetallePrestamos = () => {
   const tipo = (tipoUsuario ?? "").toUpperCase().replace(/\s+/g, "_")
   const puedeReservar = tipo === "LECTOR" || tipo === "LECTORPUBLICADOR"
   const puedePublicar = tipo === "PUBLICADOR" || tipo === "LECTORPUBLICADOR"
-  const PAGE_SIZE = 8
+  const PAGE_SIZE = 5
   const pestañas = [
     ...(puedeReservar ? [{ id: "prestados-a-mi", etiqueta: "Prestados a mí" }] : []),
     ...(puedePublicar ? [{ id: "prestados-por-mi", etiqueta: "Prestados por mí" }] : []),
