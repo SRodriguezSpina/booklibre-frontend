@@ -282,7 +282,7 @@ export const ConsultasAdmin = () => {
                             </span>
                         </div>
                         <div className="flex items-center gap-1 text-yellow-400 font-bold bg-yellow-400/10 px-3 py-1 rounded-full border border-yellow-400/20">
-                            ⭐ {libro.rating?.toFixed(1) || "5.0"}
+                            ⭐ {libro.calificacion}
                         </div>
                     </div>
                 )}
