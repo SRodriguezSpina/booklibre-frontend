@@ -171,7 +171,7 @@ describe('Auth - toRegisterDTO', () => {
       nombre: 'Juan',
       email: 'juan@mail.com',
       password: '123456',
-      confirmarPassword: '123456',
     })
+    expect(auth.toRegisterDTO()).not.toHaveProperty('confirmarPassword')
   })
 })

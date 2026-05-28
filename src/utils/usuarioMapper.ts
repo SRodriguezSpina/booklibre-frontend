@@ -6,8 +6,11 @@ export function mapTipoUsuario(tipoUsuario: string): TipoUsuario {
     case "Lector":
     case "Publicador":
     case "LectorPublicador":
-      return tipoUsuario
+    case "ADMIN":
+    case "Admin":
+      return tipoUsuario as TipoUsuario
     default:
+      if (tipoUsuario && tipoUsuario.toUpperCase() === "ADMIN") return "ADMIN"
       return "Lector"
   }
 }

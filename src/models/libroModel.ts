@@ -146,3 +146,7 @@ export type LibroMasClickeadoResponse = {
   libroTitulo: string
   total: number
 }
+
+export type CantidadColeccionablesResponse = {
+    cantidad: number
+}

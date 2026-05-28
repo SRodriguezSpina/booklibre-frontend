@@ -1,20 +1,31 @@
 import { adminService } from "../services/adminService"
 import { ConsultaCard } from "../components/ui/ConsultaCard"
 import type { UsuarioReservasDevueltasResponse, ReservaAnualUsuarioResponse } from "../models/usuarioModel"
+import type { CantidadColeccionablesResponse } from "../models/libroModel"
 import { useState } from "react"
 
 export const ConsultasAdmin = () => {
     const [usuariosConDevoluciones, setUsuariosConDevoluciones] = useState<UsuarioReservasDevueltasResponse[]>([])
     const [loadingDevoluciones, setLoadingDevoluciones] = useState(false)
     const [errorDevoluciones, setErrorDevoluciones] = useState("")
+    //
     const [usuariosConReservas, setUsuariosConReservas] = useState<UsuarioReservasDevueltasResponse[]>([])
     const [cantidadReservas, setCantidadReservas] = useState(3)
     const [loadingReservas, setLoadingReservas] = useState(false)
     const [errorReservas, setErrorReservas] = useState("")
+    //
     const [usuarioId, setUsuarioId] = useState(1)
     const [reservasAnuales, setReservasAnuales] = useState<ReservaAnualUsuarioResponse[]>([])
     const [loadingAnuales, setLoadingAnuales] = useState(false)
     const [errorAnuales, setErrorAnuales] = useState("")
+    //
+    const [loadingColeccionables, setLoadingColeccionables] = useState(false)
+    const [errorColeccionables, setErrorColeccionables] = useState("")
+    const [cantidadColeccionables, setCantidadColeccionables] = useState<CantidadColeccionablesResponse | null>(null)
+    //
+    const [librosCumplidas, setLibrosCumplidas] = useState<any[]>([])
+    const [loadingCumplidas, setLoadingCumplidas] = useState(false)
+    const [errorCumplidas, setErrorCumplidas] = useState("")
 
     const consultarUsuariosConDevoluciones = async () => {
         try {
@@ -71,6 +82,36 @@ export const ConsultasAdmin = () => {
             setLoadingAnuales(false)
         }
     }
+
+    const consultarLibrosColeccionables = async () => {
+        try {
+            setLoadingColeccionables(true)
+            setErrorColeccionables("")
+
+            const data = await adminService.obtenerLibrosColeccionables()
+
+            setCantidadColeccionables(data)
+        } catch {
+            setErrorColeccionables("No se pudo realizar la consulta")
+        } finally {
+            setLoadingColeccionables(false)
+        }
+    }
+
+    const consultarLibrosCumplidas = async () => {
+        try {
+            setLoadingCumplidas(true)
+            setErrorCumplidas("")
+
+            const data = await adminService.obtenerLibrosConReservasCumplidas()
+            setLibrosCumplidas(data)
+        } catch {
+            setErrorCumplidas("No se pudo realizar la consulta")
+        } finally {
+            setLoadingCumplidas(false)
+        }
+    }
+
     return (
         <div className="max-w-6xl mx-auto space-y-8 pt-20 animate-in fade-in duration-300 pt-25 pb-15">
             <ConsultaCard
@@ -172,6 +213,38 @@ export const ConsultasAdmin = () => {
 
             </ConsultaCard>
 
-        </div>
+            <ConsultaCard<CantidadColeccionablesResponse>
+                titulo="Cantidad de libros 'Coleccionables'"
+                descripcion=""
+                loading={loadingColeccionables}
+                error={errorColeccionables}
+                onConsultar={consultarLibrosColeccionables}
+                resultados={cantidadColeccionables ? [cantidadColeccionables] : []}
+                renderResultado={(resultado) => (
+                    <div>
+                        Cantidad: {resultado.cantidad}
+                    </div>
+                )}
+            />
+
+            <ConsultaCard
+                titulo="Libros con todas las reservas cumplidas"
+                descripcion="Muestra los libros cuyas reservas ya han sido cumplidas."
+                loading={loadingCumplidas}
+                error={errorCumplidas}
+                onConsultar={consultarLibrosCumplidas}
+                resultados={librosCumplidas}
+                renderResultado={(libro) => (
+                    <div className="flex flex-col gap-1">
+                        <span className="font-semibold">
+                            {libro.titulo}
+                        </span>
+                        <span className="text-sm text-on-surface-variant">
+                            {libro.autor}
+                        </span>
+                    </div>
+                )}
+            />
+        </div >
     )
 }

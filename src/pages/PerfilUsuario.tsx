@@ -3,7 +3,6 @@ import { libroService } from "../services/libroService"
 import type {
   ClickLogDTO,
   LibroMasClickeadoResponse,
-  LibroUsuarioItemDTO,
 } from "../models/libroModel"
 import { useEffect, useMemo, useState } from "react"
 import type { ContextoPerfilUsuario } from "../layouts/PerfilUsuarioLayout"
@@ -41,11 +40,12 @@ export const PerfilUsuario = () => {
 
   const esSoloLector = usuario.tipoUsuario === "Lector"
   const esSoloPublicador = usuario.tipoUsuario === "Publicador"
+  const esAdmin = usuario.tipoUsuario === "ADMIN"
 
-  const gestionLibros = useGestionMisLibros({ usuarioId: usuario.id, enabled: !esSoloLector })
+  const gestionLibros = useGestionMisLibros({ usuarioId: usuario.id, enabled: !esSoloLector && !esAdmin })
 
   const cargarClicks = async () => {
-    if (usuario.tipoUsuario === "Lector") {
+    if (usuario.tipoUsuario === "Lector" || usuario.tipoUsuario === "ADMIN") {
       setClicks([])
       setErrorClicks(null)
       setCargandoClicks(false)
@@ -70,7 +70,7 @@ export const PerfilUsuario = () => {
     let activa = true
 
     const cargarClicksSegunTipo = async () => {
-      if (usuario.tipoUsuario === "Lector") {
+      if (usuario.tipoUsuario === "Lector" || usuario.tipoUsuario === "ADMIN") {
         if (!activa) return
         setClicks([])
         setErrorClicks(null)
@@ -112,7 +112,7 @@ export const PerfilUsuario = () => {
     let activa = true
 
     const cargarLibroMasClickeado = async () => {
-      if (usuario.tipoUsuario === "Lector") {
+      if (usuario.tipoUsuario === "Lector" || usuario.tipoUsuario === "ADMIN") {
         if (!activa) return
         setLibroMasClickeado(null)
         return
@@ -189,12 +189,12 @@ export const PerfilUsuario = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:items-stretch">
         <div
-          className={`${esSoloLector ? "lg:col-span-8" : "lg:col-span-4 lg:h-full lg:flex lg:flex-col"} space-y-6 animate-in fade-in duration-300`}
+          className={`${esAdmin ? "lg:col-span-12" : (esSoloLector ? "lg:col-span-8" : "lg:col-span-4 lg:h-full lg:flex lg:flex-col")} space-y-6 animate-in fade-in duration-300`}
           style={{ animationDelay: "120ms" }}
         >
           <MisDatosCard usuario={usuario} />
 
-          {!esSoloLector && (
+          {(!esSoloLector && !esAdmin) && (
             <div
               className={`grid gap-4 lg:flex-1 lg:h-full ${esSoloPublicador ? "grid-cols-1" : "grid-cols-2"}`}
             >
@@ -237,7 +237,7 @@ export const PerfilUsuario = () => {
           </div>
         )}
 
-        {!esSoloLector && (
+        {(!esSoloLector && !esAdmin) && (
           <div
             className="lg:col-span-8 animate-in fade-in duration-300"
             style={{ animationDelay: "160ms" }}
@@ -252,7 +252,7 @@ export const PerfilUsuario = () => {
         )}
       </div>
 
-      {!esSoloLector && libroMasClickeado && (
+      {!esSoloLector && !esAdmin && libroMasClickeado && (
         <div
           className="animate-in fade-in duration-300"
           style={{ animationDelay: "180ms" }}
@@ -276,7 +276,7 @@ export const PerfilUsuario = () => {
         </div>
       )}
 
-      {!esSoloLector && (
+      {!esSoloLector && !esAdmin && (
         <div
           className="animate-in fade-in duration-300"
           style={{ animationDelay: "200ms" }}
