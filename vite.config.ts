@@ -23,10 +23,7 @@ export default defineConfig({
     port: 5173,
     strictPort: true, // Si el 5173 está ocupado, no arranca en otro puerto
     host: process.env.VITE_BACKEND_URL ? true : "localhost",
-    watch: {
-      usePolling: true,
-      interval: 500,
-    },
+
     proxy: {
       "/api": { target: backendUrl, changeOrigin: true },
       "/usuarios": { target: backendUrl, changeOrigin: true },

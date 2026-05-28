@@ -18,11 +18,16 @@ apiClient.interceptors.response.use(
     
     // Si la request falla con 401 y no es una request de refresh que ya fue reintentada
     if (error.response?.status === HttpStatusCodes.UNAUTHORIZED && !originalRequest._retry) {
+      // No intentar refrescar si el error 401 viene del login (credenciales incorrectas)
+      if (originalRequest.url?.includes('/login')) {
+        return Promise.reject(error)
+      }
+
       originalRequest._retry = true
       
       try {
         // Intentar refrescar la sesión
-        await axios.post(`${API_BASE_URL}/auth/refresh`, {}, { withCredentials: true })
+        await axios.post(`${API_BASE_URL}/refresh`, {}, { withCredentials: true })
         // Si fue exitoso, reintentar la request original
         return apiClient(originalRequest)
       } catch (refreshError) {
