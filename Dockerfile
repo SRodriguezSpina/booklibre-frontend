@@ -20,4 +20,4 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 EXPOSE 5173
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["pnpm", "run", "dev", "--host"]
+CMD ["pnpm", "run", "dev", "--host"]
