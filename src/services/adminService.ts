@@ -33,9 +33,23 @@ export const adminService = {
     },
 
     async obtenerLibrosColeccionables(): Promise<CantidadColeccionablesResponse> {
-    const res = await apiClient.get(
-        `/libros/coleccionables/count`
-    )
-    return res.data
-}
+        const res = await apiClient.get(
+            `/libros/coleccionables/count`
+        )
+        return res.data
+    },
+
+    async obtenerLibrosMejorCalificados(): Promise<any[]> {
+        const res = await apiClient.get(
+            `/libros/mejor-calificados`
+        )
+        return res.data
+    },
+
+    async obtenerLibrosConReservasActivas(minReservas: number = 3): Promise<any[]> {
+        const res = await apiClient.get(
+            `/libros/reservas-activas`, { params: { minReservas } }
+        )
+        return res.data
+    }
 }
