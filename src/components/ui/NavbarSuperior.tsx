@@ -52,13 +52,13 @@ export const NavbarSuperior = () => {
 
   const items: NavItemProps[] = [
     { text: "Inicio", to: "/home" },
-    ...(estaLogueado
+    ...(estaLogueado && !enPaginaAuth
       ? [
           { text: "Mis Préstamos", to: "/mis-prestamos" },
           { text: "Perfil", to: "/perfil" },
         ]
       : []),
-    ...(esAdmin ? [{ text: "Consultas", to: "/consultas" }] : []),
+    ...(esAdmin && estaLogueado && !enPaginaAuth ? [{ text: "Consultas", to: "/consultas" }] : []),
   ]
 
   const handleLogout = () => {
