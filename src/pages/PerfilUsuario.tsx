@@ -1,9 +1,6 @@
 import { useNavigate, useOutletContext } from "react-router-dom"
 import { libroService } from "../services/libroService"
-import type {
-  ClickLogDTO,
-  LibroMasClickeadoResponse,
-} from "../models/libroModel"
+import type { ClickLogDTO } from "../models/libroModel"
 import { useEffect, useMemo, useState } from "react"
 import type { ContextoPerfilUsuario } from "../layouts/PerfilUsuarioLayout"
 import { Usuario } from "../classes/usuario"
@@ -26,8 +23,6 @@ export const PerfilUsuario = () => {
   const [clicks, setClicks] = useState<ClickLogDTO[]>([])
   const [cargandoClicks, setCargandoClicks] = useState(false)
   const [errorClicks, setErrorClicks] = useState<string | null>(null)
-  const [libroMasClickeado, setLibroMasClickeado] =
-    useState<LibroMasClickeadoResponse | null>(null)
   const [modalEditarAbierto, setModalEditarAbierto] = useState(false)
 
   const clicksPorLibro = useMemo(() => {
@@ -36,6 +31,26 @@ export const PerfilUsuario = () => {
       mapa.set(click.libroId, (mapa.get(click.libroId) ?? 0) + 1)
     }
     return mapa
+  }, [clicks])
+
+  const libroMasClickeado = useMemo(() => {
+    if (clicks.length === 0) return null
+
+    const acumulado = new Map<
+      number,
+      { libroId: number; libroTitulo: string; total: number }
+    >()
+
+    for (const click of clicks) {
+      const actual = acumulado.get(click.libroId)
+      acumulado.set(click.libroId, {
+        libroId: click.libroId,
+        libroTitulo: click.libroTitulo,
+        total: (actual?.total ?? 0) + 1,
+      })
+    }
+
+    return [...acumulado.values()].sort((a, b) => b.total - a.total)[0] ?? null
   }, [clicks])
 
   const esSoloLector = usuario.tipoUsuario === "Lector"
@@ -108,42 +123,11 @@ export const PerfilUsuario = () => {
     }
   }, [usuario.id, usuario.tipoUsuario])
 
-  useEffect(() => {
-    let activa = true
-
-    const cargarLibroMasClickeado = async () => {
-      if (usuario.tipoUsuario === "Lector" || usuario.tipoUsuario === "ADMIN") {
-        if (!activa) return
-        setLibroMasClickeado(null)
-        return
-      }
-
-      try {
-        const response = await libroService.getLibroMasClickeado()
-        if (!activa) return
-        if ("id" in response) {
-          setLibroMasClickeado(response)
-        } else {
-          setLibroMasClickeado(null)
-        }
-      } catch {
-        if (!activa) return
-        setLibroMasClickeado(null)
-      }
-    }
-
-    void cargarLibroMasClickeado()
-
-    return () => {
-      activa = false
-    }
-  }, [usuario.id, usuario.tipoUsuario])
-
   const guardarDesdeModal = async (u: Usuario) => {
     try {
       const data = await usuarioService.actualizarUsuario(u)
       const imagenUrl =
-        data.imagenUrl !== undefined ? data.imagenUrl : u.imagenUrl
+        data.imagenUrl != null ? data.imagenUrl : u.imagenUrl
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { errors: _, ...uSinErrores } = u
       const nuevo = new Usuario({ ...uSinErrores, ...data, imagenUrl })
