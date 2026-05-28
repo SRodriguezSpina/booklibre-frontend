@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 import { PerfilUsuario } from '../../pages/PerfilUsuario'
 import { Usuario } from '../../classes/usuario'
 import { toast } from 'react-toastify'
@@ -9,6 +9,7 @@ const mockNavigate = vi.fn()
 const mockUseOutletContext = vi.fn()
 const mockObtenerLibrosUsuarioPerfil = vi.fn()
 const mockActualizarUsuario = vi.fn()
+const mockObtenerClicksDePublicador = vi.fn()
 const mockSetUsuarioContext = vi.fn()
 
 vi.mock('react-router-dom', async () => {
@@ -30,6 +31,7 @@ vi.mock('../../services/libroService', () => ({
 vi.mock('../../services/usuarioService', () => ({
   usuarioService: {
     actualizarUsuario: (...args: unknown[]) => mockActualizarUsuario(...args),
+    obtenerClicksDePublicador: (...args: unknown[]) => mockObtenerClicksDePublicador(...args),
   },
 }))
 
@@ -115,6 +117,7 @@ describe('PerfilUsuario', () => {
       setUsuario: mockSetUsuario,
     })
     mockObtenerLibrosUsuarioPerfil.mockResolvedValue({ content: [], totalElements: 0, totalPages: 0 })
+    mockObtenerClicksDePublicador.mockResolvedValue([])
   })
 
   it('actualiza usuario desde modal y conserva imagen local si backend no la devuelve', async () => {
@@ -143,6 +146,33 @@ describe('PerfilUsuario', () => {
       const usuarioContexto = mockSetUsuarioContext.mock.calls[0][0] as Usuario
       expect(usuarioContexto.imagenUrl).toBe('img-local')
       expect(toast.success).toHaveBeenCalledWith('¡Perfil actualizado con éxito!')
+    })
+  })
+
+  it('actualiza usuario desde modal y conserva imagen local si backend devuelve imagen nula', async () => {
+    mockActualizarUsuario.mockResolvedValueOnce({
+      nombre: 'Ana 2',
+      desc: 'desc',
+      email: 'ana@mail.com',
+      celular: '123',
+      ciudad: 'CABA',
+      tipoUsuario: 'Lector',
+      bibliokarmas: 10,
+      imagenUrl: null,
+    })
+
+    render(<PerfilUsuario />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir modal' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar mock' }))
+
+    await waitFor(() => {
+      expect(mockSetUsuario).toHaveBeenCalledTimes(1)
+      expect(mockSetUsuarioContext).toHaveBeenCalledTimes(1)
+      const usuarioSeteado = mockSetUsuario.mock.calls[0][0] as Usuario
+      expect(usuarioSeteado.imagenUrl).toBe('img-local')
+      const usuarioContexto = mockSetUsuarioContext.mock.calls[0][0] as Usuario
+      expect(usuarioContexto.imagenUrl).toBe('img-local')
     })
   })
 
@@ -177,5 +207,37 @@ describe('PerfilUsuario', () => {
     await waitFor(() => {
       expect(mockObtenerLibrosUsuarioPerfil).toHaveBeenCalled()
     })
+  })
+
+  it('muestra el banner con el libro mas clickeado del publicador', async () => {
+    mockUseOutletContext.mockReturnValue({
+      usuario: new Usuario({
+        id: 1,
+        nombre: 'Ana',
+        desc: 'desc',
+        email: 'ana@mail.com',
+        celular: '123',
+        ciudad: 'CABA',
+        tipoUsuario: 'Publicador',
+        bibliokarmas: 10,
+        imagenUrl: 'img-original',
+      }),
+      setUsuario: mockSetUsuario,
+    })
+
+    mockObtenerClicksDePublicador.mockResolvedValueOnce([
+      { libroId: 10, libroTitulo: 'Dune', nombreUsuario: 'u1@mail.com', fechaHora: '2026-05-28T10:00:00' },
+      { libroId: 10, libroTitulo: 'Dune', nombreUsuario: 'u2@mail.com', fechaHora: '2026-05-28T10:05:00' },
+      { libroId: 11, libroTitulo: '1984', nombreUsuario: 'u3@mail.com', fechaHora: '2026-05-28T10:10:00' },
+    ])
+
+    render(<PerfilUsuario />)
+
+    const bannerHeading = await screen.findByText('Tu libro más clickeado')
+    const banner = bannerHeading.parentElement
+
+    expect(banner).not.toBeNull()
+    expect(within(banner as HTMLElement).getByText('Dune')).toBeInTheDocument()
+    expect(within(banner as HTMLElement).getByText('(2 visitas)')).toBeInTheDocument()
   })
 })

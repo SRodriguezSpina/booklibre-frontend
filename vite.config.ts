@@ -22,7 +22,7 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true, // Si el 5173 está ocupado, no arranca en otro puerto
-    host: process.env.VITE_BACKEND_URL ? true : "localhost",
+    host: true, // Escucha en 0.0.0.0 para que Docker pueda exponer el puerto
 
     proxy: {
       "/api": { target: backendUrl, changeOrigin: true },

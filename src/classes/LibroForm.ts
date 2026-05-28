@@ -88,13 +88,23 @@ export class LibroForm {
 
   validate(): Record<string, string | undefined> {
     const errors: Record<string, string | undefined> = {
-      titulo: !this.titulo.trim() ? "El título es obligatorio" : undefined,
-      autor: !this.autor.trim() ? "El autor es obligatorio" : undefined,
-      descripcion: !this.descripcion.trim() ? "La descripción es obligatoria" : undefined,
+      titulo: !this.titulo.trim()
+        ? "El título es obligatorio"
+        : this.titulo.length > 200 ? "El título no puede superar los 200 caracteres" : undefined,
+      autor: !this.autor.trim()
+        ? "El autor es obligatorio"
+        : this.autor.length > 150 ? "El autor no puede superar los 150 caracteres" : undefined,
+      descripcion: !this.descripcion.trim()
+        ? "La descripción es obligatoria"
+        : this.descripcion.length > 2000 ? "La descripción no puede superar los 2000 caracteres" : undefined,
+      editorial: !this.editorial.trim()
+        ? "La editorial es obligatoria"
+        : this.editorial.length > 150 ? "La editorial no puede superar los 150 caracteres" : undefined,
       tipo: !this.tipo ? "El tipo es obligatorio" : undefined,
       genero: !this.genero ? "El género es obligatorio" : undefined,
       paginas: this.paginas === "" || Number(this.paginas) <= 0
-        ? "Ingresá una cantidad de páginas válida" : undefined,
+        ? "Ingresá una cantidad de páginas válida"
+        : Number(this.paginas) > 9999 ? "La cantidad de páginas no puede superar 9999" : undefined,
       isbn: (() => {
         const isbnStr = this.isbn.trim()
         if (isbnStr.length !== 13) return "El ISBN debe tener exactamente 13 dígitos"
