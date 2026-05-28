@@ -15,6 +15,13 @@ export type Idioma = "ESPANOL" | "INGLES" | "FRANCES" | "PORTUGUES"
 export type TipoLibro = "Comun" | "ConDedicatoria" | "Coleccionable"
 export type TipoPrestamo = "prestados-a-mi" | "prestados-por-mi"
 
+export type PagedResponse<T> = {
+  content: T[]
+  page: number
+  totalPages: number
+  totalElements: number
+}
+
 export type RangoReservaDTO = {
   fechaDesde: string
   fechaHasta: string
