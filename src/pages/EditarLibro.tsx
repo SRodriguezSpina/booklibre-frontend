@@ -15,7 +15,7 @@ import {
 } from "../utils/libroFormMapper"
 import { formatLibroInputDate, parseLibroInputDate } from "../utils/libroDate"
 
-const MAX_FOTO_BYTES = 800_000
+const MAX_FOTO_BYTES = 200_000
 
 async function archivoADataUrl(file: File): Promise<string> {
   if (file.size > MAX_FOTO_BYTES) {
@@ -128,11 +128,21 @@ export const EditarLibro = () => {
           instance.toDTO(0),
           Number(values.propietarioId),
         )
+        toast.success("¡Libro creado exitosamente!")
       } else {
         await libroService.actualizarLibro(instance.toDTO(Number(id)), Number(values.propietarioId))
+        toast.success("¡Libro editado exitosamente!")
       }
       navigate("/home", { replace: true })
-    } catch {
+    } catch (err: unknown) {
+      if (err !== null && typeof err === 'object' && 'isAxiosError' in err) {
+        const axiosErr = err as any
+        if (axiosErr.response?.data?.message) {
+          setServerError(axiosErr.response.data.message)
+          toast.error("Hubo errores de validación", { toastId: "val-err" })
+          return
+        }
+      }
       setServerError("No se pudo guardar el libro. Intentá de nuevo.")
     } finally {
       setIsSubmitting(false)
@@ -197,7 +207,15 @@ export const EditarLibro = () => {
               label={field.label}
               type={field.type}
               placeholder={field.placeholder}
-              maxLength={field.name === "isbn" ? 13 : undefined}
+              maxLength={
+                field.name === "isbn" ? 13 :
+                field.name === "descripcion" ? 2000 :
+                field.name === "titulo" ? 200 :
+                field.name === "autor" ? 150 :
+                field.name === "editorial" ? 150 :
+                undefined
+              }
+              showCharCount={field.name === "descripcion"}
               value={values[field.name] ?? ""}
               error={errors[field.name]}
               onChange={(v) => handleChange(field.name, v)}
@@ -367,6 +385,7 @@ interface FieldProps {
   type?: string
   placeholder?: string
   maxLength?: number
+  showCharCount?: boolean
   value: string
   error?: string
   disabled?: boolean
@@ -378,6 +397,7 @@ const Field = ({
   type = "text",
   placeholder,
   maxLength,
+  showCharCount = false,
   value,
   error,
   disabled,
@@ -387,18 +407,39 @@ const Field = ({
     <label className="text-xs font-bold text-secondary-light uppercase tracking-wider">
       {label} <span className="text-primary">*</span>
     </label>
-    <input
-      type={type}
-      value={value}
-      placeholder={placeholder}
-      maxLength={maxLength}
-      disabled={disabled}
-      onChange={(e) => onChange(e.target.value)}
-      className={`w-full px-4 py-2.5 rounded-lg border bg-background text-secondary-dark text-sm placeholder:text-secondary-light outline-none transition-colors focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed ${
-        error ? "border-red-400" : "border-accent"
-      }`}
-    />
-    {error && <p className="text-xs text-red-500">{error}</p>}
+    {showCharCount ? (
+      <textarea
+        value={value}
+        placeholder={placeholder}
+        maxLength={maxLength}
+        disabled={disabled}
+        rows={4}
+        onChange={(e) => onChange(e.target.value)}
+        className={`w-full px-4 py-2.5 rounded-lg border bg-background text-secondary-dark text-sm placeholder:text-secondary-light outline-none transition-colors focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed resize-none ${
+          error ? "border-red-400" : "border-accent"
+        }`}
+      />
+    ) : (
+      <input
+        type={type}
+        value={value}
+        placeholder={placeholder}
+        maxLength={maxLength}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.value)}
+        className={`w-full px-4 py-2.5 rounded-lg border bg-background text-secondary-dark text-sm placeholder:text-secondary-light outline-none transition-colors focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed ${
+          error ? "border-red-400" : "border-accent"
+        }`}
+      />
+    )}
+    <div className="flex justify-between items-center">
+      {error ? <p className="text-xs text-red-500">{error}</p> : <span />}
+      {showCharCount && maxLength && (
+        <p className={`text-xs ${value.length >= maxLength ? "text-red-500 font-semibold" : "text-secondary/40"}`}>
+          {value.length}/{maxLength}
+        </p>
+      )}
+    </div>
   </div>
 )
 

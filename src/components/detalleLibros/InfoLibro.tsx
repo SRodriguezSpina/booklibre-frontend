@@ -48,7 +48,7 @@ export const InfoLibro = ({ libro, karmaCalculado, mostrarKarma = true }: InfoLi
       {/* Sinopsis */}
       <div>
         <h3 className="font-bold text-lg mb-2 text-on-surface">Sinopsis</h3>
-        <p className="text-on-surface-variant/80 leading-relaxed text-sm">
+        <p className="text-on-surface-variant/80 leading-relaxed text-sm break-words overflow-wrap-anywhere">
           {libro.descripcion}
         </p>
       </div>

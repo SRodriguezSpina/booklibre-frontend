@@ -21,6 +21,7 @@ function libroFormValido(): LibroForm {
   form.estado = "EXCELENTE"
   form.fechaPublicacion = new Date("2008-08-01")
   form.propietarioId = 1
+  form.editorial = "Prentice Hall"
   return form
 }
 
@@ -40,6 +41,7 @@ function libroBase(): Libro {
     propietarioId: 5,
     imagenUrl: "https://example.com/cover.jpg",
     rating: 4,
+    editorial: "Addison-Wesley",
   })
 }
 
