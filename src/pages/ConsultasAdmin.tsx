@@ -26,6 +26,10 @@ export const ConsultasAdmin = () => {
     const [librosCumplidas, setLibrosCumplidas] = useState<any[]>([])
     const [loadingCumplidas, setLoadingCumplidas] = useState(false)
     const [errorCumplidas, setErrorCumplidas] = useState("")
+    //
+    const [librosMejores, setLibrosMejores] = useState<any[]>([])
+    const [loadingMejores, setLoadingMejores] = useState(false)
+    const [errorMejores, setErrorMejores] = useState("")
 
     const consultarUsuariosConDevoluciones = async () => {
         try {
@@ -109,6 +113,20 @@ export const ConsultasAdmin = () => {
             setErrorCumplidas("No se pudo realizar la consulta")
         } finally {
             setLoadingCumplidas(false)
+        }
+    }
+
+    const consultarLibrosMejores = async () => {
+        try {
+            setLoadingMejores(true)
+            setErrorMejores("")
+
+            const data = await adminService.obtenerLibrosMejorCalificados()
+            setLibrosMejores(data)
+        } catch {
+            setErrorMejores("No se pudo realizar la consulta")
+        } finally {
+            setLoadingMejores(false)
         }
     }
 
@@ -242,6 +260,30 @@ export const ConsultasAdmin = () => {
                         <span className="text-sm text-on-surface-variant">
                             {libro.autor}
                         </span>
+                    </div>
+                )}
+            />
+
+            <ConsultaCard
+                titulo="Libros Destacados"
+                descripcion="Saber qué libros tienen más de 4 puntos de calificación."
+                loading={loadingMejores}
+                error={errorMejores}
+                onConsultar={consultarLibrosMejores}
+                resultados={librosMejores}
+                renderResultado={(libro) => (
+                    <div className="flex justify-between items-center gap-4">
+                        <div className="flex flex-col gap-1">
+                            <span className="font-semibold">
+                                {libro.titulo}
+                            </span>
+                            <span className="text-sm text-on-surface-variant">
+                                {libro.autor}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-1 text-yellow-400 font-bold bg-yellow-400/10 px-3 py-1 rounded-full border border-yellow-400/20">
+                            ⭐ {libro.rating?.toFixed(1) || "5.0"}
+                        </div>
                     </div>
                 )}
             />
