@@ -4,21 +4,27 @@ import type {
   LibroDTO,
   LibroMasClickeadoResponse,
   LibroUsuarioItemDTO,
+  PagedResponse,
   PrestamoDTO,
   TipoPrestamo,
 } from "../models/libroModel"
 import { apiClient } from "./apiClient"
 
 export const libroService = {
-  async obtenerTodosLosPrestamos(usuarioId: number, tipo: TipoPrestamo,): Promise<Libro[]> {
+  async obtenerTodosLosPrestamos(
+    usuarioId: number,
+    tipo: TipoPrestamo,
+    page: number = 0,
+    size: number = 10,
+  ): Promise<PagedResponse<Libro>> {
     const tipoReserva = tipo === "prestados-a-mi" ? "HECHAS" : "RECIBIDAS"
-    const res = await apiClient.get<PrestamoDTO[]>(`/reservas`, {
-      params: {
-        usuarioId,
-        tipo: tipoReserva,
-      },
+    const res = await apiClient.get<PagedResponse<PrestamoDTO>>(`/reservas`, {
+      params: { usuarioId, tipo: tipoReserva, page, size },
     })
-    return res.data.map(Libro.fromPrestamoJson)
+    return {
+      ...res.data,
+      content: res.data.content.map(Libro.fromPrestamoJson),
+    }
   },
 
   filtrarPrestamos(
@@ -120,10 +126,11 @@ export const libroService = {
     tipo: TipoPrestamo,
     query: string = "",
   ): Promise<Libro[]> {
-    const todosLosLibros = await this.obtenerTodosLosPrestamos(usuarioId, tipo)
-    if (!query) return todosLosLibros
+    const respuestaPaginada = await this.obtenerTodosLosPrestamos(usuarioId, tipo)
+    const todos = respuestaPaginada.content
+    if (!query) return todos
     const q = query.toLowerCase()
-    return todosLosLibros.filter(
+    return todos.filter(
       (libro) =>
         libro.titulo.toLowerCase().includes(q) ||
         libro.autor.toLowerCase().includes(q),

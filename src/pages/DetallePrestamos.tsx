@@ -20,6 +20,7 @@ export const DetallePrestamos = () => {
   const navigate = useNavigate()
   const [animating, setAnimating] = useState(false)
   const [todosLosLibros, setTodosLosLibros] = useState<Libro[]>([])
+  const [totalPaginasServidor, setTotalPaginasServidor] = useState(1)
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<ErrorPersonalizado | null>(null)
   const [activeTab, setActiveTab] = useState<TipoPrestamo>("prestados-a-mi")
@@ -33,13 +34,19 @@ export const DetallePrestamos = () => {
   const tipo = (tipoUsuario ?? "").toUpperCase().replace(/\s+/g, "_")
   const puedeReservar = tipo === "LECTOR" || tipo === "LECTORPUBLICADOR"
   const puedePublicar = tipo === "PUBLICADOR" || tipo === "LECTORPUBLICADOR"
-  const itemsPerPage = 5
+  const PAGE_SIZE = 8
   const pestañas = [
     ...(puedeReservar ? [{ id: "prestados-a-mi", etiqueta: "Prestados a mí" }] : []),
     ...(puedePublicar ? [{ id: "prestados-por-mi", etiqueta: "Prestados por mí" }] : []),
   ]
 
-  const fetchTodosLosPrestamos = async (tipo: TipoPrestamo = activeTab) => {
+  // When a search query is active we fetch the entire dataset so client-side
+  // filtering works across all results. Without a query, we paginate server-side.
+  const fetchTodosLosPrestamos = async (
+    tipo: TipoPrestamo = activeTab,
+    page: number = 0,
+    query: string = searchQuery,
+  ) => {
     if (!usuarioId) {
       setError({ estado: 401, mensaje: "No estás logueado. Por favor iniciá sesión para ver tus préstamos." })
       return
@@ -47,8 +54,11 @@ export const DetallePrestamos = () => {
     setLoading(true)
     setError(null)
     try {
-      const data = await libroService.obtenerTodosLosPrestamos(usuarioId, tipo)
-      setTodosLosLibros(data)
+      const fetchPage = query ? 0 : page
+      const fetchSize = query ? 9999 : PAGE_SIZE
+      const respuestaPaginada = await libroService.obtenerTodosLosPrestamos(usuarioId, tipo, fetchPage, fetchSize)
+      setTodosLosLibros(respuestaPaginada.content)
+      if (!query) setTotalPaginasServidor(respuestaPaginada.totalPages)
     } catch (e: unknown) {
       setError(obtenerMensajeError(e))
     } finally {
@@ -88,6 +98,7 @@ export const DetallePrestamos = () => {
       setCurrentPage(1)
       setAnimating(false)
     }, 150)
+    fetchTodosLosPrestamos(activeTab, 0, query)
   }
 
   const handlePageChange = (page: number) => {
@@ -96,6 +107,8 @@ export const DetallePrestamos = () => {
       setCurrentPage(page)
       setAnimating(false)
     }, 150)
+    // When no search is active, fetch the new page from the server
+    if (!searchQuery) fetchTodosLosPrestamos(activeTab, page - 1, "")
   }
 
   const handleTabChange = (id: string) => {
@@ -109,11 +122,14 @@ export const DetallePrestamos = () => {
     fetchTodosLosPrestamos(nuevoTipo)
   }
 
-  const totalPages = Math.max(1, Math.ceil(librosFiltrados.length / itemsPerPage))
-  const librosAMostrar = librosFiltrados.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  )
+  // When searching: paginate the filtered results client-side.
+  // When browsing: the server already sent us exactly one page.
+  const totalPages = searchQuery
+    ? Math.max(1, Math.ceil(librosFiltrados.length / PAGE_SIZE))
+    : totalPaginasServidor
+  const librosAMostrar = searchQuery
+    ? librosFiltrados.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+    : librosFiltrados
 
   if (error) {
     const es401 = error.estado === 401
