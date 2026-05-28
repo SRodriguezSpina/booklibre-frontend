@@ -322,7 +322,7 @@ describe("libroService - getLibroById", () => {
 
     await libroService.getLibroById(1)
 
-    expect(mockedApiClient.get).toHaveBeenCalledWith("/libros/1", { params: undefined })
+    expect(mockedApiClient.get).toHaveBeenCalledWith("/libros/1")
   })
 
   it("devuelve una instancia de Libro", async () => {
