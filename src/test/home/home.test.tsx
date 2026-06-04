@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { Home } from '../../pages/Home'
 import { homeService } from '../../services/homeService'
 import { authService } from '../../services/AuthService'
+import { adminService } from '../../services/adminService'
 
 vi.mock('../../services/homeService', () => ({
     homeService: {
@@ -14,12 +15,20 @@ vi.mock('../../services/homeService', () => ({
 
 vi.mock('../../services/AuthService', () => ({
     authService: {
-        obtenerIdUsuarioActual: vi.fn()
+        obtenerIdUsuarioActual: vi.fn(),
+        obtenerTipoUsuarioActual: vi.fn(),
+    }
+}))
+
+vi.mock('../../services/adminService', () => ({
+    adminService: {
+        obtenerResumenKpisHome: vi.fn(),
     }
 }))
 
 const mockedHomeService = vi.mocked(homeService)
 const mockedAuthService = vi.mocked(authService)
+const mockedAdminService = vi.mocked(adminService)
 
 const librosMock = [
     {
@@ -44,6 +53,13 @@ const responseMock = (libros = librosMock) => ({
     totalPages: 1,
 })
 
+const emptyAdminKpiSummary = {
+    conversionPromedio: 0,
+    libroMasClickeado: null,
+    mejorTipoCalificado: null,
+    tiposEvaluados: 0,
+}
+
 const renderHome = () =>
     render(
         <MemoryRouter>
@@ -55,6 +71,8 @@ describe('Home', () => {
     beforeEach(() => {
         vi.clearAllMocks()
         mockedAuthService.obtenerIdUsuarioActual.mockReturnValue(null)
+        mockedAuthService.obtenerTipoUsuarioActual.mockReturnValue('Lector')
+        mockedAdminService.obtenerResumenKpisHome.mockResolvedValue(emptyAdminKpiSummary)
         vi.useFakeTimers()
     })
 
@@ -114,6 +132,44 @@ describe('Home', () => {
         })
 
         expect(mockedHomeService.getPopulares).toHaveBeenCalledTimes(1)
+    })
+
+    it('no carga ni muestra KPIs de admin para usuarios no administradores', async () => {
+        mockedHomeService.getPopulares.mockResolvedValueOnce(responseMock())
+        renderHome()
+
+        await act(async () => {
+            await vi.runAllTimersAsync()
+        })
+
+        expect(mockedAdminService.obtenerResumenKpisHome).not.toHaveBeenCalled()
+        expect(screen.queryByTestId('admin-kpi-header')).not.toBeInTheDocument()
+    })
+
+    it('carga y muestra los KPIs de admin para usuarios administradores', async () => {
+        mockedAuthService.obtenerTipoUsuarioActual.mockReturnValue('ADMIN')
+        mockedHomeService.getPopulares.mockResolvedValueOnce(responseMock())
+        mockedAdminService.obtenerResumenKpisHome.mockResolvedValueOnce({
+            conversionPromedio: 0.25,
+            libroMasClickeado: { titulo: 'Rayuela', clicks: 20 },
+            mejorTipoCalificado: {
+                tipoLibro: 'Coleccionable',
+                promedioCalificacion: 4.8,
+            },
+            tiposEvaluados: 2,
+        })
+
+        renderHome()
+
+        await act(async () => {
+            await vi.runAllTimersAsync()
+        })
+
+        expect(mockedAdminService.obtenerResumenKpisHome).toHaveBeenCalledTimes(1)
+        expect(screen.getByTestId('admin-kpi-header')).toBeInTheDocument()
+        expect(screen.getByText('25.0%')).toBeInTheDocument()
+        expect(screen.getByText('Rayuela')).toBeInTheDocument()
+        expect(screen.getByText('Coleccionable')).toBeInTheDocument()
     })
 
     it('llama al service de search con el nuevo sort al cambiar el SortBy', async () => {
