@@ -150,3 +150,11 @@ export type LibroMasClickeadoResponse = {
 export type CantidadColeccionablesResponse = {
     cantidad: number
 }
+
+export type TasaConversionLibroResponse = {
+  libroId: number
+  titulo: string
+  clicks: number
+  reservas: number
+  tasaConversion: number
+}

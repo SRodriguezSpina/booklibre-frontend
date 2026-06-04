@@ -1,4 +1,4 @@
-import type { CantidadColeccionablesResponse } from "../models/libroModel"
+import type { CantidadColeccionablesResponse, TasaConversionLibroResponse } from "../models/libroModel"
 import type { ReservaAnualUsuarioResponse, UsuarioReservasDevueltasResponse } from "../models/usuarioModel"
 import { apiClient } from "./apiClient"
 
@@ -51,5 +51,21 @@ export const adminService = {
             `/libros/reservas-activas`, { params: { minReservas } }
         )
         return res.data
+    },
+
+    async obtenerTasaConversion(): Promise<TasaConversionLibroResponse[]> {
+        const query = `
+            query {
+                tasaConversion {
+                    libroId
+                    titulo
+                    clicks
+                    reservas
+                    tasaConversion
+                }
+            }
+        `
+        const res = await apiClient.post('/graphql', { query })
+        return res.data.data.tasaConversion
     }
 }
