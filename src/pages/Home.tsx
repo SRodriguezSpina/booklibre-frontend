@@ -43,8 +43,8 @@ export const Home = () => {
 
       if (isInitialLoad) {
         const data = await homeService.getPopulares(userId)
-        setBooks(data)
-        setTotalPaginas(1)
+        setBooks(data.content)
+        setTotalPaginas(data.totalPages)
       } else {
         const data = await homeService.search(q, f, page, ITEMS_POR_PAGINA, userId, sort)
         setBooks(data.content)

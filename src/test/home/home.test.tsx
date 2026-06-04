@@ -72,7 +72,7 @@ describe('Home', () => {
     })
 
     it('muestra los libros cuando la respuesta es exitosa', async () => {
-        mockedHomeService.getPopulares.mockResolvedValueOnce(librosMock)
+        mockedHomeService.getPopulares.mockResolvedValueOnce(responseMock())
         renderHome()
 
         await act(async () => {
@@ -84,7 +84,7 @@ describe('Home', () => {
     })
 
     it('muestra el estado vacío cuando no hay libros', async () => {
-        mockedHomeService.getPopulares.mockResolvedValueOnce([])
+        mockedHomeService.getPopulares.mockResolvedValueOnce(responseMock([]))
         renderHome()
 
         await act(async () => {
@@ -106,7 +106,7 @@ describe('Home', () => {
     })
 
     it('llama al service de populares al montar el componente', async () => {
-        mockedHomeService.getPopulares.mockResolvedValueOnce(librosMock)
+        mockedHomeService.getPopulares.mockResolvedValueOnce(responseMock())
         renderHome()
 
         await act(async () => {
@@ -117,7 +117,7 @@ describe('Home', () => {
     })
 
     it('llama al service de search con el nuevo sort al cambiar el SortBy', async () => {
-        mockedHomeService.getPopulares.mockResolvedValueOnce(librosMock)
+        mockedHomeService.getPopulares.mockResolvedValueOnce(responseMock())
         mockedHomeService.search.mockResolvedValueOnce(responseMock())
 
         renderHome()

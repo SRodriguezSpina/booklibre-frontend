@@ -48,8 +48,8 @@ class HomeService {
         return response.data
     }
 
-    async getPopulares(usuarioId: number | null): Promise<LibroHome[]> {
-        const response = await apiClient.get<LibroHome[]>(`/libros/populares`, {
+    async getPopulares(usuarioId: number | null): Promise<SearchResponse> {
+        const response = await apiClient.get<SearchResponse>(`/libros/populares`, {
             params: {
                 ...(usuarioId !== null && {usuarioId})
             }
