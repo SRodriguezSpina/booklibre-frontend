@@ -1,14 +1,14 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest' // <-- Agregamos afterEach
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { Home } from '../../pages/Home'
 import { homeService } from '../../services/homeService'
 import { authService } from '../../services/AuthService'
 
-
 vi.mock('../../services/homeService', () => ({
     homeService: {
-        search: vi.fn()
+        search: vi.fn(),
+        getPopulares: vi.fn(),
     }
 }))
 
@@ -55,11 +55,10 @@ describe('Home', () => {
     beforeEach(() => {
         vi.clearAllMocks()
         mockedAuthService.obtenerIdUsuarioActual.mockReturnValue(null)
-        vi.useFakeTimers()  // ← activar fake timers
+        vi.useFakeTimers()
     })
 
     afterEach(async () => {
-        // Drena timers pendientes ANTES de que el entorno se destruya
         await act(async () => {
             vi.runAllTimers()
         })
@@ -67,17 +66,17 @@ describe('Home', () => {
     })
 
     it('muestra el spinner mientras carga', () => {
-        mockedHomeService.search.mockReturnValue(new Promise(() => {}))
+        mockedHomeService.getPopulares.mockReturnValue(new Promise(() => {}))
         renderHome()
         expect(screen.getByTestId('spinner')).toBeInTheDocument()
     })
 
     it('muestra los libros cuando la respuesta es exitosa', async () => {
-        mockedHomeService.search.mockResolvedValueOnce(responseMock())
+        mockedHomeService.getPopulares.mockResolvedValueOnce(librosMock)
         renderHome()
 
         await act(async () => {
-            await vi.runAllTimersAsync()  // resuelve promesas Y setTimeout
+            await vi.runAllTimersAsync()
         })
 
         expect(screen.getByTestId('libros-grid')).toBeInTheDocument()
@@ -85,7 +84,7 @@ describe('Home', () => {
     })
 
     it('muestra el estado vacío cuando no hay libros', async () => {
-        mockedHomeService.search.mockResolvedValueOnce(responseMock([]))
+        mockedHomeService.getPopulares.mockResolvedValueOnce([])
         renderHome()
 
         await act(async () => {
@@ -96,7 +95,7 @@ describe('Home', () => {
     })
 
     it('muestra el ErrorCard cuando el service falla', async () => {
-        mockedHomeService.search.mockRejectedValueOnce(new Error('Network Error'))
+        mockedHomeService.getPopulares.mockRejectedValueOnce(new Error('Network Error'))
         renderHome()
 
         await act(async () => {
@@ -106,21 +105,20 @@ describe('Home', () => {
         expect(screen.getByTestId('error-card')).toBeInTheDocument()
     })
 
-    it('llama al service al montar el componente', async () => {
-        mockedHomeService.search.mockResolvedValueOnce(responseMock())
+    it('llama al service de populares al montar el componente', async () => {
+        mockedHomeService.getPopulares.mockResolvedValueOnce(librosMock)
         renderHome()
 
         await act(async () => {
             await vi.runAllTimersAsync()
         })
 
-        expect(mockedHomeService.search).toHaveBeenCalledTimes(1)
+        expect(mockedHomeService.getPopulares).toHaveBeenCalledTimes(1)
     })
 
-    it('llama al service con el nuevo sort al cambiar el SortBy', async () => {
-        mockedHomeService.search
-            .mockResolvedValueOnce(responseMock())
-            .mockResolvedValueOnce(responseMock())
+    it('llama al service de search con el nuevo sort al cambiar el SortBy', async () => {
+        mockedHomeService.getPopulares.mockResolvedValueOnce(librosMock)
+        mockedHomeService.search.mockResolvedValueOnce(responseMock())
 
         renderHome()
 
@@ -138,7 +136,7 @@ describe('Home', () => {
             await vi.runAllTimersAsync()
         })
 
-        expect(mockedHomeService.search).toHaveBeenCalledTimes(2)
+        expect(mockedHomeService.search).toHaveBeenCalledTimes(1)
         expect(mockedHomeService.search).toHaveBeenLastCalledWith(
             '', expect.anything(), 0, 10, null, 'autor'
         )

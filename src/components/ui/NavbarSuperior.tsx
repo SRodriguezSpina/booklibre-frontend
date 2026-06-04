@@ -5,7 +5,6 @@ import { authService } from "../../services/AuthService"
 import { useState } from "react"
 import { Avatar } from "./Avatar"
 import { useAuthContext } from "../../utils/hooks"
-import { obtenerRolesDesdeToken } from "../../utils/jwt"
 import { useTheme } from "../../context/ThemeContext"
 
 interface NavItemProps {
