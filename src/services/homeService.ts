@@ -47,6 +47,15 @@ class HomeService {
         })
         return response.data
     }
+
+    async getPopulares(usuarioId: number | null): Promise<SearchResponse> {
+        const response = await apiClient.get<SearchResponse>(`/libros/populares`, {
+            params: {
+                ...(usuarioId !== null && {usuarioId})
+            }
+        })
+        return response.data
+    }
 }
 
 export const homeService = new HomeService()

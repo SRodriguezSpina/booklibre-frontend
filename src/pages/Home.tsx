@@ -36,9 +36,20 @@ export const Home = () => {
     setLoading(true)
     setError(null)
     try {
-      const data = await homeService.search(q, f, page, ITEMS_POR_PAGINA, userId, sort)
-      setBooks(data.content)
-      setTotalPaginas(data.totalPages)
+      const hasFilters = Object.values(f).some(
+        (v) => v !== false && v !== undefined && v !== "" && v !== 0
+      )
+      const isInitialLoad = q === "" && !hasFilters && page === 0 && sort === "titulo"
+
+      if (isInitialLoad) {
+        const data = await homeService.getPopulares(userId)
+        setBooks(data.content)
+        setTotalPaginas(data.totalPages)
+      } else {
+        const data = await homeService.search(q, f, page, ITEMS_POR_PAGINA, userId, sort)
+        setBooks(data.content)
+        setTotalPaginas(data.totalPages)
+      }
     } catch (e: unknown) {
       setError(obtenerMensajeError(e))
     } finally {
