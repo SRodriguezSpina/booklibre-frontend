@@ -1,7 +1,7 @@
 import { adminService } from "../services/adminService"
 import { ConsultaCard } from "../components/ui/ConsultaCard"
 import type { UsuarioReservasDevueltasResponse, ReservaAnualUsuarioResponse } from "../models/usuarioModel"
-import type { CantidadColeccionablesResponse } from "../models/libroModel"
+import type { CantidadColeccionablesResponse, TasaConversionLibroResponse } from "../models/libroModel"
 import { useState } from "react"
 
 export const ConsultasAdmin = () => {
@@ -34,6 +34,10 @@ export const ConsultasAdmin = () => {
     const [librosReservasActivas, setLibrosReservasActivas] = useState<any[]>([])
     const [loadingReservasActivas, setLoadingReservasActivas] = useState(false)
     const [errorReservasActivas, setErrorReservasActivas] = useState("")
+    //
+    const [tasaConversion, setTasaConversion] = useState<TasaConversionLibroResponse[]>([])
+    const [loadingTasaConversion, setLoadingTasaConversion] = useState(false)
+    const [errorTasaConversion, setErrorTasaConversion] = useState("")
 
     const consultarUsuariosConDevoluciones = async () => {
         try {
@@ -145,6 +149,20 @@ export const ConsultasAdmin = () => {
             setErrorReservasActivas("No se pudo realizar la consulta")
         } finally {
             setLoadingReservasActivas(false)
+        }
+    }
+
+    const consultarTasaConversion = async () => {
+        try {
+            setLoadingTasaConversion(true)
+            setErrorTasaConversion("")
+
+            const data = await adminService.obtenerTasaConversion()
+            setTasaConversion(data)
+        } catch {
+            setErrorTasaConversion("No se pudo realizar la consulta")
+        } finally {
+            setLoadingTasaConversion(false)
         }
     }
 
@@ -322,6 +340,30 @@ export const ConsultasAdmin = () => {
                             <span className="text-sm text-on-surface-variant">
                                 {libro.autor}
                             </span>
+                        </div>
+                    </div>
+                )}
+            />
+
+            <ConsultaCard<TasaConversionLibroResponse>
+                titulo="Tasa de Conversión (Clicks vs. Reservas) [GraphQL]"
+                descripcion="Muestra el top 5 de libros más clickeados en Redis y su tasa de conversión basada en reservas en PostgreSQL."
+                loading={loadingTasaConversion}
+                error={errorTasaConversion}
+                onConsultar={consultarTasaConversion}
+                resultados={tasaConversion}
+                mensajeVacio="No hay libros clickeados"
+                renderResultado={(res) => (
+                    <div className="flex flex-col gap-1 w-full">
+                        <div className="flex justify-between items-center w-full">
+                            <span className="font-semibold">{res.titulo}</span>
+                            <span className="text-sm font-bold text-accent">
+                                {(res.tasaConversion * 100).toFixed(1)}% tasa
+                            </span>
+                        </div>
+                        <div className="flex gap-4 text-xs text-on-surface-variant">
+                            <span>Clicks: {res.clicks}</span>
+                            <span>Reservas: {res.reservas}</span>
                         </div>
                     </div>
                 )}

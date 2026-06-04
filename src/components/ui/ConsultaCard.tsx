@@ -10,6 +10,7 @@ interface ConsultaCardProps<T> {
     resultados: T[]
     renderResultado: (item: T) => ReactNode
     children?: ReactNode
+    mensajeVacio?: string
 }
 
 export const ConsultaCard = <T,>({
@@ -21,6 +22,7 @@ export const ConsultaCard = <T,>({
     resultados,
     renderResultado,
     children,
+    mensajeVacio,
 }: ConsultaCardProps<T>) => {
     const [expandida, setExpandida] = useState(false)
 
@@ -74,7 +76,7 @@ export const ConsultaCard = <T,>({
 
                 {resultados.length === 0 && !loading ? (
                     <div className="h-full flex items-center justify-center text-sm text-on-surface-variant">
-                        No hay resultados para mostrar.
+                        {mensajeVacio || "No hay resultados para mostrar."}
                     </div>
                 ) : (
                     resultados.map((resultado, index) => (
