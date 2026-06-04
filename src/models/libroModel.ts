@@ -158,3 +158,8 @@ export type TasaConversionLibroResponse = {
   reservas: number
   tasaConversion: number
 }
+
+export type PromedioCalificacionPorTipoResponse = {
+  tipoLibro: string
+  promedioCalificacion: number
+}
