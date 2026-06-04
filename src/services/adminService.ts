@@ -1,4 +1,4 @@
-import type { CantidadColeccionablesResponse, PromedioCalificacionPorTipoResponse, TasaConversionLibroResponse } from "../models/libroModel"
+import type { AdminKpiResumenResponse, CantidadColeccionablesResponse, PromedioCalificacionPorTipoResponse, TasaConversionLibroResponse } from "../models/libroModel"
 import type { ReservaAnualUsuarioResponse, UsuarioReservasDevueltasResponse } from "../models/usuarioModel"
 import { apiClient } from "./apiClient"
 
@@ -80,5 +80,48 @@ export const adminService = {
         `
         const res = await apiClient.post('/graphql', { query })
         return res.data.data.analisisCalificaciones
+    },
+
+    async obtenerResumenKpisHome(): Promise<AdminKpiResumenResponse> {
+        const query = `
+            query {
+                tasaConversion {
+                    libroId
+                    titulo
+                    clicks
+                    reservas
+                    tasaConversion
+                }
+                analisisCalificaciones {
+                    tipoLibro
+                    promedioCalificacion
+                }
+            }
+        `
+        const res = await apiClient.post('/graphql', { query })
+        const tasaConversion = res.data.data.tasaConversion as TasaConversionLibroResponse[]
+        const analisisCalificaciones = res.data.data.analisisCalificaciones as PromedioCalificacionPorTipoResponse[]
+
+        const conversionPromedio = tasaConversion.length > 0
+            ? tasaConversion.reduce((total, libro) => total + libro.tasaConversion, 0) / tasaConversion.length
+            : 0
+        const libroMasClickeado = tasaConversion.length > 0
+            ? {
+                titulo: tasaConversion[0].titulo,
+                clicks: tasaConversion[0].clicks,
+            }
+            : null
+        const mejorTipoCalificado = analisisCalificaciones.length > 0
+            ? analisisCalificaciones.reduce((mejor, tipo) =>
+                tipo.promedioCalificacion > mejor.promedioCalificacion ? tipo : mejor
+            )
+            : null
+
+        return {
+            conversionPromedio,
+            libroMasClickeado,
+            mejorTipoCalificado,
+            tiposEvaluados: analisisCalificaciones.length,
+        }
     }
 }

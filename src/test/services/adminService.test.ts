@@ -41,3 +41,83 @@ describe("adminService - obtenerAnalisisCalificaciones", () => {
     expect(result).toEqual(analisisCalificaciones)
   })
 })
+
+describe("adminService - obtenerResumenKpisHome", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it("envia una consulta GraphQL combinada y resume las metricas del home admin", async () => {
+    const tasaConversion = [
+      {
+        libroId: 1,
+        titulo: "Rayuela",
+        clicks: 20,
+        reservas: 5,
+        tasaConversion: 0.25,
+      },
+      {
+        libroId: 2,
+        titulo: "Ficciones",
+        clicks: 10,
+        reservas: 5,
+        tasaConversion: 0.5,
+      },
+    ]
+    const analisisCalificaciones = [
+      { tipoLibro: "Comun", promedioCalificacion: 4.2 },
+      { tipoLibro: "Coleccionable", promedioCalificacion: 4.8 },
+    ]
+
+    mockedApiClient.post.mockResolvedValueOnce({
+      data: { data: { tasaConversion, analisisCalificaciones } },
+    } as any)
+
+    const result = await adminService.obtenerResumenKpisHome()
+
+    expect(mockedApiClient.post).toHaveBeenCalledWith(
+      "/graphql",
+      expect.objectContaining({
+        query: expect.stringContaining("tasaConversion"),
+      }),
+    )
+    const body = mockedApiClient.post.mock.calls[0][1] as { query: string }
+    expect(body.query).toContain("libroId")
+    expect(body.query).toContain("titulo")
+    expect(body.query).toContain("clicks")
+    expect(body.query).toContain("reservas")
+    expect(body.query).toContain("tasaConversion")
+    expect(body.query).toContain("analisisCalificaciones")
+    expect(body.query).toContain("tipoLibro")
+    expect(body.query).toContain("promedioCalificacion")
+    expect(result).toEqual({
+      conversionPromedio: 0.375,
+      libroMasClickeado: { titulo: "Rayuela", clicks: 20 },
+      mejorTipoCalificado: {
+        tipoLibro: "Coleccionable",
+        promedioCalificacion: 4.8,
+      },
+      tiposEvaluados: 2,
+    })
+  })
+
+  it("devuelve un resumen vacio cuando no hay datos de conversion ni calificaciones", async () => {
+    mockedApiClient.post.mockResolvedValueOnce({
+      data: {
+        data: {
+          tasaConversion: [],
+          analisisCalificaciones: [],
+        },
+      },
+    } as any)
+
+    const result = await adminService.obtenerResumenKpisHome()
+
+    expect(result).toEqual({
+      conversionPromedio: 0,
+      libroMasClickeado: null,
+      mejorTipoCalificado: null,
+      tiposEvaluados: 0,
+    })
+  })
+})

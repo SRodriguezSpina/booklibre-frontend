@@ -163,3 +163,13 @@ export type PromedioCalificacionPorTipoResponse = {
   tipoLibro: string
   promedioCalificacion: number
 }
+
+export type AdminKpiResumenResponse = {
+  conversionPromedio: number
+  libroMasClickeado: {
+    titulo: string
+    clicks: number
+  } | null
+  mejorTipoCalificado: PromedioCalificacionPorTipoResponse | null
+  tiposEvaluados: number
+}
