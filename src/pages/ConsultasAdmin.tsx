@@ -1,7 +1,7 @@
 import { adminService } from "../services/adminService"
 import { ConsultaCard } from "../components/ui/ConsultaCard"
 import type { UsuarioReservasDevueltasResponse, ReservaAnualUsuarioResponse } from "../models/usuarioModel"
-import type { CantidadColeccionablesResponse, TasaConversionLibroResponse } from "../models/libroModel"
+import { TIPO_LABEL, type CantidadColeccionablesResponse, type PromedioCalificacionPorTipoResponse, type TasaConversionLibroResponse } from "../models/libroModel"
 import { useState } from "react"
 
 export const ConsultasAdmin = () => {
@@ -38,6 +38,10 @@ export const ConsultasAdmin = () => {
     const [tasaConversion, setTasaConversion] = useState<TasaConversionLibroResponse[]>([])
     const [loadingTasaConversion, setLoadingTasaConversion] = useState(false)
     const [errorTasaConversion, setErrorTasaConversion] = useState("")
+    //
+    const [analisisCalificaciones, setAnalisisCalificaciones] = useState<PromedioCalificacionPorTipoResponse[]>([])
+    const [loadingAnalisisCalificaciones, setLoadingAnalisisCalificaciones] = useState(false)
+    const [errorAnalisisCalificaciones, setErrorAnalisisCalificaciones] = useState("")
 
     const consultarUsuariosConDevoluciones = async () => {
         try {
@@ -163,6 +167,20 @@ export const ConsultasAdmin = () => {
             setErrorTasaConversion("No se pudo realizar la consulta")
         } finally {
             setLoadingTasaConversion(false)
+        }
+    }
+
+    const consultarAnalisisCalificaciones = async () => {
+        try {
+            setLoadingAnalisisCalificaciones(true)
+            setErrorAnalisisCalificaciones("")
+
+            const data = await adminService.obtenerAnalisisCalificaciones()
+            setAnalisisCalificaciones(data)
+        } catch {
+            setErrorAnalisisCalificaciones("No se pudo realizar la consulta")
+        } finally {
+            setLoadingAnalisisCalificaciones(false)
         }
     }
 
@@ -365,6 +383,24 @@ export const ConsultasAdmin = () => {
                             <span>Clicks: {res.clicks}</span>
                             <span>Reservas: {res.reservas}</span>
                         </div>
+                    </div>
+                )}
+            />
+
+            <ConsultaCard<PromedioCalificacionPorTipoResponse>
+                titulo="Análisis de Calificaciones [GraphQL]"
+                descripcion="Promedio de calificación agrupado por tipo de libro, excluyendo libros sin reseñas."
+                loading={loadingAnalisisCalificaciones}
+                error={errorAnalisisCalificaciones}
+                onConsultar={consultarAnalisisCalificaciones}
+                resultados={analisisCalificaciones}
+                mensajeVacio="No hay libros calificados"
+                renderResultado={(res) => (
+                    <div className="flex justify-between items-center gap-4">
+                        <span className="font-semibold">{TIPO_LABEL[res.tipoLibro] ?? res.tipoLibro}</span>
+                        <span className="text-sm font-bold text-accent">
+                            {res.promedioCalificacion.toFixed(2)}
+                        </span>
                     </div>
                 )}
             />

@@ -1,4 +1,4 @@
-import type { CantidadColeccionablesResponse, TasaConversionLibroResponse } from "../models/libroModel"
+import type { CantidadColeccionablesResponse, PromedioCalificacionPorTipoResponse, TasaConversionLibroResponse } from "../models/libroModel"
 import type { ReservaAnualUsuarioResponse, UsuarioReservasDevueltasResponse } from "../models/usuarioModel"
 import { apiClient } from "./apiClient"
 
@@ -67,5 +67,18 @@ export const adminService = {
         `
         const res = await apiClient.post('/graphql', { query })
         return res.data.data.tasaConversion
+    },
+
+    async obtenerAnalisisCalificaciones(): Promise<PromedioCalificacionPorTipoResponse[]> {
+        const query = `
+            query {
+                analisisCalificaciones {
+                    tipoLibro
+                    promedioCalificacion
+                }
+            }
+        `
+        const res = await apiClient.post('/graphql', { query })
+        return res.data.data.analisisCalificaciones
     }
 }
