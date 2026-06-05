@@ -1,13 +1,15 @@
 import { useState } from "react"
 import { homeService } from "../services/homeService"
 import { authService } from "../services/AuthService.ts"
+import { adminService } from "../services/adminService"
 import { SearchBar } from "../components/ui/SearchBar"
 import { Paginacion } from "../components/ui/Paginacion"
 import { Spinner } from "../components/ui/Spinner.tsx"
 import { Filters, INITIAL_FILTERS } from "../components/home/Filters"
 import type { FiltersState } from "../components/home/Filters"
-import type { LibroHome } from "../models/libroModel"
+import type { AdminKpiResumenResponse, LibroHome } from "../models/libroModel"
 import { LibroCardHome } from "../components/home/LibroCardHome"
+import { AdminKpiHeader } from "../components/home/AdminKpiHeader"
 import { useOnInit } from "../utils/hooks.ts"
 import { SortBy } from "../components/home/SortBy.tsx"
 import { obtenerMensajeError, type ErrorPersonalizado } from "../utils/errorHandler.ts"
@@ -28,8 +30,12 @@ export const Home = () => {
   const [animating, setAnimating] = useState(false)
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
   const [filterKey, setFilterKey] = useState(0)
+  const [adminKpis, setAdminKpis] = useState<AdminKpiResumenResponse | null>(null)
+  const [loadingAdminKpis, setLoadingAdminKpis] = useState(false)
+  const [errorAdminKpis, setErrorAdminKpis] = useState("")
 
   const userId = authService.obtenerIdUsuarioActual()
+  const esAdmin = authService.obtenerTipoUsuarioActual()?.toUpperCase() === "ADMIN"
 
   const search = async (q: string, f: FiltersState, page: number = 0, sort: string = sortBy) => {
     setAnimating(true)
@@ -58,7 +64,25 @@ export const Home = () => {
     }
   }
 
-  useOnInit(() => search("", INITIAL_FILTERS, 0))
+  const cargarAdminKpis = async () => {
+    if (!esAdmin) return
+
+    setLoadingAdminKpis(true)
+    setErrorAdminKpis("")
+    try {
+      const data = await adminService.obtenerResumenKpisHome()
+      setAdminKpis(data)
+    } catch {
+      setErrorAdminKpis("No se pudieron cargar los KPIs")
+    } finally {
+      setLoadingAdminKpis(false)
+    }
+  }
+
+  useOnInit(() => {
+    search("", INITIAL_FILTERS, 0)
+    cargarAdminKpis()
+  })
 
   const handleSearch = (q: string) => {
     setQuery(q)
@@ -131,6 +155,16 @@ export const Home = () => {
             <SearchBar onSearch={handleSearch} placeholder="Buscar por título..." />
           </div>
         </div>
+
+        {esAdmin && (
+          <div className="mt-6">
+            <AdminKpiHeader
+              resumen={adminKpis}
+              loading={loadingAdminKpis}
+              error={errorAdminKpis}
+            />
+          </div>
+        )}
       </div>
 
       {/* ── Cuerpo principal ────────────────────────────────── */}
