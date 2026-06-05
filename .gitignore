@@ -30,3 +30,6 @@ coverage
 
 # Archivos de output de pruebas locales
 test-output.txt
+
+# Planes/specs locales de Codex Superpowers
+docs/superpowers/
