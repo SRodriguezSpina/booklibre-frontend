@@ -323,6 +323,11 @@ export const ModalEditarPerfil = ({
                 onChange={setCampo("tipoUsuario")}
                 className={"cursor-pointer " + claseInput}
               >
+                {form.tipoUsuario === "ADMIN" && (
+                  <option value="ADMIN" disabled>
+                    Administrador (elegí un tipo)
+                  </option>
+                )}
                 {opcionesTipo.map((opcion) => (
                   <option key={opcion} value={opcion}>
                     {opcion === "LectorPublicador"
@@ -331,6 +336,11 @@ export const ModalEditarPerfil = ({
                   </option>
                 ))}
               </select>
+              {usuario.esAdmin && (
+                <p className="mt-1 text-[11px] text-on-surface-variant/80">
+                  Tu rol de administrador se mantiene aunque cambies el tipo.
+                </p>
+              )}
             </div>
           </div>
 

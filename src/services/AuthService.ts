@@ -14,6 +14,7 @@ class AuthService {
       tokenService.setIdUsuario(response.data.usuario.id)
       tokenService.setNombreUsuario(response.data.usuario.nombre)
       tokenService.setTipoUsuario(response.data.usuario.tipoUsuario)
+      tokenService.setEsAdmin(response.data.usuario.esAdmin)
     }
     return response.data
   }
@@ -27,6 +28,7 @@ class AuthService {
       tokenService.setIdUsuario(response.data.usuario.id)
       tokenService.setNombreUsuario(response.data.usuario.nombre)
       tokenService.setTipoUsuario(response.data.usuario.tipoUsuario)
+      tokenService.setEsAdmin(response.data.usuario.esAdmin)
     }
     return response.data
   }

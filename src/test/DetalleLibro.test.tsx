@@ -26,6 +26,7 @@ describe('DetalleLibro', () => {
     bibliokarmas: 500,
     reservados: 0,
     leidos: 0,
+    esAdmin: false,
   }
 
   beforeEach(() => {

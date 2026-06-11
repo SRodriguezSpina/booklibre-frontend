@@ -1,6 +1,7 @@
 const ID_USUARIO_KEY = 'idUsuario'
 const NOMBRE_USUARIO_KEY = 'nombreUsuario'
 const TIPO_USUARIO_KEY = 'tipoUsuario'
+const ES_ADMIN_KEY = 'esAdmin'
 
 export const tokenService = {
 
@@ -21,6 +22,14 @@ export const tokenService = {
     return localStorage.getItem(TIPO_USUARIO_KEY)
   },
 
+  setEsAdmin(esAdmin: boolean): void {
+    localStorage.setItem(ES_ADMIN_KEY, String(esAdmin))
+  },
+
+  getEsAdmin(): boolean {
+    return localStorage.getItem(ES_ADMIN_KEY) === 'true'
+  },
+
   getNombreUsuario(): string | null {
     return localStorage.getItem(NOMBRE_USUARIO_KEY)
   },
@@ -37,5 +46,6 @@ export const tokenService = {
     localStorage.removeItem(ID_USUARIO_KEY)
     localStorage.removeItem(NOMBRE_USUARIO_KEY)
     localStorage.removeItem(TIPO_USUARIO_KEY)
+    localStorage.removeItem(ES_ADMIN_KEY)
   },
 }
