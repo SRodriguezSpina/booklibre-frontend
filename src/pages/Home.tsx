@@ -33,11 +33,18 @@ export const Home = () => {
   const [adminKpis, setAdminKpis] = useState<AdminKpiResumenResponse | null>(null)
   const [loadingAdminKpis, setLoadingAdminKpis] = useState(false)
   const [errorAdminKpis, setErrorAdminKpis] = useState("")
+  const [vistaPopulares, setVistaPopulares] = useState(true)
 
   const userId = authService.obtenerIdUsuarioActual()
   const esAdmin = authService.obtenerTipoUsuarioActual()?.toUpperCase() === "ADMIN"
 
-  const search = async (q: string, f: FiltersState, page: number = 0, sort: string = sortBy) => {
+  const search = async (
+    q: string,
+    f: FiltersState,
+    page: number = 0,
+    sort: string = sortBy,
+    usarPopulares: boolean = vistaPopulares,
+  ) => {
     setAnimating(true)
     setLoading(true)
     setError(null)
@@ -45,7 +52,7 @@ export const Home = () => {
       const hasFilters = Object.values(f).some(
         (v) => v !== false && v !== undefined && v !== "" && v !== 0
       )
-      const isInitialLoad = q === "" && !hasFilters && page === 0 && sort === "titulo"
+      const isInitialLoad = usarPopulares && q === "" && !hasFilters && page === 0 && sort === "titulo"
 
       if (isInitialLoad) {
         const data = await homeService.getPopulares(userId)
@@ -87,25 +94,29 @@ export const Home = () => {
   const handleSearch = (q: string) => {
     setQuery(q)
     setCurrentPage(1)
-    search(q, filters, 0)
+    setVistaPopulares(false)
+    search(q, filters, 0, sortBy, false)
   }
 
   const handleApplyFilters = (f: FiltersState) => {
     setFilters(f)
     setCurrentPage(1)
-    search(query, f, 0)
+    setVistaPopulares(false)
+    search(query, f, 0, sortBy, false)
     setIsFiltersOpen(false)
   }
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
-    search(query, filters, page - 1)
+    setVistaPopulares(false)
+    search(query, filters, page - 1, sortBy, false)
   }
 
   const handleSortChange = (sort: string) => {
     setSortBy(sort)
     setCurrentPage(1)
-    search(query, filters, 0, sort)
+    setVistaPopulares(false)
+    search(query, filters, 0, sort, false)
   }
 
   const hasActiveFilters = Object.values(filters).some(
@@ -116,7 +127,18 @@ export const Home = () => {
     setFilters(INITIAL_FILTERS)
     setCurrentPage(1)
     setFilterKey((k) => k + 1)
-    search(query, INITIAL_FILTERS, 0, sortBy)
+    setVistaPopulares(false)
+    search(query, INITIAL_FILTERS, 0, sortBy, false)
+  }
+
+  const handleVerMas = () => {
+    setVistaPopulares(false)
+    setQuery("")
+    setFilters(INITIAL_FILTERS)
+    setSortBy("titulo")
+    setCurrentPage(1)
+    setFilterKey((k) => k + 1)
+    search("", INITIAL_FILTERS, 0, "titulo", false)
   }
 
   if (error) {
@@ -203,12 +225,31 @@ export const Home = () => {
             </button>
 
             {/* Resultados count */}
-            <span className="hidden md:block text-xs text-on-surface-variant/50">
-              {loading ? "Buscando..." : `${books.length} resultado${books.length !== 1 ? "s" : ""} · Pág. ${currentPage}/${totalPaginas}`}
-            </span>
+            {!vistaPopulares && (
+              <span className="hidden md:block text-xs text-on-surface-variant/50">
+                {loading ? "Buscando..." : `${books.length} resultado${books.length !== 1 ? "s" : ""} · Pág. ${currentPage}/${totalPaginas}`}
+              </span>
+            )}
 
             <SortBy value={sortBy} onChange={handleSortChange} />
           </div>
+
+          {vistaPopulares && !loading && !error && (
+            <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border border-primary/20 bg-surface/70 px-4 py-3">
+              <div>
+                <h2 className="text-sm font-bold text-on-surface">
+                  Libros más populares
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={handleVerMas}
+                className="self-start sm:self-auto px-4 py-2 rounded-lg bg-primary text-background text-xs font-bold hover:bg-primary-dark active:scale-95 transition-all cursor-pointer"
+              >
+                Ver más
+              </button>
+            </section>
+          )}
 
           {/* Grid de libros */}
           {loading ? (
@@ -245,11 +286,13 @@ export const Home = () => {
                   <LibroCardHome key={book.id} {...book} />
                 ))}
               </div>
-              <Paginacion
-                pagina={currentPage}
-                totalPaginas={totalPaginas}
-                alCambiar={handlePageChange}
-              />
+              {!vistaPopulares && (
+                <Paginacion
+                  pagina={currentPage}
+                  totalPaginas={totalPaginas}
+                  alCambiar={handlePageChange}
+                />
+              )}
             </>
           )}
         </div>
