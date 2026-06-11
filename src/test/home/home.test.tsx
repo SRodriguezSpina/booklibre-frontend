@@ -143,7 +143,6 @@ describe('Home', () => {
         })
 
         expect(screen.getByText('Libros más populares')).toBeInTheDocument()
-        expect(screen.getByText('Ranking cargado desde Redis')).toBeInTheDocument()
         expect(screen.getByRole('button', { name: 'Ver más' })).toBeInTheDocument()
         expect(screen.queryByText(/Pág\./)).not.toBeInTheDocument()
         expect(screen.queryByRole('button', { name: '2' })).not.toBeInTheDocument()

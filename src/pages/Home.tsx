@@ -240,9 +240,6 @@ export const Home = () => {
                 <h2 className="text-sm font-bold text-on-surface">
                   Libros más populares
                 </h2>
-                <p className="text-xs text-on-surface-variant/70">
-                  Ranking cargado desde Redis
-                </p>
               </div>
               <button
                 type="button"
