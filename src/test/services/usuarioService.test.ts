@@ -21,6 +21,7 @@ const usuarioDataMock: UsuarioData = {
   bibliokarmas: 10,
   reservados: 0,
   leidos: 0,
+  esAdmin: false,
 }
 
 const usuarioUpdateResponseMock = {

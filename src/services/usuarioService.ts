@@ -28,6 +28,7 @@ class UsuarioService {
     }
     const res = await apiClient.put<UsuarioUpdateResponse>(`/usuarios/${usuario.id}`, payload)
     tokenService.setNombreUsuario(res.data.usuario.nombre)
+    tokenService.setEsAdmin(res.data.usuario.esAdmin)
     return mapUsuarioResponse(res.data.usuario)
   }
 

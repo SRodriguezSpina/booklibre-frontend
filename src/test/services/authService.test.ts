@@ -15,6 +15,7 @@ const usuarioMock = {
   ciudad: '',
   tipoUsuario: 'Lector',
   bibliokarmas: 0,
+  esAdmin: false,
 }
 
 describe('AuthService - login', () => {
@@ -42,6 +43,16 @@ describe('AuthService - login', () => {
     await authService.login({ email: 'juan@mail.com', password: '123' })
 
     expect(localStorage.getItem('nombreUsuario')).toBe('Juan Pérez')
+  })
+
+  it('guarda esAdmin en localStorage tras login exitoso', async () => {
+    mockedApiClient.post.mockResolvedValueOnce({
+      data: { success: true, message: 'Login exitoso', usuario: { ...usuarioMock, esAdmin: true } }
+    })
+
+    await authService.login({ email: 'admin@booklibre.com', password: 'admin123' })
+
+    expect(localStorage.getItem('esAdmin')).toBe('true')
   })
 
   it('retorna los datos del response correctamente', async () => {

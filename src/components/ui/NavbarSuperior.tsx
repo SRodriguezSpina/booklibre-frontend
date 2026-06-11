@@ -2,6 +2,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom"
 import { TrendingUp, LogOut, Menu, X, Sun, Moon } from "lucide-react"
 import navBarLogo from "../../assets/icons/booklibre-logo.svg"
 import { authService } from "../../services/AuthService"
+import { tokenService } from "../../services/tokenService"
 import { useState } from "react"
 import { Avatar } from "./Avatar"
 import { useAuthContext } from "../../utils/hooks"
@@ -46,8 +47,7 @@ export const NavbarSuperior = () => {
   const enPaginaAuth =
     location.pathname === "/login" || location.pathname === "/register"
 
-  const tipoUsuario = usuario?.tipoUsuario ?? localStorage.getItem("tipoUsuario") ?? ""
-  const esAdmin = tipoUsuario.toUpperCase() === "ADMIN"
+  const esAdmin = usuario?.esAdmin ?? tokenService.getEsAdmin()
 
   const items: NavItemProps[] = [
     { text: "Inicio", to: "/home" },

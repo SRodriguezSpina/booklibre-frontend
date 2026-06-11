@@ -13,6 +13,7 @@ export type UsuarioData = {
   imagenUrl?: string | null
   reservados: number
   leidos: number
+  esAdmin: boolean
 }
 
 export type ErrorsUsuario = Partial<Record<keyof UsuarioData, string>>
@@ -33,6 +34,7 @@ export class Usuario implements UsuarioData {
   imagenUrl?: string | null
   reservados: number = 0
   leidos: number = 0
+  esAdmin: boolean = false
   errors: ErrorsUsuario = {}
 
   constructor(props?: Partial<UsuarioData>) {
