@@ -1,7 +1,7 @@
 import { adminService } from "../services/adminService"
 import { ConsultaCard } from "../components/ui/ConsultaCard"
 import type { UsuarioReservasDevueltasResponse, ReservaAnualUsuarioResponse } from "../models/usuarioModel"
-import { TIPO_LABEL, type CantidadColeccionablesResponse, type PromedioCalificacionPorTipoResponse, type TasaConversionLibroResponse } from "../models/libroModel"
+import { TIPO_LABEL, type CantidadColeccionablesResponse, type PromedioCalificacionPorTipoResponse, type SaludCatalogoResponse, type TasaConversionLibroResponse } from "../models/libroModel"
 import { useState } from "react"
 
 export const ConsultasAdmin = () => {
@@ -42,6 +42,10 @@ export const ConsultasAdmin = () => {
     const [analisisCalificaciones, setAnalisisCalificaciones] = useState<PromedioCalificacionPorTipoResponse[]>([])
     const [loadingAnalisisCalificaciones, setLoadingAnalisisCalificaciones] = useState(false)
     const [errorAnalisisCalificaciones, setErrorAnalisisCalificaciones] = useState("")
+    //
+    const [saludCatalogo, setSaludCatalogo] = useState<SaludCatalogoResponse | null>(null)
+    const [loadingSaludCatalogo, setLoadingSaludCatalogo] = useState(false)
+    const [errorSaludCatalogo, setErrorSaludCatalogo] = useState("")
 
     const consultarUsuariosConDevoluciones = async () => {
         try {
@@ -181,6 +185,20 @@ export const ConsultasAdmin = () => {
             setErrorAnalisisCalificaciones("No se pudo realizar la consulta")
         } finally {
             setLoadingAnalisisCalificaciones(false)
+        }
+    }
+
+    const consultarSaludCatalogo = async () => {
+        try {
+            setLoadingSaludCatalogo(true)
+            setErrorSaludCatalogo("")
+
+            const data = await adminService.obtenerSaludCatalogo()
+            setSaludCatalogo(data)
+        } catch {
+            setErrorSaludCatalogo("No se pudo realizar la consulta")
+        } finally {
+            setLoadingSaludCatalogo(false)
         }
     }
 
@@ -401,6 +419,40 @@ export const ConsultasAdmin = () => {
                         <span className="text-sm font-bold text-accent">
                             {res.promedioCalificacion.toFixed(2)}
                         </span>
+                    </div>
+                )}
+            />
+
+            <ConsultaCard<SaludCatalogoResponse>
+                titulo="Estado de Salud del Catálogo [GraphQL]"
+                descripcion="Clasifica los libros activos en buckets disjuntos según el estado de sus reservas: las cuatro cantidades suman el total."
+                loading={loadingSaludCatalogo}
+                error={errorSaludCatalogo}
+                onConsultar={consultarSaludCatalogo}
+                resultados={saludCatalogo ? [saludCatalogo] : []}
+                mensajeVacio="Sin datos del catálogo"
+                renderResultado={(res) => (
+                    <div className="flex flex-col gap-2 w-full">
+                        <div className="flex justify-between items-center w-full">
+                            <span className="font-semibold">Total de libros activos</span>
+                            <span className="text-sm font-bold text-accent">{res.total}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                            <span>Prestados (reserva vigente hoy)</span>
+                            <span className="font-bold">{res.prestados}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                            <span>Disponibles, nunca reservados</span>
+                            <span className="font-bold">{res.disponiblesNuncaReservados}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                            <span>Disponibles, reservados a futuro</span>
+                            <span className="font-bold">{res.disponiblesReservadosAFuturo}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                            <span>Disponibles, devueltos</span>
+                            <span className="font-bold">{res.disponiblesDevueltos}</span>
+                        </div>
                     </div>
                 )}
             />

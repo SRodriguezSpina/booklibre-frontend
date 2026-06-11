@@ -1,4 +1,4 @@
-import type { AdminKpiResumenResponse, CantidadColeccionablesResponse, PromedioCalificacionPorTipoResponse, TasaConversionLibroResponse } from "../models/libroModel"
+import type { AdminKpiResumenResponse, CantidadColeccionablesResponse, PromedioCalificacionPorTipoResponse, SaludCatalogoResponse, TasaConversionLibroResponse } from "../models/libroModel"
 import type { ReservaAnualUsuarioResponse, UsuarioReservasDevueltasResponse } from "../models/usuarioModel"
 import { apiClient } from "./apiClient"
 
@@ -80,6 +80,22 @@ export const adminService = {
         `
         const res = await apiClient.post('/graphql', { query })
         return res.data.data.analisisCalificaciones
+    },
+
+    async obtenerSaludCatalogo(): Promise<SaludCatalogoResponse> {
+        const query = `
+            query {
+                saludCatalogo {
+                    total
+                    prestados
+                    disponiblesNuncaReservados
+                    disponiblesReservadosAFuturo
+                    disponiblesDevueltos
+                }
+            }
+        `
+        const res = await apiClient.post('/graphql', { query })
+        return res.data.data.saludCatalogo
     },
 
     async obtenerResumenKpisHome(): Promise<AdminKpiResumenResponse> {
