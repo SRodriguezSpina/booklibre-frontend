@@ -42,6 +42,42 @@ describe("adminService - obtenerAnalisisCalificaciones", () => {
   })
 })
 
+describe("adminService - obtenerSaludCatalogo", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it("envia la consulta GraphQL correcta y devuelve la salud del catalogo", async () => {
+    const saludCatalogo = {
+      total: 100,
+      prestados: 12,
+      disponiblesNuncaReservados: 60,
+      disponiblesReservadosAFuturo: 8,
+      disponiblesDevueltos: 20,
+    }
+
+    mockedApiClient.post.mockResolvedValueOnce({
+      data: { data: { saludCatalogo } },
+    } as any)
+
+    const result = await adminService.obtenerSaludCatalogo()
+
+    expect(mockedApiClient.post).toHaveBeenCalledWith(
+      "/graphql",
+      expect.objectContaining({
+        query: expect.stringContaining("saludCatalogo"),
+      }),
+    )
+    const body = mockedApiClient.post.mock.calls[0][1] as { query: string }
+    expect(body.query).toContain("total")
+    expect(body.query).toContain("prestados")
+    expect(body.query).toContain("disponiblesNuncaReservados")
+    expect(body.query).toContain("disponiblesReservadosAFuturo")
+    expect(body.query).toContain("disponiblesDevueltos")
+    expect(result).toEqual(saludCatalogo)
+  })
+})
+
 describe("adminService - obtenerResumenKpisHome", () => {
   beforeEach(() => {
     vi.clearAllMocks()

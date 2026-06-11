@@ -164,6 +164,14 @@ export type PromedioCalificacionPorTipoResponse = {
   promedioCalificacion: number
 }
 
+export type SaludCatalogoResponse = {
+  total: number
+  prestados: number
+  disponiblesNuncaReservados: number
+  disponiblesReservadosAFuturo: number
+  disponiblesDevueltos: number
+}
+
 export type AdminKpiResumenResponse = {
   conversionPromedio: number
   libroMasClickeado: {
