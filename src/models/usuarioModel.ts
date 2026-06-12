@@ -47,3 +47,9 @@ export type ReservaAnualUsuarioResponse = {
   fechaHasta: string
   anioReserva: number
 }
+
+export type TopUsuariosResponse = {
+  id: number
+  nombre: string
+  bibliokarma: number
+}

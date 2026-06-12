@@ -1,5 +1,5 @@
 import type { AdminKpiResumenResponse, CantidadColeccionablesResponse, PromedioCalificacionPorTipoResponse, SaludCatalogoResponse, TasaConversionLibroResponse } from "../models/libroModel"
-import type { ReservaAnualUsuarioResponse, UsuarioReservasDevueltasResponse } from "../models/usuarioModel"
+import type { ReservaAnualUsuarioResponse, UsuarioReservasDevueltasResponse, TopUsuariosResponse } from "../models/usuarioModel"
 import { apiClient } from "./apiClient"
 
 export const adminService = {
@@ -139,5 +139,19 @@ export const adminService = {
             mejorTipoCalificado,
             tiposEvaluados: analisisCalificaciones.length,
         }
+    },
+
+    async obtenerTopUsuarios(): Promise<TopUsuariosResponse[]> {
+        const query = `
+        query {
+            topBibliokarmas {
+                id
+                nombre
+                bibliokarma
+            }
+        }
+    `
+        const res = await apiClient.post('/graphql', { query })
+        return res.data.data.topBibliokarmas
     }
 }
