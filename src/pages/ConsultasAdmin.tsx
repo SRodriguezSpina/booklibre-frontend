@@ -1,6 +1,6 @@
 import { adminService } from "../services/adminService"
 import { ConsultaCard } from "../components/ui/ConsultaCard"
-import type { UsuarioReservasDevueltasResponse, ReservaAnualUsuarioResponse } from "../models/usuarioModel"
+import type { UsuarioReservasDevueltasResponse, ReservaAnualUsuarioResponse, TopUsuariosResponse } from "../models/usuarioModel"
 import { TIPO_LABEL, type CantidadColeccionablesResponse, type PromedioCalificacionPorTipoResponse, type SaludCatalogoResponse, type TasaConversionLibroResponse } from "../models/libroModel"
 import { useState } from "react"
 
@@ -46,6 +46,10 @@ export const ConsultasAdmin = () => {
     const [saludCatalogo, setSaludCatalogo] = useState<SaludCatalogoResponse | null>(null)
     const [loadingSaludCatalogo, setLoadingSaludCatalogo] = useState(false)
     const [errorSaludCatalogo, setErrorSaludCatalogo] = useState("")
+    //
+    const [topUsuarios, setTopUsuarios] = useState<TopUsuariosResponse[]>([])
+    const [loadingTopUsuarios, setLoadingTopUsuarios] = useState(false)
+    const [errorTopUsuarios, setErrorTopUsuarios] = useState("")
 
     const consultarUsuariosConDevoluciones = async () => {
         try {
@@ -199,6 +203,20 @@ export const ConsultasAdmin = () => {
             setErrorSaludCatalogo("No se pudo realizar la consulta")
         } finally {
             setLoadingSaludCatalogo(false)
+        }
+    }
+
+    const consultarTopUsuarios = async () => {
+        try {
+            setLoadingTopUsuarios(true)
+            setErrorTopUsuarios("")
+
+            const data = await adminService.obtenerTopUsuarios()
+            setTopUsuarios(data)
+        } catch {
+            setErrorTopUsuarios("No se pudo realizar la consulta")
+        } finally {
+            setLoadingTopUsuarios(false)
         }
     }
 
@@ -452,6 +470,31 @@ export const ConsultasAdmin = () => {
                         <div className="flex justify-between items-center text-sm">
                             <span>Disponibles, devueltos</span>
                             <span className="font-bold">{res.disponiblesDevueltos}</span>
+                        </div>
+                    </div>
+                )}
+            />
+            <ConsultaCard<TopUsuariosResponse>
+                titulo="Top 5 Usuarios por Bibliokarma [GraphQL]"
+                descripcion="Ranking de usuarios con mayor bibliokarma"
+                loading={loadingTopUsuarios}
+                error={errorTopUsuarios}
+                onConsultar={consultarTopUsuarios}
+                resultados={topUsuarios}
+                mensajeVacio="No hay usuarios en el ranking"
+                renderResultado={(usuario) => (
+                    <div className="flex justify-between items-center gap-4">
+                        <div className="flex flex-col gap-1">
+                            <span className="font-semibold">
+                                {usuario.nombre}
+                            </span>
+                            <span className="text-sm text-on-surface-variant">
+                                ID: {usuario.id}
+                            </span>
+                        </div>
+
+                        <div className="flex items-center gap-1 font-bold text-accent">
+                            ⭐ {usuario.bibliokarma} BK
                         </div>
                     </div>
                 )}
