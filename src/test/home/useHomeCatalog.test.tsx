@@ -171,7 +171,96 @@ describe('useHomeCatalog', () => {
         expect(result.current.vistaPopulares).toBe(false)
     })
 
-    it('handleClearFilters resets filters, increments filterKey, resets page and popular view, and searches', async () => {
+    it('handleChangeFilters updates draft filters without calling the service', () => {
+        const draftFilters = {
+            ...INITIAL_HOME_FILTERS,
+            isbn: '978-0132350884',
+        }
+        const { result } = renderHook(() => useHomeCatalog({ userId: null }))
+
+        act(() => {
+            result.current.handleChangeFilters(draftFilters)
+        })
+
+        expect(result.current.filters).toEqual(draftFilters)
+        expect(mockedHomeService.search).not.toHaveBeenCalled()
+        expect(mockedHomeService.getPopulares).not.toHaveBeenCalled()
+    })
+
+    it('handleSearch uses the applied filters and ignores unapplied draft filters', async () => {
+        const draftFilters = {
+            ...INITIAL_HOME_FILTERS,
+            drama: true,
+        }
+        mockedHomeService.search.mockResolvedValueOnce(responseMock())
+        const { result } = renderHook(() => useHomeCatalog({ userId: 42 }))
+
+        act(() => {
+            result.current.handleChangeFilters(draftFilters)
+        })
+
+        await act(async () => {
+            await result.current.handleSearch('rayuela')
+        })
+
+        expect(mockedHomeService.search).toHaveBeenCalledWith(
+            'rayuela',
+            INITIAL_HOME_FILTERS,
+            0,
+            10,
+            42,
+            'titulo'
+        )
+    })
+
+    it('handleSearch uses draft filters after they are applied', async () => {
+        const draftFilters = {
+            ...INITIAL_HOME_FILTERS,
+            drama: true,
+        }
+        mockedHomeService.search.mockResolvedValue(responseMock())
+        const { result } = renderHook(() => useHomeCatalog({ userId: 42 }))
+
+        act(() => {
+            result.current.handleChangeFilters(draftFilters)
+        })
+        await act(async () => {
+            await result.current.handleApplyFilters(draftFilters)
+        })
+        mockedHomeService.search.mockClear()
+
+        await act(async () => {
+            await result.current.handleSearch('rayuela')
+        })
+
+        expect(mockedHomeService.search).toHaveBeenCalledWith(
+            'rayuela',
+            draftFilters,
+            0,
+            10,
+            42,
+            'titulo'
+        )
+    })
+
+    it('hasActiveFilters derives from applied filters instead of draft filters', async () => {
+        mockedHomeService.search.mockResolvedValueOnce(responseMock())
+        const { result } = renderHook(() => useHomeCatalog({ userId: null }))
+
+        act(() => {
+            result.current.handleChangeFilters(activeFilters)
+        })
+
+        expect(result.current.hasActiveFilters).toBe(false)
+
+        await act(async () => {
+            await result.current.handleApplyFilters(activeFilters)
+        })
+
+        expect(result.current.hasActiveFilters).toBe(true)
+    })
+
+    it('handleClearFilters resets filters, resets page and popular view, and searches', async () => {
         mockedHomeService.search.mockResolvedValue(responseMock())
         const { result } = renderHook(() => useHomeCatalog({ userId: null }))
 
@@ -196,9 +285,44 @@ describe('useHomeCatalog', () => {
             'titulo'
         )
         expect(result.current.filters).toEqual(INITIAL_HOME_FILTERS)
-        expect(result.current.filterKey).toBe(1)
         expect(result.current.currentPage).toBe(1)
         expect(result.current.vistaPopulares).toBe(false)
+    })
+
+    it('handleClearFilters resets draft and applied filters', async () => {
+        const draftFilters = {
+            ...INITIAL_HOME_FILTERS,
+            isbn: '978-0132350884',
+        }
+        mockedHomeService.search.mockResolvedValue(responseMock())
+        const { result } = renderHook(() => useHomeCatalog({ userId: 42 }))
+
+        await act(async () => {
+            await result.current.handleApplyFilters(activeFilters)
+        })
+        act(() => {
+            result.current.handleChangeFilters(draftFilters)
+        })
+
+        await act(async () => {
+            await result.current.handleClearFilters()
+        })
+        mockedHomeService.search.mockClear()
+
+        await act(async () => {
+            await result.current.handleSearch('borges')
+        })
+
+        expect(result.current.filters).toEqual(INITIAL_HOME_FILTERS)
+        expect(result.current.hasActiveFilters).toBe(false)
+        expect(mockedHomeService.search).toHaveBeenCalledWith(
+            'borges',
+            INITIAL_HOME_FILTERS,
+            0,
+            10,
+            42,
+            'titulo'
+        )
     })
 
     it('handleVerMas resets catalog state and searches without loading popular books', async () => {
@@ -237,7 +361,6 @@ describe('useHomeCatalog', () => {
         expect(result.current.filters).toEqual(INITIAL_HOME_FILTERS)
         expect(result.current.sortBy).toBe('titulo')
         expect(result.current.currentPage).toBe(1)
-        expect(result.current.filterKey).toBe(1)
         expect(result.current.vistaPopulares).toBe(false)
     })
 

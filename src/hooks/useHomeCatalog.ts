@@ -17,6 +17,7 @@ type UseHomeCatalogParams = {
 export const useHomeCatalog = ({ userId }: UseHomeCatalogParams) => {
   const [query, setQuery] = useState("")
   const [filters, setFilters] = useState<HomeFiltersState>(INITIAL_HOME_FILTERS)
+  const [appliedFilters, setAppliedFilters] = useState<HomeFiltersState>(INITIAL_HOME_FILTERS)
   const [books, setBooks] = useState<LibroHome[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPaginas, setTotalPaginas] = useState(1)
@@ -24,7 +25,6 @@ export const useHomeCatalog = ({ userId }: UseHomeCatalogParams) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<ErrorPersonalizado | null>(null)
   const [animating, setAnimating] = useState(false)
-  const [filterKey, setFilterKey] = useState(0)
   const [vistaPopulares, setVistaPopulares] = useState(true)
 
   const search = async (
@@ -68,11 +68,16 @@ export const useHomeCatalog = ({ userId }: UseHomeCatalogParams) => {
     setQuery(q)
     setCurrentPage(1)
     setVistaPopulares(false)
-    await search(q, filters, 0, sortBy, false)
+    await search(q, appliedFilters, 0, sortBy, false)
+  }
+
+  const handleChangeFilters = (newFilters: HomeFiltersState) => {
+    setFilters(newFilters)
   }
 
   const handleApplyFilters = async (f: HomeFiltersState) => {
     setFilters(f)
+    setAppliedFilters(f)
     setCurrentPage(1)
     setVistaPopulares(false)
     await search(query, f, 0, sortBy, false)
@@ -81,20 +86,20 @@ export const useHomeCatalog = ({ userId }: UseHomeCatalogParams) => {
   const handlePageChange = async (page: number) => {
     setCurrentPage(page)
     setVistaPopulares(false)
-    await search(query, filters, page - 1, sortBy, false)
+    await search(query, appliedFilters, page - 1, sortBy, false)
   }
 
   const handleSortChange = async (sort: string) => {
     setSortBy(sort)
     setCurrentPage(1)
     setVistaPopulares(false)
-    await search(query, filters, 0, sort, false)
+    await search(query, appliedFilters, 0, sort, false)
   }
 
   const handleClearFilters = async () => {
     setFilters(INITIAL_HOME_FILTERS)
+    setAppliedFilters(INITIAL_HOME_FILTERS)
     setCurrentPage(1)
-    setFilterKey((k) => k + 1)
     setVistaPopulares(false)
     await search(query, INITIAL_HOME_FILTERS, 0, sortBy, false)
   }
@@ -103,13 +108,13 @@ export const useHomeCatalog = ({ userId }: UseHomeCatalogParams) => {
     setVistaPopulares(false)
     setQuery("")
     setFilters(INITIAL_HOME_FILTERS)
+    setAppliedFilters(INITIAL_HOME_FILTERS)
     setSortBy("titulo")
     setCurrentPage(1)
-    setFilterKey((k) => k + 1)
     await search("", INITIAL_HOME_FILTERS, 0, "titulo", false)
   }
 
-  const retrySearch = () => search(query, filters, currentPage - 1, sortBy)
+  const retrySearch = () => search(query, appliedFilters, currentPage - 1, sortBy)
 
   return {
     query,
@@ -122,9 +127,9 @@ export const useHomeCatalog = ({ userId }: UseHomeCatalogParams) => {
     error,
     animating,
     vistaPopulares,
-    filterKey,
-    hasActiveFilters: hasActiveHomeFilters(filters),
+    hasActiveFilters: hasActiveHomeFilters(appliedFilters),
     handleSearch,
+    handleChangeFilters,
     handleApplyFilters,
     handlePageChange,
     handleSortChange,

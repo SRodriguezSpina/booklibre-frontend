@@ -28,9 +28,10 @@ export const Home = () => {
     error,
     animating,
     vistaPopulares,
-    filterKey,
+    filters,
     hasActiveFilters,
     handleSearch,
+    handleChangeFilters,
     handleApplyFilters: applyCatalogFilters,
     handlePageChange,
     handleSortChange,
@@ -110,7 +111,8 @@ export const Home = () => {
         {/* ── Sidebar filtros ─── */}
         <aside className="hidden lg:flex flex-col gap-0 w-64 shrink-0">
           <Filters
-            key={filterKey}
+            filters={filters}
+            onChangeFilters={handleChangeFilters}
             onApplyFilters={handleApplyFilters}
             onClearFilters={handleClearFilters}
             hasActiveFilters={hasActiveFilters}
@@ -237,7 +239,8 @@ export const Home = () => {
             </div>
             <div className="flex-1 overflow-y-auto px-5 py-4">
               <Filters
-                key={filterKey}
+                filters={filters}
+                onChangeFilters={handleChangeFilters}
                 onApplyFilters={handleApplyFilters}
                 onClearFilters={handleClearFilters}
                 hasActiveFilters={hasActiveFilters}

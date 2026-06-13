@@ -2,12 +2,13 @@ import { useState } from "react"
 import { ChevronDown, Hash, BookMarked, Calendar, FileText, SlidersHorizontal } from "lucide-react"
 import {
   HOME_GENRES,
-  INITIAL_HOME_FILTERS,
   normalizeNumberFilter,
   type HomeFiltersState,
 } from "../../models/homeFilters"
 
 type Props = {
+  filters: HomeFiltersState
+  onChangeFilters: (filters: HomeFiltersState) => void
   onApplyFilters: (filters: HomeFiltersState) => void
   onClearFilters?: () => void
   hasActiveFilters?: boolean
@@ -60,12 +61,11 @@ const Section = ({ title, icon, defaultOpen = true, children, badge }: SectionPr
 const inputCls =
   "w-full bg-background/60 border border-accent/20 rounded-lg px-3 py-2 text-xs text-on-surface outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-on-surface-variant/30"
 
-export const Filters = ({ onApplyFilters, onClearFilters, hasActiveFilters }: Props) => {
-  const [filters, setFilters] = useState<HomeFiltersState>(INITIAL_HOME_FILTERS)
+export const Filters = ({ filters, onChangeFilters, onApplyFilters, onClearFilters, hasActiveFilters }: Props) => {
   const [errors, setErrors] = useState<{ paginas?: string; fechas?: string }>({})
 
   const updateFilter = <K extends keyof HomeFiltersState>(key: K, value: HomeFiltersState[K]) => {
-    setFilters((prev) => ({ ...prev, [key]: value }))
+    onChangeFilters({ ...filters, [key]: value })
     setErrors({})
   }
 
@@ -141,6 +141,7 @@ export const Filters = ({ onApplyFilters, onClearFilters, hasActiveFilters }: Pr
               type="number"
               placeholder="Min"
               min={1}
+              value={filters.paginasMin ?? ""}
               onChange={(e) => updateFilter("paginasMin", normalizeNumberFilter(e.target.value))}
               className={inputCls}
             />
@@ -149,6 +150,7 @@ export const Filters = ({ onApplyFilters, onClearFilters, hasActiveFilters }: Pr
               type="number"
               placeholder="Max"
               min={1}
+              value={filters.paginasMax ?? ""}
               onChange={(e) => updateFilter("paginasMax", normalizeNumberFilter(e.target.value))}
               className={inputCls}
             />
@@ -167,6 +169,7 @@ export const Filters = ({ onApplyFilters, onClearFilters, hasActiveFilters }: Pr
               </label>
               <input
                 type="date"
+                value={filters.fechaDesde ?? ""}
                 onChange={(e) => updateFilter("fechaDesde", e.target.value)}
                 className={inputCls}
               />
@@ -177,6 +180,7 @@ export const Filters = ({ onApplyFilters, onClearFilters, hasActiveFilters }: Pr
               </label>
               <input
                 type="date"
+                value={filters.fechaHasta ?? ""}
                 onChange={(e) => updateFilter("fechaHasta", e.target.value)}
                 className={inputCls}
               />
@@ -193,12 +197,14 @@ export const Filters = ({ onApplyFilters, onClearFilters, hasActiveFilters }: Pr
             <input
               type="text"
               placeholder="ISBN"
+              value={filters.isbn ?? ""}
               onChange={(e) => updateFilter("isbn", e.target.value)}
               className={inputCls}
             />
             <input
               type="text"
               placeholder="Prestado por usuario..."
+              value={filters.prestadoPor ?? ""}
               onChange={(e) => updateFilter("prestadoPor", e.target.value)}
               className={inputCls}
             />
