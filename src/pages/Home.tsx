@@ -1,75 +1,48 @@
 import { useState } from "react"
-import { homeService } from "../services/homeService"
 import { authService } from "../services/AuthService.ts"
 import { adminService } from "../services/adminService"
 import { SearchBar } from "../components/ui/SearchBar"
 import { Paginacion } from "../components/ui/Paginacion"
 import { Spinner } from "../components/ui/Spinner.tsx"
 import { Filters } from "../components/home/Filters"
-import { INITIAL_HOME_FILTERS, type HomeFiltersState } from "../models/homeFilters"
-import type { AdminKpiResumenResponse, LibroHome } from "../models/libroModel"
+import type { HomeFiltersState } from "../models/homeFilters"
+import type { AdminKpiResumenResponse } from "../models/libroModel"
 import { LibroCardHome } from "../components/home/LibroCardHome"
 import { AdminKpiHeader } from "../components/home/AdminKpiHeader"
 import { useOnInit } from "../utils/hooks.ts"
 import { SortBy } from "../components/home/SortBy.tsx"
-import { obtenerMensajeError, type ErrorPersonalizado } from "../utils/errorHandler.ts"
 import { ErrorCard } from "../components/ui/ErrorCard"
 import { BookOpen, SlidersHorizontal, X } from "lucide-react"
-
-const ITEMS_POR_PAGINA = 10
+import { useHomeCatalog } from "../hooks/useHomeCatalog.ts"
 
 export const Home = () => {
-  const [query, setQuery] = useState("")
-  const [filters, setFilters] = useState<HomeFiltersState>(INITIAL_HOME_FILTERS)
-  const [books, setBooks] = useState<LibroHome[]>([])
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPaginas, setTotalPaginas] = useState(1)
-  const [sortBy, setSortBy] = useState("titulo")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<ErrorPersonalizado | null>(null)
-  const [animating, setAnimating] = useState(false)
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
-  const [filterKey, setFilterKey] = useState(0)
   const [adminKpis, setAdminKpis] = useState<AdminKpiResumenResponse | null>(null)
   const [loadingAdminKpis, setLoadingAdminKpis] = useState(false)
   const [errorAdminKpis, setErrorAdminKpis] = useState("")
-  const [vistaPopulares, setVistaPopulares] = useState(true)
 
   const userId = authService.obtenerIdUsuarioActual()
   const esAdmin = authService.obtenerTipoUsuarioActual()?.toUpperCase() === "ADMIN"
-
-  const search = async (
-    q: string,
-    f: HomeFiltersState,
-    page: number = 0,
-    sort: string = sortBy,
-    usarPopulares: boolean = vistaPopulares,
-  ) => {
-    setAnimating(true)
-    setLoading(true)
-    setError(null)
-    try {
-      const hasFilters = Object.values(f).some(
-        (v) => v !== false && v !== undefined && v !== "" && v !== 0
-      )
-      const isInitialLoad = usarPopulares && q === "" && !hasFilters && page === 0 && sort === "titulo"
-
-      if (isInitialLoad) {
-        const data = await homeService.getPopulares(userId)
-        setBooks(data.content)
-        setTotalPaginas(data.totalPages)
-      } else {
-        const data = await homeService.search(q, f, page, ITEMS_POR_PAGINA, userId, sort)
-        setBooks(data.content)
-        setTotalPaginas(data.totalPages)
-      }
-    } catch (e: unknown) {
-      setError(obtenerMensajeError(e))
-    } finally {
-      setLoading(false)
-      setTimeout(() => setAnimating(false), 150)
-    }
-  }
+  const {
+    books,
+    currentPage,
+    totalPaginas,
+    sortBy,
+    loading,
+    error,
+    animating,
+    vistaPopulares,
+    filterKey,
+    hasActiveFilters,
+    handleSearch,
+    handleApplyFilters: applyCatalogFilters,
+    handlePageChange,
+    handleSortChange,
+    handleClearFilters,
+    handleVerMas,
+    loadInitialCatalog,
+    retrySearch,
+  } = useHomeCatalog({ userId })
 
   const cargarAdminKpis = async () => {
     if (!esAdmin) return
@@ -87,58 +60,13 @@ export const Home = () => {
   }
 
   useOnInit(() => {
-    search("", INITIAL_HOME_FILTERS, 0)
+    loadInitialCatalog()
     cargarAdminKpis()
   })
 
-  const handleSearch = (q: string) => {
-    setQuery(q)
-    setCurrentPage(1)
-    setVistaPopulares(false)
-    search(q, filters, 0, sortBy, false)
-  }
-
   const handleApplyFilters = (f: HomeFiltersState) => {
-    setFilters(f)
-    setCurrentPage(1)
-    setVistaPopulares(false)
-    search(query, f, 0, sortBy, false)
+    applyCatalogFilters(f)
     setIsFiltersOpen(false)
-  }
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-    setVistaPopulares(false)
-    search(query, filters, page - 1, sortBy, false)
-  }
-
-  const handleSortChange = (sort: string) => {
-    setSortBy(sort)
-    setCurrentPage(1)
-    setVistaPopulares(false)
-    search(query, filters, 0, sort, false)
-  }
-
-  const hasActiveFilters = Object.values(filters).some(
-    (v) => v !== false && v !== undefined && v !== "" && v !== 0
-  )
-
-  const handleClearFilters = () => {
-    setFilters(INITIAL_HOME_FILTERS)
-    setCurrentPage(1)
-    setFilterKey((k) => k + 1)
-    setVistaPopulares(false)
-    search(query, INITIAL_HOME_FILTERS, 0, sortBy, false)
-  }
-
-  const handleVerMas = () => {
-    setVistaPopulares(false)
-    setQuery("")
-    setFilters(INITIAL_HOME_FILTERS)
-    setSortBy("titulo")
-    setCurrentPage(1)
-    setFilterKey((k) => k + 1)
-    search("", INITIAL_HOME_FILTERS, 0, "titulo", false)
   }
 
   if (error) {
@@ -146,7 +74,7 @@ export const Home = () => {
       <div className="px-6 md:px-10 pt-24 pb-16">
         <ErrorCard
           error={error}
-          alReintentar={() => search(query, filters, currentPage - 1, sortBy)}
+          alReintentar={retrySearch}
         />
       </div>
     )
