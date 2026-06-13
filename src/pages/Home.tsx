@@ -1,12 +1,10 @@
 import { useState } from "react"
 import { authService } from "../services/AuthService.ts"
-import { adminService } from "../services/adminService"
 import { SearchBar } from "../components/ui/SearchBar"
 import { Paginacion } from "../components/ui/Paginacion"
 import { Spinner } from "../components/ui/Spinner.tsx"
 import { Filters } from "../components/home/Filters"
 import type { HomeFiltersState } from "../models/homeFilters"
-import type { AdminKpiResumenResponse } from "../models/libroModel"
 import { LibroCardHome } from "../components/home/LibroCardHome"
 import { AdminKpiHeader } from "../components/home/AdminKpiHeader"
 import { useOnInit } from "../utils/hooks.ts"
@@ -14,12 +12,10 @@ import { SortBy } from "../components/home/SortBy.tsx"
 import { ErrorCard } from "../components/ui/ErrorCard"
 import { BookOpen, SlidersHorizontal, X } from "lucide-react"
 import { useHomeCatalog } from "../hooks/useHomeCatalog.ts"
+import { useAdminHomeKpis } from "../hooks/useAdminHomeKpis.ts"
 
 export const Home = () => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
-  const [adminKpis, setAdminKpis] = useState<AdminKpiResumenResponse | null>(null)
-  const [loadingAdminKpis, setLoadingAdminKpis] = useState(false)
-  const [errorAdminKpis, setErrorAdminKpis] = useState("")
 
   const userId = authService.obtenerIdUsuarioActual()
   const esAdmin = authService.obtenerTipoUsuarioActual()?.toUpperCase() === "ADMIN"
@@ -43,25 +39,16 @@ export const Home = () => {
     loadInitialCatalog,
     retrySearch,
   } = useHomeCatalog({ userId })
-
-  const cargarAdminKpis = async () => {
-    if (!esAdmin) return
-
-    setLoadingAdminKpis(true)
-    setErrorAdminKpis("")
-    try {
-      const data = await adminService.obtenerResumenKpisHome()
-      setAdminKpis(data)
-    } catch {
-      setErrorAdminKpis("No se pudieron cargar los KPIs")
-    } finally {
-      setLoadingAdminKpis(false)
-    }
-  }
+  const {
+    adminKpis,
+    loadingAdminKpis,
+    errorAdminKpis,
+    loadAdminKpis,
+  } = useAdminHomeKpis({ esAdmin })
 
   useOnInit(() => {
     loadInitialCatalog()
-    cargarAdminKpis()
+    loadAdminKpis()
   })
 
   const handleApplyFilters = (f: HomeFiltersState) => {
