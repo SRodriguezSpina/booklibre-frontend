@@ -40,13 +40,9 @@ export const Home = () => {
     loadInitialCatalog,
     retrySearch,
   } = useHomeCatalog({ userId })
-  const {
-    adminKpis,
-    loadingAdminKpis,
-    errorAdminKpis,
-    loadAdminKpis,
-  } = useAdminHomeKpis({ esAdmin })
+  const { adminKpis, loadingAdminKpis, errorAdminKpis, loadAdminKpis } = useAdminHomeKpis({ esAdmin })
 
+  // Carga inicial de datos
   useOnInit(() => {
     loadInitialCatalog()
     loadAdminKpis()
@@ -69,7 +65,7 @@ export const Home = () => {
 
   return (
     <main className="min-h-screen">
-      {/* ── Hero header ─────────────────────────────────────── */}
+      {/* ── Home header ─────────────────────────────────────── */}
       <HomeHeader
         esAdmin={esAdmin}
         adminKpis={adminKpis}

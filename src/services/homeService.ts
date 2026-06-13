@@ -1,9 +1,5 @@
 import type { LibroHome } from '../models/libroModel'
-import {
-    INITIAL_HOME_FILTERS,
-    buildSelectedGenreParam,
-    type HomeFiltersState,
-} from '../models/homeFilters'
+import { INITIAL_HOME_FILTERS, buildSelectedGenreParam, type HomeFiltersState } from '../models/homeFilters'
 import { apiClient } from './apiClient'
 
 interface SearchResponse {
