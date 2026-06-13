@@ -1,4 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import type { AxiosResponse } from 'axios'
+import type { LibroHome } from '../../models/libroModel'
+
 vi.mock('../../services/apiClient', () => ({
   apiClient: { get: vi.fn() },
 }))
@@ -6,10 +9,16 @@ import { apiClient } from '../../services/apiClient'
 const mockedApiClient = vi.mocked(apiClient, true)
 
 import { homeService } from '../../services/homeService'
-import { INITIAL_FILTERS } from '../../components/home/Filters'
-import type { FiltersState } from '../../components/home/Filters'
+import { INITIAL_HOME_FILTERS } from '../../models/homeFilters'
+import type { HomeFiltersState } from '../../models/homeFilters'
 
-const libroHomeMock = {
+type SearchResponse = {
+    content: LibroHome[]
+    page: number
+    totalPages: number
+}
+
+const libroHomeMock: LibroHome = {
     id: 1,
     imagenUrl: 'https://example.com/cover.jpg',
     genero: 'DRAMA' as const,
@@ -30,7 +39,7 @@ const responseMock = {
         page: 0,
         totalPages: 1,
     }
-}
+} as AxiosResponse<SearchResponse>
 
 describe('HomeService - search', () => {
 
@@ -39,9 +48,9 @@ describe('HomeService - search', () => {
     })
 
     it('llama al endpoint correcto', async () => {
-        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock)
 
-        await homeService.search('', INITIAL_FILTERS, 0, 6, null)
+        await homeService.search('', INITIAL_HOME_FILTERS, 0, 6, null)
 
         expect(mockedApiClient.get).toHaveBeenCalledWith(
             '/libros/home',
@@ -50,9 +59,9 @@ describe('HomeService - search', () => {
     })
 
     it('retorna el contenido de la respuesta correctamente', async () => {
-        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock)
 
-        const result = await homeService.search('', INITIAL_FILTERS, 0, 6, null)
+        const result = await homeService.search('', INITIAL_HOME_FILTERS, 0, 6, null)
 
         expect(result.content).toHaveLength(1)
         expect(result.content[0].titulo).toBe('Clean Code')
@@ -60,46 +69,46 @@ describe('HomeService - search', () => {
     })
 
     it('no incluye usuarioId en los params cuando es null', async () => {
-        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock)
 
-        await homeService.search('', INITIAL_FILTERS, 0, 6, null)
+        await homeService.search('', INITIAL_HOME_FILTERS, 0, 6, null)
 
         const params = mockedApiClient.get.mock.calls[0][1]?.params
         expect(params).not.toHaveProperty('usuarioId')
     })
 
     it('incluye usuarioId en los params cuando está presente', async () => {
-        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock)
 
-        await homeService.search('', INITIAL_FILTERS, 0, 6, 42)
+        await homeService.search('', INITIAL_HOME_FILTERS, 0, 6, 42)
 
         const params = mockedApiClient.get.mock.calls[0][1]?.params
         expect(params.usuarioId).toBe(42)
     })
 
     it('incluye sortBy en los params', async () => {
-        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock)
 
-        await homeService.search('', INITIAL_FILTERS, 0, 6, null, 'autor')
+        await homeService.search('', INITIAL_HOME_FILTERS, 0, 6, null, 'autor')
 
         const params = mockedApiClient.get.mock.calls[0][1]?.params
         expect(params.sortBy).toBe('autor')
     })
 
     it('usa titulo como sortBy por defecto', async () => {
-        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock)
 
-        await homeService.search('', INITIAL_FILTERS, 0, 6, null)
+        await homeService.search('', INITIAL_HOME_FILTERS, 0, 6, null)
 
         const params = mockedApiClient.get.mock.calls[0][1]?.params
         expect(params.sortBy).toBe('titulo')
     })
 
     it('mapea los géneros seleccionados correctamente', async () => {
-        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock)
 
-        const filtersConGenero: FiltersState = {
-            ...INITIAL_FILTERS,
+        const filtersConGenero: HomeFiltersState = {
+            ...INITIAL_HOME_FILTERS,
             drama: true,
             romance: true,
         }
@@ -112,28 +121,28 @@ describe('HomeService - search', () => {
     })
 
     it('envía generos vacío cuando no hay géneros seleccionados', async () => {
-        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock)
 
-        await homeService.search('', INITIAL_FILTERS, 0, 6, null)
+        await homeService.search('', INITIAL_HOME_FILTERS, 0, 6, null)
 
         const params = mockedApiClient.get.mock.calls[0][1]?.params
         expect(params.generos).toBe('')
     })
 
     it('no incluye paginasMin en params cuando no está definido', async () => {
-        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock)
 
-        await homeService.search('', INITIAL_FILTERS, 0, 6, null)
+        await homeService.search('', INITIAL_HOME_FILTERS, 0, 6, null)
 
         const params = mockedApiClient.get.mock.calls[0][1]?.params
         expect(params.paginasMin).toBeUndefined()
     })
 
     it('incluye paginasMin y paginasMax cuando están definidos', async () => {
-        mockedApiClient.get.mockResolvedValueOnce(responseMock as any)
+        mockedApiClient.get.mockResolvedValueOnce(responseMock)
 
-        const filtersConPaginas: FiltersState = {
-            ...INITIAL_FILTERS,
+        const filtersConPaginas: HomeFiltersState = {
+            ...INITIAL_HOME_FILTERS,
             paginasMin: 100,
             paginasMax: 500,
         }
@@ -149,7 +158,7 @@ describe('HomeService - search', () => {
         mockedApiClient.get.mockRejectedValueOnce(new Error('Network Error'))
 
         await expect(
-            homeService.search('', INITIAL_FILTERS, 0, 6, null)
+            homeService.search('', INITIAL_HOME_FILTERS, 0, 6, null)
         ).rejects.toThrow('Network Error')
     })
 })

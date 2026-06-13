@@ -5,8 +5,8 @@ import { adminService } from "../services/adminService"
 import { SearchBar } from "../components/ui/SearchBar"
 import { Paginacion } from "../components/ui/Paginacion"
 import { Spinner } from "../components/ui/Spinner.tsx"
-import { Filters, INITIAL_FILTERS } from "../components/home/Filters"
-import type { FiltersState } from "../components/home/Filters"
+import { Filters } from "../components/home/Filters"
+import { INITIAL_HOME_FILTERS, type HomeFiltersState } from "../models/homeFilters"
 import type { AdminKpiResumenResponse, LibroHome } from "../models/libroModel"
 import { LibroCardHome } from "../components/home/LibroCardHome"
 import { AdminKpiHeader } from "../components/home/AdminKpiHeader"
@@ -20,7 +20,7 @@ const ITEMS_POR_PAGINA = 10
 
 export const Home = () => {
   const [query, setQuery] = useState("")
-  const [filters, setFilters] = useState<FiltersState>(INITIAL_FILTERS)
+  const [filters, setFilters] = useState<HomeFiltersState>(INITIAL_HOME_FILTERS)
   const [books, setBooks] = useState<LibroHome[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPaginas, setTotalPaginas] = useState(1)
@@ -40,7 +40,7 @@ export const Home = () => {
 
   const search = async (
     q: string,
-    f: FiltersState,
+    f: HomeFiltersState,
     page: number = 0,
     sort: string = sortBy,
     usarPopulares: boolean = vistaPopulares,
@@ -87,7 +87,7 @@ export const Home = () => {
   }
 
   useOnInit(() => {
-    search("", INITIAL_FILTERS, 0)
+    search("", INITIAL_HOME_FILTERS, 0)
     cargarAdminKpis()
   })
 
@@ -98,7 +98,7 @@ export const Home = () => {
     search(q, filters, 0, sortBy, false)
   }
 
-  const handleApplyFilters = (f: FiltersState) => {
+  const handleApplyFilters = (f: HomeFiltersState) => {
     setFilters(f)
     setCurrentPage(1)
     setVistaPopulares(false)
@@ -124,21 +124,21 @@ export const Home = () => {
   )
 
   const handleClearFilters = () => {
-    setFilters(INITIAL_FILTERS)
+    setFilters(INITIAL_HOME_FILTERS)
     setCurrentPage(1)
     setFilterKey((k) => k + 1)
     setVistaPopulares(false)
-    search(query, INITIAL_FILTERS, 0, sortBy, false)
+    search(query, INITIAL_HOME_FILTERS, 0, sortBy, false)
   }
 
   const handleVerMas = () => {
     setVistaPopulares(false)
     setQuery("")
-    setFilters(INITIAL_FILTERS)
+    setFilters(INITIAL_HOME_FILTERS)
     setSortBy("titulo")
     setCurrentPage(1)
     setFilterKey((k) => k + 1)
-    search("", INITIAL_FILTERS, 0, "titulo", false)
+    search("", INITIAL_HOME_FILTERS, 0, "titulo", false)
   }
 
   if (error) {

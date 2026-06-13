@@ -1,45 +1,17 @@
 import { useState } from "react"
 import { ChevronDown, Hash, BookMarked, Calendar, FileText, SlidersHorizontal } from "lucide-react"
-
-export type FiltersState = {
-  cienciaFiccion: boolean
-  drama: boolean
-  autoayuda: boolean
-  romance: boolean
-  disenio: boolean
-  literaturaClasica: boolean
-  isbn?: string
-  prestadoPor?: string
-  paginasMin?: number
-  paginasMax?: number
-  fechaDesde?: string
-  fechaHasta?: string
-}
+import {
+  HOME_GENRES,
+  INITIAL_HOME_FILTERS,
+  normalizeNumberFilter,
+  type HomeFiltersState,
+} from "../../models/homeFilters"
 
 type Props = {
-  onApplyFilters: (filters: FiltersState) => void
+  onApplyFilters: (filters: HomeFiltersState) => void
   onClearFilters?: () => void
   hasActiveFilters?: boolean
 }
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const INITIAL_FILTERS: FiltersState = {
-  cienciaFiccion: false,
-  drama: false,
-  autoayuda: false,
-  romance: false,
-  disenio: false,
-  literaturaClasica: false,
-}
-
-const GENRES = [
-  { key: "cienciaFiccion", label: "Ciencia Ficción", emoji: "🚀" },
-  { key: "drama",          label: "Drama",           emoji: "🎭" },
-  { key: "autoayuda",      label: "Autoayuda",       emoji: "✨" },
-  { key: "romance",        label: "Romance",         emoji: "💫" },
-  { key: "disenio",        label: "Diseño",          emoji: "🎨" },
-  { key: "literaturaClasica", label: "Clásica",      emoji: "📜" },
-]
 
 type SectionProps = {
   title: string
@@ -89,10 +61,10 @@ const inputCls =
   "w-full bg-background/60 border border-accent/20 rounded-lg px-3 py-2 text-xs text-on-surface outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-on-surface-variant/30"
 
 export const Filters = ({ onApplyFilters, onClearFilters, hasActiveFilters }: Props) => {
-  const [filters, setFilters] = useState<FiltersState>(INITIAL_FILTERS)
+  const [filters, setFilters] = useState<HomeFiltersState>(INITIAL_HOME_FILTERS)
   const [errors, setErrors] = useState<{ paginas?: string; fechas?: string }>({})
 
-  const updateFilter = <K extends keyof FiltersState>(key: K, value: FiltersState[K]) => {
+  const updateFilter = <K extends keyof HomeFiltersState>(key: K, value: HomeFiltersState[K]) => {
     setFilters((prev) => ({ ...prev, [key]: value }))
     setErrors({})
   }
@@ -111,7 +83,7 @@ export const Filters = ({ onApplyFilters, onClearFilters, hasActiveFilters }: Pr
     if (validar()) onApplyFilters(filters)
   }
 
-  const activeGenreCount = GENRES.filter((g) => filters[g.key as keyof FiltersState]).length
+  const activeGenreCount = HOME_GENRES.filter((g) => filters[g.key]).length
 
   return (
     <div className="bg-surface border border-accent/15 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
@@ -141,13 +113,13 @@ export const Filters = ({ onApplyFilters, onClearFilters, hasActiveFilters }: Pr
         {/* Géneros */}
         <Section title="Género" icon={<BookMarked size={13} />} badge={activeGenreCount}>
           <div className="flex flex-wrap gap-2">
-            {GENRES.map(({ key, label, emoji }) => {
-              const checked = filters[key as keyof FiltersState] as boolean
+            {HOME_GENRES.map(({ key, label, emoji }) => {
+              const checked = filters[key]
               return (
                 <button
                   key={key}
                   type="button"
-                  onClick={() => updateFilter(key as keyof FiltersState, !checked)}
+                  onClick={() => updateFilter(key, !checked)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all duration-200 border ${
                     checked
                       ? "bg-primary/15 border-primary/40 text-primary shadow-[0_0_12px_rgba(186,136,15,0.15)]"
@@ -169,7 +141,7 @@ export const Filters = ({ onApplyFilters, onClearFilters, hasActiveFilters }: Pr
               type="number"
               placeholder="Min"
               min={1}
-              onChange={(e) => updateFilter("paginasMin", Number(e.target.value))}
+              onChange={(e) => updateFilter("paginasMin", normalizeNumberFilter(e.target.value))}
               className={inputCls}
             />
             <span className="text-on-surface-variant/30 font-bold shrink-0">—</span>
@@ -177,7 +149,7 @@ export const Filters = ({ onApplyFilters, onClearFilters, hasActiveFilters }: Pr
               type="number"
               placeholder="Max"
               min={1}
-              onChange={(e) => updateFilter("paginasMax", Number(e.target.value))}
+              onChange={(e) => updateFilter("paginasMax", normalizeNumberFilter(e.target.value))}
               className={inputCls}
             />
           </div>
