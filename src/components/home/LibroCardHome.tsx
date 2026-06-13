@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { GENERO_LABEL, IDIOMA_LABEL, ESTADO_LABEL, TIPO_LABEL } from '../../models/libroModel'
+import type { EstadoLibro } from '../../models/libroModel'
 import { Star, BookOpen } from 'lucide-react'
 
 type LibroCardProps = {
@@ -14,14 +15,16 @@ type LibroCardProps = {
   idioma: string
   tipo: string
   bibliokarma: number
-  estado: string
+  estado: EstadoLibro
   duenio: string
 }
 
-const estadoColor: Record<string, string> = {
-  DISPONIBLE:    "bg-success-bg text-success border-success/20",
-  PRESTADO:      "bg-warning-bg text-warning border-warning/20",
-  NO_DISPONIBLE: "bg-danger-bg  text-danger  border-danger/20",
+const estadoColor: Record<EstadoLibro, string> = {
+  EXCELENTE: "bg-success-bg text-success border-success/20",
+  MUY_BUENO: "bg-success-bg text-success border-success/20",
+  BUENO: "bg-surface-highest text-on-surface-variant border-accent/20",
+  REGULAR: "bg-warning-bg text-warning border-warning/20",
+  MALO: "bg-danger-bg text-danger border-danger/20",
 }
 
 export const LibroCardHome = ({
