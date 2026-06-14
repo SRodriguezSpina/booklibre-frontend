@@ -26,7 +26,7 @@ export const ReseniasLibro = ({
         {totalCalificaciones !== undefined && totalCalificaciones > 2 && (
           <button
             type="button"
-            className="flex items-center gap-1.5 text-sm font-semibold text-secondary/50 hover:text-secondary transition-colors mb-3"
+            className="cursor-pointer flex items-center gap-1.5 text-sm font-semibold text-secondary/50 hover:text-secondary transition-colors mb-3"
             onClick={() => navigate(`/libros/${libroId}/resenias`)}
           >
             Ver las {totalCalificaciones} reseñas →

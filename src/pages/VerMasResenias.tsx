@@ -82,7 +82,7 @@ export const VerMasResenias = () => {
           <button
             type="button"
             onClick={() => navigate(`/libros/${id}`)}
-            className="flex items-center gap-1.5 text-xs font-semibold text-secondary/50 hover:text-secondary transition-colors mb-3"
+            className="cursor-pointer flex items-center gap-1.5 text-xs font-semibold text-secondary/50 hover:text-secondary transition-colors mb-3"
           >
             <ChevronLeft size={14} />
             Volver a {tituloLibro}
