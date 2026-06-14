@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Link, useParams } from "react-router-dom"
-import { libroService } from "../services/libroService"
 import { Libro } from "../classes/Libro"
 import { ReseniasLibro } from "../components/detalleLibros/ReseniasLibro"
 import { ReservaCard } from "../components/detalleLibros/ReservaCard"
@@ -9,73 +8,86 @@ import { useAuthContext } from "../utils/hooks"
 import { ChevronRight, Lock, CalendarDays } from "lucide-react"
 import { formatearFechaVisual } from "../utils/dateHandlerReserva"
 import { Card } from "../components/ui/Card"
+import { ErrorCard } from "../components/ui/ErrorCard"
+import { useDetalleLibro } from "../hooks/useDetalleLibro"
+import {
+  calcularElegibilidad,
+  calcularPuedeReservar,
+  calcularKarmaReserva,
+} from "../utils/libroHelpers"
 
 export const DetalleLibro = () => {
   const { id } = useParams()
-  const [libro, setLibro] = useState<Libro>()
-  const [loading, setLoading] = useState(true)
-
   const [fechaDesde, setFechaDesde] = useState<string>("")
   const [fechaHasta, setFechaHasta] = useState<string>("")
 
   const { usuario, cargandoUsuario, actualizarUsuario } = useAuthContext()
   const usuarioId = usuario?.id ?? 0
   const bibliokarmasUsuario = usuario?.bibliokarmas || 0
-  const esElegible = !!usuarioId && usuario?.tipoUsuario !== "Publicador" && libro?.propietarioId !== usuarioId
-  const puedeReservar = esElegible && !libro?.estoyReservado
 
-  const fetchLibro = async () => {
-    try {
-      if (id) {
-        const data = await libroService.getLibroById(Number(id), usuarioId)
-        setLibro(data)
-      }
-    } catch (error) {
-      console.error("Error fetching libro", error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { libro, setLibro, loading, error, recargar } = useDetalleLibro(
+    id,
+    usuarioId,
+    cargandoUsuario,
+  )
 
-  useEffect(() => {
-    if (!cargandoUsuario) {
-      fetchLibro()
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, cargandoUsuario])
+  const esElegible = calcularElegibilidad(
+    usuarioId,
+    usuario?.tipoUsuario,
+    libro?.propietarioId,
+  )
+
+  const puedeReservar = calcularPuedeReservar(esElegible, libro?.estoyReservado)
 
   const handleReservaExitosa = async (desde: string, hasta: string) => {
-    setLibro(prev => {
+    setLibro((prev) => {
       if (!prev) return prev
       return new Libro({
         ...prev,
         estoyReservado: true,
         miReservaFechaHasta: hasta,
-        reservas: [...(prev.reservas ?? []), { fechaDesde: desde, fechaHasta: hasta }],
+        reservas: [
+          ...(prev.reservas ?? []),
+          { fechaDesde: desde, fechaHasta: hasta },
+        ],
       })
     })
     await actualizarUsuario()
   }
 
-  const karmaEstimado = libro?.bibliokarma ?? 0
-  let karmaCalculado = karmaEstimado
-  if (libro && fechaDesde && fechaHasta && fechaHasta >= fechaDesde) {
-    karmaCalculado = libro.calcularBibliokarma(fechaDesde, fechaHasta, bibliokarmasUsuario)
+  const karmaCalculado = calcularKarmaReserva(
+    libro,
+    fechaDesde,
+    fechaHasta,
+    bibliokarmasUsuario,
+  )
+
+  if (loading)
+    return <div className="p-10 text-center text-primary">Cargando...</div>
+
+  if (error) {
+    return (
+      <main className="min-h-screen bg-background text-secondary-dark flex items-center justify-center pt-24">
+        <ErrorCard error={error} alReintentar={recargar} />
+      </main>
+    )
   }
 
-  if (loading) return <div className="p-10 text-center text-primary">Cargando...</div>
-  if (!libro) return <div className="p-10 text-center text-red-500">Libro no encontrado</div>
+  if (!libro)
+    return (
+      <div className="p-10 text-center text-red-500">Libro no encontrado</div>
+    )
 
   return (
     <main className="min-h-screen bg-background text-secondary-dark">
       <div className="px-6 lg:px-10 pt-24 pb-16">
-
         {/* Breadcrumb */}
         <Link
           to="/home"
           className="flex items-center gap-1.5 text-xs font-semibold text-secondary/50 hover:text-secondary transition-colors mb-8"
         >
-          Explorar <ChevronRight size={14} /> <span className="text-secondary-dark">{libro.titulo}</span>
+          Explorar <ChevronRight size={14} />{" "}
+          <span className="text-secondary-dark">{libro.titulo}</span>
         </Link>
 
         {/* Main grid: cover | info+reviews | columna reservas  */}
@@ -115,15 +127,21 @@ export const DetalleLibro = () => {
                   </span>
                   {libro.miReservaFechaHasta && (
                     <p className="text-xs text-secondary/50 text-center leading-relaxed">
-                      Tu reserva vence el<br />
-                      <span className="font-semibold text-secondary/70">{formatearFechaVisual(libro.miReservaFechaHasta)}</span>
+                      Tu reserva vence el
+                      <br />
+                      <span className="font-semibold text-secondary/70">
+                        {formatearFechaVisual(libro.miReservaFechaHasta)}
+                      </span>
                     </p>
                   )}
                 </>
               )}
               {(libro.cantidadReservas ?? 0) > 0 && (
                 <p className="text-xs text-secondary/40">
-                  {libro.cantidadReservas} {libro.cantidadReservas === 1 ? "préstamo histórico" : "préstamos históricos"}
+                  {libro.cantidadReservas}{" "}
+                  {libro.cantidadReservas === 1
+                    ? "préstamo histórico"
+                    : "préstamos históricos"}
                 </p>
               )}
             </div>
@@ -131,7 +149,11 @@ export const DetalleLibro = () => {
 
           {/* Column 2: info + reviews */}
           <div className="flex flex-col gap-8 min-w-0">
-            <InfoLibro libro={libro} karmaCalculado={karmaCalculado} mostrarKarma={esElegible} />
+            <InfoLibro
+              libro={libro}
+              karmaCalculado={karmaCalculado}
+              mostrarKarma={esElegible}
+            />
             <ReseniasLibro
               libroId={Number(id)}
               calificaciones={libro.ultimasCalificaciones}
@@ -156,7 +178,9 @@ export const DetalleLibro = () => {
                 <Card className="flex flex-col gap-0 overflow-hidden p-0">
                   <div className="px-5 pt-5 pb-4 border-b border-accent/10 flex items-center gap-2">
                     <Lock size={18} className="text-danger/70" />
-                    <span className="text-lg font-bold text-secondary-dark">No disponible</span>
+                    <span className="text-lg font-bold text-secondary-dark">
+                      No disponible
+                    </span>
                   </div>
                   <div className="px-5 py-8 flex flex-col items-center gap-4 text-center">
                     <div className="w-14 h-14 rounded-full bg-danger-bg flex items-center justify-center">
@@ -167,10 +191,15 @@ export const DetalleLibro = () => {
                     </p>
                     {libro.miReservaFechaHasta && (
                       <div className="flex items-center gap-2 bg-primary/10 rounded-lg px-4 py-3">
-                        <CalendarDays size={14} className="text-primary shrink-0" />
+                        <CalendarDays
+                          size={14}
+                          className="text-primary shrink-0"
+                        />
                         <p className="text-xs font-semibold text-secondary-dark">
                           Tu reserva vence el{" "}
-                          <span className="text-primary">{formatearFechaVisual(libro.miReservaFechaHasta)}</span>
+                          <span className="text-primary">
+                            {formatearFechaVisual(libro.miReservaFechaHasta)}
+                          </span>
                         </p>
                       </div>
                     )}
@@ -180,7 +209,6 @@ export const DetalleLibro = () => {
             </div>
           )}
         </div>
-
       </div>
     </main>
   )

@@ -8,14 +8,20 @@ interface ReseniasLibroProps {
   totalCalificaciones?: number
 }
 
-export const ReseniasLibro = ({ libroId, calificaciones, totalCalificaciones }: ReseniasLibroProps) => {
+export const ReseniasLibro = ({
+  libroId,
+  calificaciones,
+  totalCalificaciones,
+}: ReseniasLibroProps) => {
   const navigate = useNavigate()
   if (calificaciones.length === 0) return null
 
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h3 className="font-bold text-xl text-secondary-dark">Reseñas de la Comunidad</h3>
+        <h3 className="font-bold text-xl text-secondary-dark">
+          Reseñas de la Comunidad
+        </h3>
 
         {totalCalificaciones !== undefined && totalCalificaciones > 2 && (
           <button
@@ -29,11 +35,11 @@ export const ReseniasLibro = ({ libroId, calificaciones, totalCalificaciones }: 
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {calificaciones.map((calificacion, calificacionIndex) => (
-          <ReseniaCard 
-            key={calificacionIndex} 
-            calificacion={calificacion} 
-            truncate={true} 
+        {calificaciones.map((calificacion) => (
+          <ReseniaCard
+            key={calificacion.usuarioId}
+            calificacion={calificacion}
+            truncate={true}
           />
         ))}
       </div>
