@@ -181,3 +181,28 @@ export type AdminKpiResumenResponse = {
   mejorTipoCalificado: PromedioCalificacionPorTipoResponse | null
   tiposEvaluados: number
 }
+
+// --- Caso 5: Feed de Actividad Reciente ---
+
+export type LibroAgregadoResponse = {
+  __typename: "LibroAgregado"
+  tipoEvento: "LIBRO_AGREGADO"
+  fecha: string
+  libroId: number
+  titulo: string
+  autor: string
+  duenioNombre: string
+}
+
+export type ReservaConfirmadaResponse = {
+  __typename: "ReservaConfirmada"
+  tipoEvento: "RESERVA_CONFIRMADA"
+  fecha: string
+  reservaId: number
+  libroId: number
+  libroTitulo: string
+  usuarioId: number
+  usuarioNombre: string
+}
+
+export type FeedActividadResponse = LibroAgregadoResponse | ReservaConfirmadaResponse

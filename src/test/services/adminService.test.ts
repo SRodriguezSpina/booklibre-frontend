@@ -157,3 +157,58 @@ describe("adminService - obtenerResumenKpisHome", () => {
     })
   })
 })
+
+describe("adminService - obtenerFeedActividad", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it("envia la consulta GraphQL correcta y devuelve el feed de actividad", async () => {
+    const feedActividad = [
+      {
+        __typename: "LibroAgregado",
+        tipoEvento: "LIBRO_AGREGADO",
+        fecha: "2026-06-15T10:30:00",
+        libroId: 1,
+        titulo: "El Aleph",
+        autor: "Jorge Luis Borges",
+        duenioNombre: "Juan",
+      },
+      {
+        __typename: "ReservaConfirmada",
+        tipoEvento: "RESERVA_CONFIRMADA",
+        fecha: "2026-06-14T09:15:00",
+        reservaId: 10,
+        libroId: 2,
+        libroTitulo: "Ficciones",
+        usuarioId: 3,
+        usuarioNombre: "Maria",
+      },
+    ]
+
+    mockedApiClient.post.mockResolvedValueOnce({
+      data: { data: { feedActividad } },
+    } as any)
+
+    const result = await adminService.obtenerFeedActividad()
+
+    expect(mockedApiClient.post).toHaveBeenCalledWith(
+      "/graphql",
+      expect.objectContaining({
+        query: expect.stringContaining("feedActividad"),
+      }),
+    )
+    const body = mockedApiClient.post.mock.calls[0][1] as { query: string }
+    
+    // Verificamos que se pidan los campos polimórficos correctos
+    expect(body.query).toContain("... on LibroAgregado")
+    expect(body.query).toContain("... on ReservaConfirmada")
+    expect(body.query).toContain("__typename")
+    expect(body.query).toContain("fecha")
+    expect(body.query).toContain("tipoEvento")
+    expect(body.query).toContain("duenioNombre")
+    expect(body.query).toContain("usuarioNombre")
+    
+    expect(result).toEqual(feedActividad)
+  })
+})
