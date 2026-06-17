@@ -101,10 +101,11 @@ export const ReservaCard = ({
     fechaDesde && fechaHasta ? calcularDiferenciaDias(fechaDesde, fechaHasta) : 0
 
   const handleReservar = async () => {
-    const fechaDesdeEnvio = debugDesde || fechaDesde
-    const fechaHastaEnvio = debugHasta || fechaHasta
+    const usarDebug = !!(debugDesde && debugHasta)
+    const fechaDesdeEnvio = usarDebug ? debugDesde : fechaDesde
+    const fechaHastaEnvio = usarDebug ? debugHasta : fechaHasta
     if (!fechaDesdeEnvio || !fechaHastaEnvio) return
-    if (fechaHastaEnvio <= fechaDesdeEnvio) {
+    if (new Date(fechaHastaEnvio) <= new Date(fechaDesdeEnvio)) {
       toast.error(
         'La fecha de "hasta" debe ser posterior a la fecha de "desde"'
       )

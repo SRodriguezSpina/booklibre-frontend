@@ -94,6 +94,11 @@ export class Libro {
     return startOfDay(parseISO(fecha))
   }
 
+  estaReservadoFuturo(): boolean {
+    if (!this.fechaDesde) return false
+    return startOfDay(parseISO(this.fechaDesde)) > startOfDay(new Date())
+  }
+
   estaDevuelto(): boolean {
     const fechaFin = this.obtenerFechaInicioDia(this.fechaHasta)
     if (!fechaFin) return false
