@@ -48,6 +48,9 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
     // Si está devuelto, mostrar DEVUELTO
     if (libro.estaDevuelto()) return "DEVUELTO"
 
+    // Si la reserva todavía no comenzó, mostrar RESERVADO
+    if (libro.estaReservadoFuturo()) return "RESERVADO"
+
     // Si está próximo a vencer, mostrar eso
     if (proximoAVencer) return "PRÓXIMO A VENCER"
 
@@ -68,6 +71,10 @@ export const LibroCard = ({ libro, tipoVista }: LibroCardProps) => {
     // Si está devuelto (verde)
     if (libro.estaDevuelto())
       return "bg-success-bg text-success border border-success/20 shadow-[0_0_8px_rgba(16,185,129,0.2)]"
+
+    // Si la reserva todavía no comenzó (violeta)
+    if (libro.estaReservadoFuturo())
+      return "bg-purple-900/30 text-purple-400 border border-purple-400/20 shadow-[0_0_8px_rgba(168,85,247,0.2)]"
 
     // Si está próximo a vencer (amarillo/warning)
     if (proximoAVencer)
