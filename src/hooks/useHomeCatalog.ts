@@ -114,6 +114,16 @@ export const useHomeCatalog = ({ userId }: UseHomeCatalogParams) => {
     await search("", INITIAL_HOME_FILTERS, 0, "titulo", false)
   }
 
+  const handleVerPopulares = async () => {
+    setVistaPopulares(true)
+    setQuery("")
+    setFilters(INITIAL_HOME_FILTERS)
+    setAppliedFilters(INITIAL_HOME_FILTERS)
+    setSortBy("titulo")
+    setCurrentPage(1)
+    await search("", INITIAL_HOME_FILTERS, 0, "titulo", true)
+  }
+
   const retrySearch = () => search(query, appliedFilters, currentPage - 1, sortBy)
 
   return {
@@ -135,6 +145,7 @@ export const useHomeCatalog = ({ userId }: UseHomeCatalogParams) => {
     handleSortChange,
     handleClearFilters,
     handleVerMas,
+    handleVerPopulares,
     loadInitialCatalog,
     retrySearch,
   }

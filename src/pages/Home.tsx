@@ -37,6 +37,7 @@ export const Home = () => {
     handleSortChange,
     handleClearFilters,
     handleVerMas,
+    handleVerPopulares,
     loadInitialCatalog,
     retrySearch,
   } = useHomeCatalog({ userId })
@@ -102,6 +103,7 @@ export const Home = () => {
             sortBy={sortBy}
             onOpenFilters={() => setIsFiltersOpen(true)}
             onSortChange={handleSortChange}
+            onViewPopular={handleVerPopulares}
           />
 
           {vistaPopulares && !loading && !error && (

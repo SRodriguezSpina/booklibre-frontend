@@ -364,6 +364,35 @@ describe('useHomeCatalog', () => {
         expect(result.current.vistaPopulares).toBe(false)
     })
 
+    it('handleVerPopulares resets catalog state and reloads popular books', async () => {
+        mockedHomeService.search.mockResolvedValue(responseMock())
+        mockedHomeService.getPopulares.mockResolvedValueOnce(responseMock(librosMock, 1))
+        const { result } = renderHook(() => useHomeCatalog({ userId: 42 }))
+
+        await act(async () => {
+            await result.current.handleSearch('rayuela')
+        })
+        await act(async () => {
+            await result.current.handleApplyFilters(activeFilters)
+        })
+        await act(async () => {
+            await result.current.handleSortChange('autor')
+        })
+        mockedHomeService.search.mockClear()
+
+        await act(async () => {
+            await result.current.handleVerPopulares()
+        })
+
+        expect(mockedHomeService.getPopulares).toHaveBeenCalledWith(42)
+        expect(mockedHomeService.search).not.toHaveBeenCalled()
+        expect(result.current.query).toBe('')
+        expect(result.current.filters).toEqual(INITIAL_HOME_FILTERS)
+        expect(result.current.sortBy).toBe('titulo')
+        expect(result.current.currentPage).toBe(1)
+        expect(result.current.vistaPopulares).toBe(true)
+    })
+
     it('hasActiveFilters becomes true when filters contain an active value', async () => {
         mockedHomeService.search.mockResolvedValueOnce(responseMock())
         const { result } = renderHook(() => useHomeCatalog({ userId: null }))
