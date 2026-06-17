@@ -33,7 +33,7 @@ export type UsuarioUpdateRequest = {
 export type UsuarioReservasDevueltasResponse = {
   usuarioId: number
   usuarioNombre: string
-  cantidadReservasDevueltas: number
+  cantidadReservas: number
 }
 
 export type ReservaAnualUsuarioResponse = {

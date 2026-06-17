@@ -264,7 +264,7 @@ export const ConsultasAdmin = () => {
                         </span>
 
                         <span className="text-sm text-on-surface-variant">
-                            {usuario.cantidadReservasDevueltas} devoluciones
+                            {usuario.cantidadReservas} devoluciones
                         </span>
                     </div>
                 )}
@@ -287,7 +287,7 @@ export const ConsultasAdmin = () => {
                         </span>
 
                         <span className="text-sm text-on-surface-variant">
-                            {usuario.cantidadReservasDevueltas} reservas
+                            {usuario.cantidadReservas} reservas
                         </span>
                     </div>
                 )}
