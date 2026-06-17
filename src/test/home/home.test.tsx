@@ -167,7 +167,20 @@ describe('Home', () => {
             '', expect.anything(), 0, 10, null, 'titulo'
         )
         expect(screen.queryByText('Libros más populares')).not.toBeInTheDocument()
+        expect(screen.queryByRole('button', { name: 'Ver más' })).not.toBeInTheDocument()
+        expect(screen.getByRole('link', { name: /Clean Code/ })).not.toHaveClass('border-primary/60')
         expect(screen.getByRole('button', { name: '2' })).toBeInTheDocument()
+    })
+
+    it('diferencia los libros populares con borde dorado', async () => {
+        mockedHomeService.getPopulares.mockResolvedValueOnce(responseMock(librosMock, 3))
+        renderHome()
+
+        await act(async () => {
+            await vi.runAllTimersAsync()
+        })
+
+        expect(screen.getByRole('link', { name: /Clean Code/ })).toHaveClass('border-primary/60')
     })
 
     it('no carga ni muestra KPIs de admin para usuarios no administradores', async () => {

@@ -153,7 +153,7 @@ export const Home = () => {
                 }`}
               >
                 {books.map((book) => (
-                  <LibroCardHome key={book.id} {...book} />
+                  <LibroCardHome key={book.id} {...book} destacado={vistaPopulares} />
                 ))}
               </div>
               {!vistaPopulares && (
