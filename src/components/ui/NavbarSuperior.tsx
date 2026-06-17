@@ -127,7 +127,7 @@ export const NavbarSuperior = () => {
               />
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant hover:text-danger border border-accent/30 rounded-lg px-3 py-1.5 hover:bg-danger-bg/30 hover:border-danger/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/40"
+                className="cursor-pointer flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant hover:text-danger border border-accent/30 rounded-lg px-3 py-1.5 hover:bg-danger-bg/30 hover:border-danger/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/40"
               >
                 <LogOut size={13} aria-hidden />
                 Salir
@@ -199,7 +199,7 @@ export const NavbarSuperior = () => {
           <div className="border-t border-accent/15 pt-4">
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant hover:text-danger transition-colors"
+              className="cursor-pointer flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant hover:text-danger transition-colors"
             >
               <LogOut size={14} aria-hidden />
               Cerrar sesión

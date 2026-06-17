@@ -1,122 +1,56 @@
 import { useState } from "react"
-import { homeService } from "../services/homeService"
 import { authService } from "../services/AuthService.ts"
-import { adminService } from "../services/adminService"
-import { SearchBar } from "../components/ui/SearchBar"
 import { Paginacion } from "../components/ui/Paginacion"
 import { Spinner } from "../components/ui/Spinner.tsx"
-import { Filters, INITIAL_FILTERS } from "../components/home/Filters"
-import type { FiltersState } from "../components/home/Filters"
-import type { AdminKpiResumenResponse, LibroHome } from "../models/libroModel"
+import { Filters } from "../components/home/Filters"
+import type { HomeFiltersState } from "../models/homeFilters"
 import { LibroCardHome } from "../components/home/LibroCardHome"
-import { AdminKpiHeader } from "../components/home/AdminKpiHeader"
 import { useOnInit } from "../utils/hooks.ts"
-import { SortBy } from "../components/home/SortBy.tsx"
-import { obtenerMensajeError, type ErrorPersonalizado } from "../utils/errorHandler.ts"
 import { ErrorCard } from "../components/ui/ErrorCard"
-import { BookOpen, SlidersHorizontal, X } from "lucide-react"
-
-const ITEMS_POR_PAGINA = 10
+import { BookOpen } from "lucide-react"
+import { useHomeCatalog } from "../hooks/useHomeCatalog.ts"
+import { useAdminHomeKpis } from "../hooks/useAdminHomeKpis.ts"
+import { HomeHeader } from "../components/home/HomeHeader"
+import { HomeToolbar } from "../components/home/HomeToolbar"
+import { MobileFiltersDrawer } from "../components/home/MobileFiltersDrawer"
 
 export const Home = () => {
-  const [query, setQuery] = useState("")
-  const [filters, setFilters] = useState<FiltersState>(INITIAL_FILTERS)
-  const [books, setBooks] = useState<LibroHome[]>([])
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPaginas, setTotalPaginas] = useState(1)
-  const [sortBy, setSortBy] = useState("titulo")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<ErrorPersonalizado | null>(null)
-  const [animating, setAnimating] = useState(false)
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
-  const [filterKey, setFilterKey] = useState(0)
-  const [adminKpis, setAdminKpis] = useState<AdminKpiResumenResponse | null>(null)
-  const [loadingAdminKpis, setLoadingAdminKpis] = useState(false)
-  const [errorAdminKpis, setErrorAdminKpis] = useState("")
 
   const userId = authService.obtenerIdUsuarioActual()
   const esAdmin = authService.obtenerTipoUsuarioActual()?.toUpperCase() === "ADMIN"
+  const {
+    books,
+    currentPage,
+    totalPaginas,
+    sortBy,
+    loading,
+    error,
+    animating,
+    vistaPopulares,
+    filters,
+    hasActiveFilters,
+    handleSearch,
+    handleChangeFilters,
+    handleApplyFilters: applyCatalogFilters,
+    handlePageChange,
+    handleSortChange,
+    handleClearFilters,
+    handleVerMas,
+    handleVerPopulares,
+    loadInitialCatalog,
+    retrySearch,
+  } = useHomeCatalog({ userId })
+  const { adminKpis, loadingAdminKpis, errorAdminKpis, loadAdminKpis } = useAdminHomeKpis({ esAdmin })
 
-  const search = async (q: string, f: FiltersState, page: number = 0, sort: string = sortBy) => {
-    setAnimating(true)
-    setLoading(true)
-    setError(null)
-    try {
-      const hasFilters = Object.values(f).some(
-        (v) => v !== false && v !== undefined && v !== "" && v !== 0
-      )
-      const isInitialLoad = q === "" && !hasFilters && page === 0 && sort === "titulo"
-
-      if (isInitialLoad) {
-        const data = await homeService.getPopulares(userId)
-        setBooks(data.content)
-        setTotalPaginas(data.totalPages)
-      } else {
-        const data = await homeService.search(q, f, page, ITEMS_POR_PAGINA, userId, sort)
-        setBooks(data.content)
-        setTotalPaginas(data.totalPages)
-      }
-    } catch (e: unknown) {
-      setError(obtenerMensajeError(e))
-    } finally {
-      setLoading(false)
-      setTimeout(() => setAnimating(false), 150)
-    }
-  }
-
-  const cargarAdminKpis = async () => {
-    if (!esAdmin) return
-
-    setLoadingAdminKpis(true)
-    setErrorAdminKpis("")
-    try {
-      const data = await adminService.obtenerResumenKpisHome()
-      setAdminKpis(data)
-    } catch {
-      setErrorAdminKpis("No se pudieron cargar los KPIs")
-    } finally {
-      setLoadingAdminKpis(false)
-    }
-  }
-
+  // Carga inicial de datos
   useOnInit(() => {
-    search("", INITIAL_FILTERS, 0)
-    cargarAdminKpis()
+    loadInitialCatalog()
+    loadAdminKpis()
   })
 
-  const handleSearch = (q: string) => {
-    setQuery(q)
-    setCurrentPage(1)
-    search(q, filters, 0)
-  }
-
-  const handleApplyFilters = (f: FiltersState) => {
-    setFilters(f)
-    setCurrentPage(1)
-    search(query, f, 0)
-    setIsFiltersOpen(false)
-  }
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-    search(query, filters, page - 1)
-  }
-
-  const handleSortChange = (sort: string) => {
-    setSortBy(sort)
-    setCurrentPage(1)
-    search(query, filters, 0, sort)
-  }
-
-  const hasActiveFilters = Object.values(filters).some(
-    (v) => v !== false && v !== undefined && v !== "" && v !== 0
-  )
-
-  const handleClearFilters = () => {
-    setFilters(INITIAL_FILTERS)
-    setCurrentPage(1)
-    setFilterKey((k) => k + 1)
-    search(query, INITIAL_FILTERS, 0, sortBy)
+  const handleApplyFilters = (f: HomeFiltersState) => {
+    applyCatalogFilters(f)
   }
 
   if (error) {
@@ -124,7 +58,7 @@ export const Home = () => {
       <div className="px-6 md:px-10 pt-24 pb-16">
         <ErrorCard
           error={error}
-          alReintentar={() => search(query, filters, currentPage - 1, sortBy)}
+          alReintentar={retrySearch}
         />
       </div>
     )
@@ -132,40 +66,14 @@ export const Home = () => {
 
   return (
     <main className="min-h-screen">
-      {/* ── Hero header ─────────────────────────────────────── */}
-      <div className="px-6 md:px-10 pt-24 pb-6 border-b border-accent/10">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <BookOpen size={16} className="text-primary" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary/80">
-                Catálogo
-              </span>
-            </div>
-            <h1 className="text-3xl md:text-4xl font-serif font-bold text-on-surface leading-tight">
-              Encuentra tu próxima<br className="hidden md:block" /> lectura
-            </h1>
-            <p className="text-sm text-on-surface-variant/70 mt-2">
-              Explorá libros disponibles para préstamo en nuestra comunidad.
-            </p>
-          </div>
-
-          {/* Buscador en header (desktop) */}
-          <div className="w-full md:w-96">
-            <SearchBar onSearch={handleSearch} placeholder="Buscar por título..." />
-          </div>
-        </div>
-
-        {esAdmin && (
-          <div className="mt-6">
-            <AdminKpiHeader
-              resumen={adminKpis}
-              loading={loadingAdminKpis}
-              error={errorAdminKpis}
-            />
-          </div>
-        )}
-      </div>
+      {/* ── Home header ─────────────────────────────────────── */}
+      <HomeHeader
+        esAdmin={esAdmin}
+        adminKpis={adminKpis}
+        loadingAdminKpis={loadingAdminKpis}
+        errorAdminKpis={errorAdminKpis}
+        onSearch={handleSearch}
+      />
 
       {/* ── Cuerpo principal ────────────────────────────────── */}
       <div className="flex px-6 md:px-10 py-6 gap-6">
@@ -173,7 +81,8 @@ export const Home = () => {
         {/* ── Sidebar filtros ─── */}
         <aside className="hidden lg:flex flex-col gap-0 w-64 shrink-0">
           <Filters
-            key={filterKey}
+            filters={filters}
+            onChangeFilters={handleChangeFilters}
             onApplyFilters={handleApplyFilters}
             onClearFilters={handleClearFilters}
             hasActiveFilters={hasActiveFilters}
@@ -184,31 +93,35 @@ export const Home = () => {
         <div className="flex-1 flex flex-col gap-4 min-w-0">
 
           {/* Toolbar: filtros móvil + sort */}
-          <div className="flex items-center justify-between gap-3">
-            {/* Botón filtros (móvil) */}
-            <button
-              type="button"
-              onClick={() => setIsFiltersOpen(true)}
-              className={`lg:hidden flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-all ${
-                hasActiveFilters
-                  ? "border-primary/50 bg-primary/10 text-primary"
-                  : "border-accent/30 bg-surface text-on-surface-variant hover:text-on-surface hover:border-accent/50"
-              }`}
-            >
-              <SlidersHorizontal size={14} />
-              Filtros
-              {hasActiveFilters && (
-                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              )}
-            </button>
+          <HomeToolbar
+            hasActiveFilters={hasActiveFilters}
+            vistaPopulares={vistaPopulares}
+            loading={loading}
+            booksLength={books.length}
+            currentPage={currentPage}
+            totalPaginas={totalPaginas}
+            sortBy={sortBy}
+            onOpenFilters={() => setIsFiltersOpen(true)}
+            onSortChange={handleSortChange}
+            onViewPopular={handleVerPopulares}
+          />
 
-            {/* Resultados count */}
-            <span className="hidden md:block text-xs text-on-surface-variant/50">
-              {loading ? "Buscando..." : `${books.length} resultado${books.length !== 1 ? "s" : ""} · Pág. ${currentPage}/${totalPaginas}`}
-            </span>
-
-            <SortBy value={sortBy} onChange={handleSortChange} />
-          </div>
+          {vistaPopulares && !loading && !error && (
+            <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border border-primary/20 bg-surface/70 px-4 py-3">
+              <div>
+                <h2 className="text-sm font-bold text-on-surface">
+                  Libros más populares
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={handleVerMas}
+                className="self-start sm:self-auto px-4 py-2 rounded-lg bg-primary text-background text-xs font-bold hover:bg-primary-dark active:scale-95 transition-all cursor-pointer"
+              >
+                Ver más
+              </button>
+            </section>
+          )}
 
           {/* Grid de libros */}
           {loading ? (
@@ -242,52 +155,31 @@ export const Home = () => {
                 }`}
               >
                 {books.map((book) => (
-                  <LibroCardHome key={book.id} {...book} />
+                  <LibroCardHome key={book.id} {...book} destacado={vistaPopulares} />
                 ))}
               </div>
-              <Paginacion
-                pagina={currentPage}
-                totalPaginas={totalPaginas}
-                alCambiar={handlePageChange}
-              />
+              {!vistaPopulares && (
+                <Paginacion
+                  pagina={currentPage}
+                  totalPaginas={totalPaginas}
+                  alCambiar={handlePageChange}
+                />
+              )}
             </>
           )}
         </div>
       </div>
 
       {/* ── Drawer de filtros en móvil ─────────────────────── */}
-      {isFiltersOpen && (
-        <div className="fixed inset-0 z-50 flex lg:hidden">
-          {/* overlay */}
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setIsFiltersOpen(false)}
-          />
-          {/* panel */}
-          <div className="relative ml-auto h-full w-80 bg-surface shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-accent/15">
-              <div className="flex items-center gap-2">
-                <SlidersHorizontal size={15} className="text-primary" />
-                <span className="font-bold text-sm text-on-surface">Filtros</span>
-              </div>
-              <button
-                onClick={() => setIsFiltersOpen(false)}
-                className="p-1.5 rounded-lg hover:bg-surface-high text-on-surface-variant hover:text-on-surface transition-colors"
-              >
-                <X size={16} />
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto px-5 py-4">
-              <Filters
-                key={filterKey}
-                onApplyFilters={handleApplyFilters}
-                onClearFilters={handleClearFilters}
-                hasActiveFilters={hasActiveFilters}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      <MobileFiltersDrawer
+        open={isFiltersOpen}
+        filters={filters}
+        hasActiveFilters={hasActiveFilters}
+        onClose={() => setIsFiltersOpen(false)}
+        onChangeFilters={handleChangeFilters}
+        onApplyFilters={handleApplyFilters}
+        onClearFilters={handleClearFilters}
+      />
     </main>
   )
 }

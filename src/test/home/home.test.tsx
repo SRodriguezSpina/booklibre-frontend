@@ -47,10 +47,10 @@ const librosMock = [
     }
 ]
 
-const responseMock = (libros = librosMock) => ({
+const responseMock = (libros = librosMock, totalPages = 1) => ({
     content: libros,
     page: 0,
-    totalPages: 1,
+    totalPages,
 })
 
 const emptyAdminKpiSummary = {
@@ -132,6 +132,86 @@ describe('Home', () => {
         })
 
         expect(mockedHomeService.getPopulares).toHaveBeenCalledTimes(1)
+    })
+
+    it('muestra el cartel de libros populares y oculta el paginado en la carga inicial', async () => {
+        mockedHomeService.getPopulares.mockResolvedValueOnce(responseMock(librosMock, 3))
+        renderHome()
+
+        await act(async () => {
+            await vi.runAllTimersAsync()
+        })
+
+        expect(screen.getByText('Libros más populares')).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: 'Ver más' })).toBeInTheDocument()
+        expect(screen.queryByText(/Pág\./)).not.toBeInTheDocument()
+        expect(screen.queryByRole('button', { name: '2' })).not.toBeInTheDocument()
+    })
+
+    it('al hacer click en Ver más carga el catálogo desde Mongo y habilita el paginado', async () => {
+        mockedHomeService.getPopulares.mockResolvedValueOnce(responseMock(librosMock, 3))
+        mockedHomeService.search.mockResolvedValueOnce(responseMock(librosMock, 3))
+        renderHome()
+
+        await act(async () => {
+            await vi.runAllTimersAsync()
+        })
+
+        fireEvent.click(screen.getByRole('button', { name: 'Ver más' }))
+
+        await act(async () => {
+            await vi.runAllTimersAsync()
+        })
+
+        expect(mockedHomeService.search).toHaveBeenCalledWith(
+            '', expect.anything(), 0, 10, null, 'titulo'
+        )
+        expect(screen.queryByText('Libros más populares')).not.toBeInTheDocument()
+        expect(screen.queryByRole('button', { name: 'Ver más' })).not.toBeInTheDocument()
+        expect(screen.getByRole('button', { name: 'Ver populares' })).toBeInTheDocument()
+        expect(screen.getByRole('link', { name: /Clean Code/ })).not.toHaveClass('border-primary/60')
+        expect(screen.getByRole('button', { name: '2' })).toBeInTheDocument()
+    })
+
+    it('al hacer click en Ver populares vuelve al ranking y oculta el paginado', async () => {
+        mockedHomeService.getPopulares
+            .mockResolvedValueOnce(responseMock(librosMock, 3))
+            .mockResolvedValueOnce(responseMock(librosMock, 1))
+        mockedHomeService.search.mockResolvedValueOnce(responseMock(librosMock, 3))
+        renderHome()
+
+        await act(async () => {
+            await vi.runAllTimersAsync()
+        })
+
+        fireEvent.click(screen.getByRole('button', { name: 'Ver más' }))
+
+        await act(async () => {
+            await vi.runAllTimersAsync()
+        })
+
+        fireEvent.click(screen.getByRole('button', { name: 'Ver populares' }))
+
+        await act(async () => {
+            await vi.runAllTimersAsync()
+        })
+
+        expect(mockedHomeService.getPopulares).toHaveBeenCalledTimes(2)
+        expect(screen.getByText('Libros más populares')).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: 'Ver más' })).toBeInTheDocument()
+        expect(screen.queryByRole('button', { name: 'Ver populares' })).not.toBeInTheDocument()
+        expect(screen.queryByText(/Pág\./)).not.toBeInTheDocument()
+    })
+
+    it('diferencia los libros populares con borde dorado', async () => {
+        mockedHomeService.getPopulares.mockResolvedValueOnce(responseMock(librosMock, 3))
+        renderHome()
+
+        await act(async () => {
+            await vi.runAllTimersAsync()
+        })
+
+        expect(screen.getByRole('link', { name: /Clean Code/ })).toHaveClass('border-2', 'border-primary/80')
     })
 
     it('no carga ni muestra KPIs de admin para usuarios no administradores', async () => {
