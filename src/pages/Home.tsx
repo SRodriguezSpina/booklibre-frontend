@@ -37,6 +37,7 @@ export const Home = () => {
     handleSortChange,
     handleClearFilters,
     handleVerMas,
+    handleVerPopulares,
     loadInitialCatalog,
     retrySearch,
   } = useHomeCatalog({ userId })
@@ -102,6 +103,7 @@ export const Home = () => {
             sortBy={sortBy}
             onOpenFilters={() => setIsFiltersOpen(true)}
             onSortChange={handleSortChange}
+            onViewPopular={handleVerPopulares}
           />
 
           {vistaPopulares && !loading && !error && (
@@ -153,7 +155,7 @@ export const Home = () => {
                 }`}
               >
                 {books.map((book) => (
-                  <LibroCardHome key={book.id} {...book} />
+                  <LibroCardHome key={book.id} {...book} destacado={vistaPopulares} />
                 ))}
               </div>
               {!vistaPopulares && (

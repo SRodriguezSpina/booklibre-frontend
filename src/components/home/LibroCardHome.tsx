@@ -17,6 +17,7 @@ type LibroCardProps = {
   bibliokarma: number
   estado: EstadoLibro
   duenio: string
+  destacado?: boolean
 }
 
 const estadoColor: Record<EstadoLibro, string> = {
@@ -29,15 +30,18 @@ const estadoColor: Record<EstadoLibro, string> = {
 
 export const LibroCardHome = ({
   id, imagenUrl, genero, titulo, autor, calificacion,
-  isbn, idioma, tipo, bibliokarma, estado, duenio,
+  isbn, idioma, tipo, bibliokarma, estado, duenio, destacado = false,
 }: LibroCardProps) => {
   const [imgFailed, setImgFailed] = useState(false)
   const estadoCls = estadoColor[estado] ?? "bg-surface-highest text-on-surface-variant border-accent/20"
+  const destaqueCls = destacado
+    ? "border-2 border-primary/80 shadow-[0_0_22px_rgba(247,189,72,0.24)] hover:border-primary"
+    : "border border-accent/10 hover:border-accent/30 shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
 
   return (
     <Link
       to={`/libros/${id}`}
-      className="group flex flex-col bg-surface rounded-xl overflow-hidden border border-accent/10 hover:border-accent/30 shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:-translate-y-1.5 transition-all duration-300"
+      className={`group flex flex-col bg-surface rounded-xl overflow-hidden hover:-translate-y-1.5 transition-all duration-300 ${destaqueCls}`}
     >
       {/* Portada */}
       <div className="relative w-full aspect-[2/3] overflow-hidden bg-surface-highest">

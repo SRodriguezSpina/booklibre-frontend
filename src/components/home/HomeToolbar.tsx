@@ -1,4 +1,4 @@
-import { SlidersHorizontal } from "lucide-react"
+import { SlidersHorizontal, Trophy } from "lucide-react"
 import { SortBy } from "./SortBy"
 
 type HomeToolbarProps = {
@@ -11,6 +11,7 @@ type HomeToolbarProps = {
   sortBy: string
   onOpenFilters: () => void
   onSortChange: (sort: string) => void
+  onViewPopular: () => void
 }
 
 export const HomeToolbar = ({
@@ -23,6 +24,7 @@ export const HomeToolbar = ({
   sortBy,
   onOpenFilters,
   onSortChange,
+  onViewPopular,
 }: HomeToolbarProps) => {
   return (
     <div className="flex items-center justify-between gap-3">
@@ -45,9 +47,19 @@ export const HomeToolbar = ({
 
       {/* Resultados count */}
       {!vistaPopulares && (
-        <span className="hidden md:block text-xs text-on-surface-variant/50">
-          {loading ? "Buscando..." : `${booksLength} resultado${booksLength !== 1 ? "s" : ""} · Pág. ${currentPage}/${totalPaginas}`}
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="hidden md:block text-xs text-on-surface-variant/50">
+            {loading ? "Buscando..." : `${booksLength} resultado${booksLength !== 1 ? "s" : ""} · Pág. ${currentPage}/${totalPaginas}`}
+          </span>
+          <button
+            type="button"
+            onClick={onViewPopular}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-primary/40 bg-primary/10 text-primary-light text-xs font-bold hover:border-primary/70 hover:bg-primary/15 active:scale-95 transition-all cursor-pointer"
+          >
+            <Trophy size={14} />
+            Ver populares
+          </button>
+        </div>
       )}
 
       <SortBy value={sortBy} onChange={onSortChange} />
