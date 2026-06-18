@@ -28,6 +28,7 @@ interface ReservaCardProps {
   setFechaDesde: (fecha: string) => void
   fechaHasta: string
   setFechaHasta: (fecha: string) => void
+  esAdmin?: boolean
 }
 
 const strToDate = (str: string) => new Date(str + "T12:00:00")
@@ -41,6 +42,7 @@ export const ReservaCard = ({
   setFechaDesde,
   fechaHasta,
   setFechaHasta,
+  esAdmin = false,
 }: ReservaCardProps) => {
   const [loading, setLoading] = useState(false)
   const [calendarAbierto, setCalendarAbierto] = useState(false)
@@ -101,7 +103,7 @@ export const ReservaCard = ({
     fechaDesde && fechaHasta ? calcularDiferenciaDias(fechaDesde, fechaHasta) : 0
 
   const handleReservar = async () => {
-    const usarDebug = !!(debugDesde && debugHasta)
+    const usarDebug = esAdmin && !!(debugDesde && debugHasta)
     const fechaDesdeEnvio = usarDebug ? debugDesde : fechaDesde
     const fechaHastaEnvio = usarDebug ? debugHasta : fechaHasta
     if (!fechaDesdeEnvio || !fechaHastaEnvio) return
@@ -293,63 +295,65 @@ export const ReservaCard = ({
 
           <div className="px-5 py-4 flex flex-col gap-2">
             {/* Debug fecha */}
-            <div className="border border-yellow-500/30 rounded-lg overflow-hidden">
-              <button
-                type="button"
-                onClick={() => setDebugAbierto((v) => !v)}
-                className="w-full flex items-center gap-2 px-3 py-2 bg-yellow-500/10 hover:bg-yellow-500/20 transition-colors text-left"
-              >
-                <Bug size={12} className="text-yellow-400 shrink-0" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-yellow-400">
-                  Debug
-                </span>
-                <span className="ml-auto text-[10px] text-yellow-400/60">
-                  {debugAbierto ? "▲" : "▼"}
-                </span>
-              </button>
-              {debugAbierto && (
-                <div className="px-3 py-3 flex flex-col gap-2 bg-yellow-500/5">
-                  <p className="text-[10px] text-yellow-400/70 leading-relaxed">
-                    Sobreescribe las fechas del calendario con valores exactos
-                    (fecha + hora).
-                  </p>
-                  <label className="flex flex-col gap-1">
-                    <span className="text-[10px] font-semibold text-yellow-400/80">
-                      Desde
-                    </span>
-                    <input
-                      type="datetime-local"
-                      value={debugDesde}
-                      onChange={(e) => setDebugDesde(e.target.value)}
-                      className="text-xs bg-surface-high border border-yellow-500/30 rounded px-2 py-1 text-secondary-dark focus:outline-none focus:border-yellow-400"
-                    />
-                  </label>
-                  <label className="flex flex-col gap-1">
-                    <span className="text-[10px] font-semibold text-yellow-400/80">
-                      Hasta
-                    </span>
-                    <input
-                      type="datetime-local"
-                      value={debugHasta}
-                      onChange={(e) => setDebugHasta(e.target.value)}
-                      className="text-xs bg-surface-high border border-yellow-500/30 rounded px-2 py-1 text-secondary-dark focus:outline-none focus:border-yellow-400"
-                    />
-                  </label>
-                  {(debugDesde || debugHasta) && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setDebugDesde("")
-                        setDebugHasta("")
-                      }}
-                      className="text-[10px] text-yellow-400/60 hover:text-yellow-400 text-left underline"
-                    >
-                      Limpiar override
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
+            {esAdmin && (
+              <div className="border border-yellow-500/30 rounded-lg overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setDebugAbierto((v) => !v)}
+                  className="w-full flex items-center gap-2 px-3 py-2 bg-yellow-500/10 hover:bg-yellow-500/20 transition-colors text-left"
+                >
+                  <Bug size={12} className="text-yellow-400 shrink-0" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-yellow-400">
+                    Debug
+                  </span>
+                  <span className="ml-auto text-[10px] text-yellow-400/60">
+                    {debugAbierto ? "▲" : "▼"}
+                  </span>
+                </button>
+                {debugAbierto && (
+                  <div className="px-3 py-3 flex flex-col gap-2 bg-yellow-500/5">
+                    <p className="text-[10px] text-yellow-400/70 leading-relaxed">
+                      Sobreescribe las fechas del calendario con valores exactos
+                      (fecha + hora).
+                    </p>
+                    <label className="flex flex-col gap-1">
+                      <span className="text-[10px] font-semibold text-yellow-400/80">
+                        Desde
+                      </span>
+                      <input
+                        type="datetime-local"
+                        value={debugDesde}
+                        onChange={(e) => setDebugDesde(e.target.value)}
+                        className="text-xs bg-surface-high border border-yellow-500/30 rounded px-2 py-1 text-secondary-dark focus:outline-none focus:border-yellow-400"
+                      />
+                    </label>
+                    <label className="flex flex-col gap-1">
+                      <span className="text-[10px] font-semibold text-yellow-400/80">
+                        Hasta
+                      </span>
+                      <input
+                        type="datetime-local"
+                        value={debugHasta}
+                        onChange={(e) => setDebugHasta(e.target.value)}
+                        className="text-xs bg-surface-high border border-yellow-500/30 rounded px-2 py-1 text-secondary-dark focus:outline-none focus:border-yellow-400"
+                      />
+                    </label>
+                    {(debugDesde || debugHasta) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDebugDesde("")
+                          setDebugHasta("")
+                        }}
+                        className="text-[10px] text-yellow-400/60 hover:text-yellow-400 text-left underline"
+                      >
+                        Limpiar override
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             <Boton
               tipo="primario"
@@ -357,7 +361,7 @@ export const ReservaCard = ({
               onClick={handleReservar}
               deshabilitado={
                 loading ||
-                (!(fechaDesde && fechaHasta) && !(debugDesde && debugHasta))
+                (!(fechaDesde && fechaHasta) && !(esAdmin && debugDesde && debugHasta))
               }
             >
               {loading ? "Procesando..." : "Confirmar Reserva ✓"}

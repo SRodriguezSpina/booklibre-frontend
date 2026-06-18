@@ -156,6 +156,7 @@ export const DetalleLibro = () => {
                     setFechaDesde={setFechaDesde}
                     fechaHasta={fechaHasta}
                     setFechaHasta={setFechaHasta}
+                    esAdmin={usuario?.tipoUsuario === "ADMIN"}
                   />
                 ) : (
                   <Card className="flex flex-col gap-0 overflow-hidden p-0">
