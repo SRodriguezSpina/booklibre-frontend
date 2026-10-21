@@ -6,6 +6,8 @@ WORKDIR /app
 # Usando la version de .nvmrc (lts/jod = Node 22)
 COPY package.json package-lock.json ./
 RUN npm ci
+
+COPY . .
  
 EXPOSE 5173
 
