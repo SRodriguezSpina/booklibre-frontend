@@ -12,11 +12,11 @@ export type UsuarioResponse = {
   imagenUrl?: string | null
   reservados: number
   leidos: number
+  esAdmin?: boolean
 }
 
 export type UsuarioUpdateResponse = {
   usuario: UsuarioResponse
-  token: string
 }
 
 export type UsuarioUpdateRequest = {

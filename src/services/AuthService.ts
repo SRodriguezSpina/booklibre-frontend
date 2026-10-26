@@ -8,12 +8,12 @@ class AuthService {
     const response = await axios.post<AuthResponseUsuario>(
       `${API_BASE_URL}${AUTH_PATH('login')}`,
       data,
+      { withCredentials: true },
     )
     if (response.data.success && response.data.usuario) {
       tokenService.setIdUsuario(response.data.usuario.id)
       tokenService.setNombreUsuario(response.data.usuario.nombre)
       tokenService.setTipoUsuario(response.data.usuario.tipoUsuario)
-      tokenService.setToken(response.data.token)
     }
     return response.data
   }
@@ -22,19 +22,17 @@ class AuthService {
     const response = await axios.post<AuthResponseUsuario>(
       `${API_BASE_URL}${AUTH_PATH('register')}`,
       data,
+      { withCredentials: true },
     )
-    if (response.data.token) {
-      tokenService.setToken(response.data.token)
-    }
     return response.data
   }
 
-  logout(): void {
-    tokenService.clearAll()
-  }
-
-  obtenerToken(): string | null {
-    return tokenService.getToken()
+  async logout(): Promise<void> {
+    try {
+      await axios.post(`${API_BASE_URL}${AUTH_PATH('logout')}`, {}, { withCredentials: true })
+    } finally {
+      tokenService.clearAll()
+    }
   }
 
   obtenerIdUsuarioActual(): number | null {

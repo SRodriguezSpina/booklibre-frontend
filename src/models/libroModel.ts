@@ -55,6 +55,7 @@ export interface LibroDTO {
 
 export interface PrestamoDTO {
   id: number
+  prestamoId: number
   titulo: string
   autor: string
   estado: EstadoLibro
@@ -62,13 +63,12 @@ export interface PrestamoDTO {
   propietarioNombre: string
   imagenUrl: string
   alquiladoPorId: number | null
-  alquiladoPorNombre: string
+  alquiladoPorNombre: string | null
   fechaDesde: string | null
   fechaHasta: string | null
   rating: number
   bibliokarma: number | null
-  disponibilidad: "DISPONIBLE" | "RESERVADO"
-  disponible: boolean
+  disponibilidad: boolean | null
   libroActivo: boolean
   yaCalificadoPorUsuario?: boolean
 }

@@ -39,26 +39,39 @@ const libroDTOMock: LibroDTO = {
 
 const prestamoDTOMock: PrestamoDTO = {
   id: 1,
+  prestamoId: 11,
   titulo: "1984",
   autor: "George Orwell",
   estado: "EXCELENTE",
   propietarioId: 3,
+  propietarioNombre: "Ana",
   imagenUrl: "",
   alquiladoPorId: 1,
+  alquiladoPorNombre: "Juan",
   fechaDesde: "2026-03-01",
   fechaHasta: "2026-03-20",
   rating: 0,
   bibliokarma: 1550,
+  disponibilidad: true,
+  libroActivo: true,
 }
 
 const prestamoDTOMock2: PrestamoDTO = {
   ...prestamoDTOMock,
   id: 2,
+  prestamoId: 12,
   titulo: "Dune",
   autor: "Frank Herbert",
   alquiladoPorId: 2,
   propietarioId: 1, // prestado por el usuario 1
 }
+
+const prestamosPagina = (content: PrestamoDTO[]) => ({
+  content,
+  page: 0,
+  totalPages: content.length > 0 ? 1 : 0,
+  totalElements: content.length,
+})
 
 const libroUsuarioItemMock: LibroUsuarioItemDTO = {
   id: 1,
@@ -76,7 +89,7 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   })
 
   it("llama al endpoint correcto con el usuarioId", async () => {
-    mockedApiClient.get.mockResolvedValueOnce({ data: [] } as any)
+    mockedApiClient.get.mockResolvedValueOnce({ data: prestamosPagina([]) } as any)
 
     await libroService.obtenerTodosLosPrestamos(1, "prestados-a-mi")
 
@@ -92,7 +105,7 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   })
 
   it("devuelve un array de instancias de Libro", async () => {
-    mockedApiClient.get.mockResolvedValueOnce({ data: [prestamoDTOMock] } as any)
+    mockedApiClient.get.mockResolvedValueOnce({ data: prestamosPagina([prestamoDTOMock]) } as any)
 
     const result = await libroService.obtenerTodosLosPrestamos(
       1,
@@ -104,7 +117,7 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   })
 
   it("mapea el título del préstamo correctamente", async () => {
-    mockedApiClient.get.mockResolvedValueOnce({ data: [prestamoDTOMock] } as any)
+    mockedApiClient.get.mockResolvedValueOnce({ data: prestamosPagina([prestamoDTOMock]) } as any)
 
     const result = await libroService.obtenerTodosLosPrestamos(
       1,
@@ -115,7 +128,7 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   })
 
   it("mapea fechaHasta del DTO a fechaDevolucion del Libro", async () => {
-    mockedApiClient.get.mockResolvedValueOnce({ data: [prestamoDTOMock] } as any)
+    mockedApiClient.get.mockResolvedValueOnce({ data: prestamosPagina([prestamoDTOMock]) } as any)
 
     const result = await libroService.obtenerTodosLosPrestamos(
       1,
@@ -126,7 +139,7 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
   })
 
   it("mapea alquiladoPorId correctamente", async () => {
-    mockedApiClient.get.mockResolvedValueOnce({ data: [prestamoDTOMock] } as any)
+    mockedApiClient.get.mockResolvedValueOnce({ data: prestamosPagina([prestamoDTOMock]) } as any)
 
     const result = await libroService.obtenerTodosLosPrestamos(
       1,
@@ -136,8 +149,23 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
     expect(result[0].alquiladoPorId).toBe(1)
   })
 
+  it("mapea el id de reserva y disponibilidad enviados por el backend", async () => {
+    mockedApiClient.get.mockResolvedValueOnce({
+      data: prestamosPagina([prestamoDTOMock]),
+    } as any)
+
+    const [result] = await libroService.obtenerTodosLosPrestamos(
+      1,
+      "prestados-a-mi",
+    )
+
+    expect(result.prestamoId).toBe(11)
+    expect(result.disponibilidad).toBe("DISPONIBLE")
+    expect(result.disponible).toBe(true)
+  })
+
   it("devuelve array vacío si el backend no devuelve préstamos", async () => {
-    mockedApiClient.get.mockResolvedValueOnce({ data: [] } as any)
+    mockedApiClient.get.mockResolvedValueOnce({ data: prestamosPagina([]) } as any)
 
     const result = await libroService.obtenerTodosLosPrestamos(
       1,
@@ -149,7 +177,7 @@ describe("libroService - obtenerTodosLosPrestamos", () => {
 
   it("mapea múltiples préstamos correctamente", async () => {
     mockedApiClient.get.mockResolvedValueOnce({
-      data: [prestamoDTOMock, prestamoDTOMock2],
+      data: prestamosPagina([prestamoDTOMock, prestamoDTOMock2]),
     } as any)
 
     const result = await libroService.obtenerTodosLosPrestamos(
@@ -619,7 +647,7 @@ describe("libroService - obtenerPrestamosFiltrados", () => {
 
   it("devuelve todos los libros si no hay query", async () => {
     mockedApiClient.get.mockResolvedValueOnce({
-      data: [prestamoDTOMock, prestamoDTOMock2],
+      data: prestamosPagina([prestamoDTOMock, prestamoDTOMock2]),
     } as any)
 
     const result = await libroService.obtenerPrestamosFiltrados(1)
@@ -634,7 +662,7 @@ describe("libroService - obtenerPrestamosFiltrados", () => {
 
     it("devuelve todos los libros sin query", async () => {
       mockedApiClient.get.mockResolvedValueOnce({
-        data: [prestamoDTOMock, prestamoDTOMock2],
+        data: prestamosPagina([prestamoDTOMock, prestamoDTOMock2]),
       } as any)
 
       const result = await libroService.obtenerPrestamosFiltrados(
@@ -647,7 +675,7 @@ describe("libroService - obtenerPrestamosFiltrados", () => {
 
     it("filtra por título con query", async () => {
       mockedApiClient.get.mockResolvedValueOnce({
-        data: [prestamoDTOMock, prestamoDTOMock2],
+        data: prestamosPagina([prestamoDTOMock, prestamoDTOMock2]),
       } as any)
 
       const result = await libroService.obtenerPrestamosFiltrados(
@@ -662,7 +690,7 @@ describe("libroService - obtenerPrestamosFiltrados", () => {
 
     it("filtra por autor con query", async () => {
       mockedApiClient.get.mockResolvedValueOnce({
-        data: [prestamoDTOMock, prestamoDTOMock2],
+        data: prestamosPagina([prestamoDTOMock, prestamoDTOMock2]),
       } as any)
 
       const result = await libroService.obtenerPrestamosFiltrados(
@@ -677,7 +705,7 @@ describe("libroService - obtenerPrestamosFiltrados", () => {
 
     it("la búsqueda es case-insensitive", async () => {
       mockedApiClient.get.mockResolvedValueOnce({
-        data: [prestamoDTOMock, prestamoDTOMock2],
+        data: prestamosPagina([prestamoDTOMock, prestamoDTOMock2]),
       } as any)
 
       const result = await libroService.obtenerPrestamosFiltrados(
@@ -691,7 +719,7 @@ describe("libroService - obtenerPrestamosFiltrados", () => {
 
     it("devuelve lista vacía si la query no coincide con nada", async () => {
       mockedApiClient.get.mockResolvedValueOnce({
-        data: [prestamoDTOMock, prestamoDTOMock2],
+        data: prestamosPagina([prestamoDTOMock, prestamoDTOMock2]),
       } as any)
 
       const result = await libroService.obtenerPrestamosFiltrados(

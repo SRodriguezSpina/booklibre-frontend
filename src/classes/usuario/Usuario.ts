@@ -13,6 +13,7 @@ export type UsuarioData = {
   imagenUrl?: string | null
   reservados: number
   leidos: number
+  esAdmin?: boolean
 }
 
 export type ErrorsUsuario = Partial<Record<keyof UsuarioData, string>>

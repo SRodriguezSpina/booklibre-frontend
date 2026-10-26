@@ -68,6 +68,7 @@ export class Libro {
   static fromPrestamoJson(json: PrestamoDTO): Libro {
     return new Libro({
       id: json.id,
+      prestamoId: json.prestamoId,
       titulo: json.titulo,
       autor: json.autor,
       estado: json.estado,
@@ -81,8 +82,8 @@ export class Libro {
       rating: json.rating,
       bibliokarma: json.bibliokarma ?? undefined,
       reservas: [],
-      disponibilidad: json.disponibilidad ?? "DISPONIBLE",
-      disponible: json.disponible ?? false,
+      disponibilidad: json.disponibilidad ? "DISPONIBLE" : "RESERVADO",
+      disponible: json.disponibilidad ?? false,
       libroActivo: json.libroActivo,
       yaCalificadoPorUsuario: json.yaCalificadoPorUsuario ?? false,
     })

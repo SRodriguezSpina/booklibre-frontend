@@ -4,14 +4,9 @@ import { toast } from 'react-toastify'
 import { HttpStatusCodes } from '../constants/http'
 import { tokenService } from './tokenService'
 
-export const apiClient = axios.create({ baseURL: API_BASE_URL })
-
-apiClient.interceptors.request.use((config) => {
-  const token = tokenService.getToken()
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
+export const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true,
 })
 
 apiClient.interceptors.response.use(

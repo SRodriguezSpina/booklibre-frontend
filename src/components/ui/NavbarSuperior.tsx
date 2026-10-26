@@ -5,7 +5,7 @@ import { authService } from "../../services/AuthService"
 import { useState } from "react"
 import { Avatar } from "./Avatar"
 import { useAuthContext } from "../../utils/hooks"
-import { obtenerRolesDesdeToken } from "../../utils/jwt"
+import { toast } from "react-toastify"
 
 interface NavItemProps {
   text: string
@@ -43,9 +43,7 @@ export const NavbarSuperior = () => {
   const bibliokarmas = usuario?.bibliokarmas ?? 0
   const navigate = useNavigate()
 
-  const token = localStorage.getItem("token") ?? ""
-  const roles = obtenerRolesDesdeToken(token)
-  const esAdmin = roles.includes("ROLE_ADMIN")
+  const esAdmin = usuario?.esAdmin === true
 
   const items: NavItemProps[] = [
     { text: "Inicio", to: "/home" },
@@ -60,9 +58,14 @@ export const NavbarSuperior = () => {
       : []),
   ]
 
-  const handleLogout = () => {
-    authService.logout()
-    navigate("/login")
+  const handleLogout = async () => {
+    try {
+      await authService.logout()
+    } catch (error) {
+      toast.error(authService.manejarError(error))
+    } finally {
+      navigate("/login")
+    }
   }
 
   const cerrarMenu = () => setMenuMovilAbierto(false)

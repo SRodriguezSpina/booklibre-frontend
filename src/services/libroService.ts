@@ -28,6 +28,13 @@ export type LibrosUsuarioPaginaResponse = {
   totalElements: number
 }
 
+type PrestamosPaginaResponse = {
+  content: PrestamoDTO[]
+  page: number
+  totalPages: number
+  totalElements: number
+}
+
 type LibrosUsuarioPaginaResponseRaw = {
   content: Array<LibroUsuarioItemDTO & { disponible: boolean | string }>
   page: number
@@ -38,13 +45,13 @@ type LibrosUsuarioPaginaResponseRaw = {
 export const libroService = {
   async obtenerTodosLosPrestamos(usuarioId: number, tipo: TipoPrestamo,): Promise<Libro[]> {
     const tipoReserva = tipo === "prestados-a-mi" ? "HECHAS" : "RECIBIDAS"
-    const res = await apiClient.get<PrestamoDTO[]>(`/reservas`, {
+    const res = await apiClient.get<PrestamosPaginaResponse>(`/reservas`, {
       params: {
         usuarioId,
         tipo: tipoReserva,
       },
     })
-    return res.data.map(Libro.fromPrestamoJson)
+    return res.data.content.map(Libro.fromPrestamoJson)
   },
 
   filtrarPrestamos(
