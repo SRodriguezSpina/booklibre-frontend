@@ -32,3 +32,25 @@ export function RequireTipoUsuario({permitidos,children,redirectTo = "/home"}: R
   return <>{children}</>
 }
 
+export function RequireAdmin({ children }: { children: ReactNode }) {
+  const { usuario, cargandoUsuario } = useAuthContext()
+  const location = useLocation()
+
+  if (cargandoUsuario) {
+    return (
+      <div className="flex justify-center py-20 italic text-primary font-medium">
+        Cargando...
+      </div>
+    )
+  }
+
+  if (!usuario) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />
+  }
+
+  if (!usuario.esAdmin) {
+    return <Navigate to="/home" replace />
+  }
+
+  return <>{children}</>
+}

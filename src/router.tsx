@@ -10,7 +10,7 @@ import { DetalleLibro } from "./pages/DetalleLibro"
 import { VerMasResenias } from "./pages/VerMasResenias"
 import { ConsultasAdmin } from "./pages/ConsultasAdmin.tsx"
 import { NotFound } from "./pages/NotFound"
-import { RequireTipoUsuario } from "./components/auth/RequireTipoUsuario"
+import { RequireAdmin, RequireTipoUsuario } from "./components/auth/RequireTipoUsuario"
 
 export function AppRouter() {
   return (
@@ -52,7 +52,14 @@ export function AppRouter() {
             <Route index element={<PerfilUsuario />} />
           </Route>
 
-          <Route path="consultas" element={<ConsultasAdmin />} />
+          <Route
+            path="consultas"
+            element={
+              <RequireAdmin>
+                <ConsultasAdmin />
+              </RequireAdmin>
+            }
+          />
 
           <Route path="*" element={<NotFound />} />
         </Route>
