@@ -4,6 +4,8 @@ BookLibre is a community book-lending application. Members can browse books shar
 
 This repository contains the web interface, built with React, TypeScript, and Vite. It communicates with the BookLibre API for authentication, catalogue browsing, reservations, profiles, and administrative queries.
 
+The API and backend implementation are maintained in the [BookLibre backend repository](https://github.com/SRodriguezSpina/booklibre-backend/tree/feat/ajustes-deploy).
+
 ## How it works
 
 Members can use BookLibre as a **Reader**, a **Publisher**, or both. Readers discover and reserve books; Publishers manage the books they offer. Reader & Publisher accounts combine both sets of features.
